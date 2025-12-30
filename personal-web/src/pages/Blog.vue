@@ -4,15 +4,25 @@
     <div v-if="!currentPost">
       <ul>
         <li v-for="post in posts" :key="post.slug">
-          <router-link :to="{ name: 'BlogDetail', params: { slug: post.slug } }">{{ post.title }}</router-link>
+          <router-link
+            :to="{ name: 'BlogDetail', params: { slug: post.slug } }"
+            class="post-title"
+          >
+            {{ post.title }}
+          </router-link>
+          <span v-if="post.date" class="post-date">{{ post.date }}</span>
         </li>
       </ul>
     </div>
     <div v-else>
       <button @click="goBack">返回列表</button>
       <h2>{{ currentPost.title }}</h2>
-      <div class="markdown-body">
-        <vue3-markdown-it :source="currentPost.content" />
+      <div class="markdown-body markdown-body">
+        <vue3-markdown-it
+          :source="currentPost.content"
+          :options="markdownOptions"
+          :plugins="plugins"
+        />
       </div>
     </div>
   </section>
@@ -22,17 +32,59 @@
 import { ref, watchEffect } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Vue3MarkdownIt from 'vue3-markdown-it'
+import hljs from 'highlight.js'
+import MarkdownItKatex from 'markdown-it-katex'
 
 // 自动导入所有 markdown 文件
 const modules = import.meta.glob('../markdowns/*.md', { as: 'raw', eager: true })
 
-// 解析文件名和内容，生成 slug
-const posts = Object.entries(modules).map(([path, content]) => {
-  const match = path.match(/\/([^/]+)\.md$/)
-  const slug = match ? match[1] : path
-  const title = match ? decodeURIComponent(match[1]) : path
-  return { path, slug, title, content }
-})
+// 解析文件名和内容，生成元信息（slug、标题、日期等）
+const posts = Object.entries(modules)
+  .map(([path, content]) => {
+    const match = path.match(/\/([^/]+)\.md$/)
+    const slug = match ? match[1] : path
+    const decoded = match ? decodeURIComponent(match[1]) : path
+
+    let date = null
+    let displayTitle = decoded
+
+    // 文件名形如：2025-01-01-我的第一篇博客.md
+    const dateMatch = decoded.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/)
+    if (dateMatch) {
+      date = dateMatch[1]
+      displayTitle = dateMatch[2]
+    }
+
+    // 如果 markdown 第一行有一级标题，则用它作为最终标题
+    const headingMatch = content.match(/^#\s+(.+)$/m)
+    if (headingMatch) {
+      displayTitle = headingMatch[1].trim()
+    }
+
+    const sortKey = date ?? decoded
+
+    return { path, slug, title: displayTitle, content, date, sortKey }
+  })
+  // 按日期或文件名倒序（最新的在上面）
+  .sort((a, b) => {
+    if (a.sortKey === b.sortKey) return 0
+    return a.sortKey < b.sortKey ? 1 : -1
+  })
+
+const plugins = [
+  {
+    plugin: MarkdownItKatex,
+  },
+]
+
+const markdownOptions = {
+  highlight(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
+    }
+    return hljs.highlightAuto(code).value
+  },
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -77,8 +129,14 @@ li + li {
   margin-top: 0.75rem;
 }
 
-a {
+ .post-title {
   color: #1f6feb;
+}
+
+.post-date {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
 }
 
 button {
