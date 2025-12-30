@@ -131,6 +131,7 @@ li + li {
 
  .post-title {
   color: #1f6feb;
+  font-weight: 600;
 }
 
 .post-date {
@@ -146,7 +147,8 @@ button {
 .markdown-body {
   margin-top: 1.5rem;
   font-size: 0.95rem;
-  line-height: 1.8;
+  line-height: 1.9;
+  color: #111827;
 }
 
 .markdown-body h1,
@@ -192,5 +194,19 @@ button {
   padding-left: 1rem;
   border-left: 4px solid #e5e7eb;
   color: #6b7280;
+}
+
+/* KaTeX / 数学公式排版优化 */
+.markdown-body .katex-display {
+  margin: 1.4rem 0;
+  text-align: left;
+}
+
+.markdown-body .katex-display > .katex {
+  font-size: 1.02em;
+}
+
+.markdown-body .katex {
+  line-height: 1.4;
 }
 </style>

@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "buefy": "^3.0.3",
+    "bulma": "^1.0.4",
     "d3": "^7.9.0",
     "github-markdown-css": "^5.8.1",
     "highlight.js": "^11.11.1",

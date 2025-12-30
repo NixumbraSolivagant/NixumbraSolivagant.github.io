@@ -1,31 +1,38 @@
 <script setup>
-// 无需引入 HelloWorld
 </script>
 
 <template>
   <div>
-    <nav>
-      <router-link to="/">首页</router-link> |
-      <router-link to="/blog">博客</router-link> |
-      <router-link to="/about">关于我</router-link>
-    </nav>
-    <main>
-      <router-view />
-    </main>
+    <b-navbar type="is-white" wrapper-class="container" fixed-top shadow>
+      <template #brand>
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+          <span class="has-text-weight-semibold">My Blog</span>
+        </b-navbar-item>
+      </template>
+
+      <template #end>
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+          首页
+        </b-navbar-item>
+        <b-navbar-item tag="router-link" :to="{ path: '/blog' }">
+          博客
+        </b-navbar-item>
+        <b-navbar-item tag="router-link" :to="{ path: '/about' }">
+          关于我
+        </b-navbar-item>
+      </template>
+    </b-navbar>
+
+    <section class="section main-section">
+      <div class="container">
+        <router-view />
+      </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-nav {
-  margin-bottom: 2rem;
-}
-nav a {
-  margin: 0 1rem;
-  text-decoration: none;
-  color: #42b983;
-}
-nav a.router-link-exact-active {
-  font-weight: bold;
-  color: #35495e;
+.main-section {
+  padding-top: 4.5rem;
 }
 </style>

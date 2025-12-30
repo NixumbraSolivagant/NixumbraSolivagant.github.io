@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './style.css'
+import 'bulma/css/bulma.css'
+import 'buefy/dist/buefy.css'
 import 'github-markdown-css/github-markdown.css'
 import 'highlight.js/styles/github-dark.css'
 import 'katex/dist/katex.min.css'
+import Buefy from 'buefy'
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './pages/Home.vue'
 import Blog from './pages/Blog.vue'
@@ -23,4 +26,4 @@ const router = createRouter({
   routes,
 })
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(router).use(Buefy).mount('#app')
