@@ -4,10 +4,11 @@
       <div id="zyyo-loading-center"></div>
     </div>
     <div class="zyyo-filter"></div>
+    <canvas id="three-body-canvas" class="three-body-canvas"></canvas>
 
     <div class="zyyo-main">
       <div class="zyyo-left">
-        <div class="logo" style="background-image: url(/static/img/avatar.png); background-position: center 1%;">
+        <div class="logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
           <img
             style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
             src="/static/img/logokuang.png"
@@ -47,40 +48,15 @@
           <ul id="line">
             <li>
               <div class="focus"></div>
-              <div>敬请期待</div>
-              <div>2024.1</div>
-            </li>
-            <li>
-              <div class="focus"></div>
-              <div>ICP备案成功</div>
-              <div>2023.8</div>
-            </li>
-            <li>
-              <div class="focus"></div>
-              <div>注册域名zyyo.net</div>
-              <div>2023.3</div>
-            </li>
-            <li>
-              <div class="focus"></div>
-              <div>出来后洗心革面</div>
-              <div>2021.2</div>
-            </li>
-            <li>
-              <div class="focus"></div>
-              <div>...</div>
-              <div>...</div>
-            </li>
-            <li>
-              <div class="focus"></div>
-              <div>搭建第一个网站</div>
-              <div>2018.1</div>
+              <div>搭建网站初版</div>
+              <div>2026.1.24</div>
             </li>
           </ul>
         </div>
       </div>
       <div class="zyyo-right">
         <header>
-          <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center 10%;">
+          <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
             <img
               style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
               src="/static/img/logokuang.png"
@@ -110,7 +86,7 @@
               </svg>
               <div class="iconTip">Github</div>
             </a>
-            <a class="iconItem" href="mailto:i@zyyo.net">
+            <a class="iconItem" href="mailto:Hmzemc333@outlook.com">
               <svg
                 t="1704870588438"
                 class="icon"
@@ -239,61 +215,6 @@
           </div>
           <div class="title">
             <svg
-              t="1705257422086"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="1891"
-            >
-              <path
-                d="M629.333333 202.666667v213.333333h277.333334v448h-512v-213.333333h-277.333334v-448h512z m213.333334 277.333333h-213.333334v170.666667h-170.666666v149.333333h384v-320z m-277.333334-213.333333h-384v320h213.333334v-170.666667h170.666666v-149.333333z m0 213.333333h-106.666666v106.666667h106.666666v-106.666667z"
-                p-id="1892"
-              ></path>
-            </svg>
-            project
-          </div>
-          <div class="projectList">
-            <a class="projectItem b" target="_blank" rel="noreferrer" href="https://blog.zyyo.net">
-              <div class="projectItemLeft">
-                <h1>博客</h1>
-                <p>记录摆烂日常</p>
-              </div>
-              <div class="projectItemRight">
-                <img src="/static/img/i1.png" alt="" />
-              </div>
-            </a>
-            <a class="projectItem b" target="_blank" rel="noreferrer" href="https://i.zyyo.cc">
-              <div class="projectItemLeft">
-                <h1>云盘</h1>
-                <p>存储收集文件</p>
-              </div>
-              <div class="projectItemRight">
-                <img src="/static/img/i2.png" alt="" />
-              </div>
-            </a>
-            <a class="projectItem b" target="_blank" rel="noreferrer" href="https://zyyo.cc">
-              <div class="projectItemLeft">
-                <h1>实验室</h1>
-                <p>收集有趣html作品</p>
-              </div>
-              <div class="projectItemRight">
-                <img src="/static/img/i4.png" alt="" />
-              </div>
-            </a>
-            <a class="projectItem b" target="_blank" rel="noreferrer" href="https://zyyo.cc">
-              <div class="projectItemLeft">
-                <h1>实验室</h1>
-                <p>收集有趣html作品</p>
-              </div>
-              <div class="projectItemRight">
-                <img src="/static/img/i4.png" alt="" />
-              </div>
-            </a>
-          </div>
-
-          <div class="title">
-            <svg
               t="1705257823317"
               class="icon"
               viewBox="0 0 1024 1024"
@@ -338,10 +259,7 @@
         </div>
       </div>
     </div>
-    <footer>
-      Zyyo © 2024 |
-      <a href="https://beian.miit.gov.cn/">豫ICP备2023015852号-1</a>
-    </footer>
+    <footer></footer>
     <div class="tc">
       <div class="tc-main">
         <img class="tc-img" src="" alt="" />
@@ -351,11 +269,192 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 
 const handlePop = imageUrl => {
   if (typeof window !== 'undefined' && typeof window.pop === 'function') {
     window.pop(imageUrl)
+  }
+}
+
+const backgroundImages = [
+  '/static/img/backgrounds/bg-1.png',
+  '/static/img/backgrounds/bg-2.png',
+  '/static/img/backgrounds/bg-3.png',
+  '/static/img/backgrounds/bg-4.png',
+]
+
+let backgroundIndex = 0
+let backgroundTimer = null
+let threeBodyFrame = null
+let threeBodyResize = null
+
+const applyBackground = imageUrl => {
+  const root = document.documentElement
+  root.style.setProperty('--main_bg_color', `url(${imageUrl})`)
+  updateTextColorFromBackground(`url(${imageUrl})`)
+}
+
+const startBackgroundRotation = () => {
+  if (!backgroundImages.length) return
+  applyBackground(backgroundImages[backgroundIndex])
+  backgroundTimer = window.setInterval(() => {
+    backgroundIndex = (backgroundIndex + 1) % backgroundImages.length
+    applyBackground(backgroundImages[backgroundIndex])
+  }, 12000)
+}
+
+const startThreeBodySimulation = () => {
+  const canvas = document.getElementById('three-body-canvas')
+  if (!(canvas instanceof HTMLCanvasElement)) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  const dpr = window.devicePixelRatio || 1
+  const resize = () => {
+    const width = window.innerWidth
+    const height = window.innerHeight
+    canvas.width = width * dpr
+    canvas.height = height * dpr
+    canvas.style.width = `${width}px`
+    canvas.style.height = `${height}px`
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  }
+
+  resize()
+  threeBodyResize = resize
+  window.addEventListener('resize', resize)
+
+  const createPoint = (center = null) => {
+    const width = canvas.width / dpr
+    const height = canvas.height / dpr
+    const depth = 600
+    const spread = 140
+    const origin = center ?? {
+      x: width * (0.45 + Math.random() * 0.1),
+      y: height * (0.45 + Math.random() * 0.1),
+      z: (Math.random() - 0.5) * (depth * 0.3),
+    }
+    return {
+      x: origin.x + (Math.random() - 0.5) * spread,
+      y: origin.y + (Math.random() - 0.5) * spread,
+      z: origin.z + (Math.random() - 0.5) * spread,
+      dx: (Math.random() - 0.5) * 1.4,
+      dy: (Math.random() - 0.5) * 1.4,
+      dz: (Math.random() - 0.5) * 1.2,
+      m: 80 + Math.random() * 80,
+    }
+  }
+
+  const clusterCenter = {
+    x: (canvas.width / dpr) * 0.5,
+    y: (canvas.height / dpr) * 0.5,
+    z: 0,
+  }
+  const points = [createPoint(clusterCenter), createPoint(clusterCenter), createPoint(clusterCenter)]
+  const g = 0.08
+  const minDistance = 80
+  const depth = 600
+  const fov = 500
+  const margin = 120
+
+  const step = () => {
+    const width = canvas.width / dpr
+    const height = canvas.height / dpr
+    const cx = width / 2
+    const cy = height / 2
+    const time = performance.now() * 0.001
+    ctx.clearRect(0, 0, width, height)
+
+    points.forEach(p => {
+      points.forEach(other => {
+        if (p === other) return
+        const dx = other.x - p.x
+        const dy = other.y - p.y
+        const dz = other.z - p.z
+        const r2 = dx * dx + dy * dy + dz * dz
+        const dist = Math.max(Math.sqrt(r2), minDistance)
+        const k = g * other.m / (dist * dist * dist)
+        p.dx += k * dx
+        p.dy += k * dy
+        p.dz += k * dz
+      })
+    })
+
+    points.forEach((p, index) => {
+      p.x += p.dx
+      p.y += p.dy
+      p.z += p.dz
+
+      if (
+        p.x < -margin ||
+        p.x > width + margin ||
+        p.y < -margin ||
+        p.y > height + margin ||
+        p.z < -depth ||
+        p.z > depth
+      ) {
+        points[index] = createPoint()
+        return
+      }
+
+      const scale = fov / (fov + p.z)
+      const px = (p.x - cx) * scale + cx
+      const py = (p.y - cy) * scale + cy
+      const r = Math.max(16, (Math.sqrt(p.m) / 0.9) * scale)
+      const alpha = Math.min(1, Math.max(0.4, 0.6 * scale))
+      const hue = (time * 40 + index * 120) % 360
+      ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`
+      ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.85)`
+      ctx.shadowBlur = 44 * scale
+      ctx.beginPath()
+      ctx.arc(px, py, r, 0, Math.PI * 2)
+      ctx.fill()
+    })
+
+    threeBodyFrame = requestAnimationFrame(step)
+  }
+
+  step()
+}
+
+const updateTextColorFromBackground = (imageUrl = '') => {
+  const root = document.documentElement
+  const source = imageUrl || getComputedStyle(root).getPropertyValue('--main_bg_color').trim()
+  const urlMatch = source.match(/url\((['"]?)(.*?)\1\)/)
+  if (!urlMatch) return
+
+  const image = new Image()
+  image.crossOrigin = 'anonymous'
+  image.src = urlMatch[2]
+  image.onload = () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const size = 40
+    canvas.width = size
+    canvas.height = size
+    ctx.drawImage(image, 0, 0, size, size)
+    const { data } = ctx.getImageData(0, 0, size, size)
+    let total = 0
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i]
+      const g = data[i + 1]
+      const b = data[i + 2]
+      total += 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    const brightness = total / (data.length / 4)
+    const isDark = brightness < 140
+    root.style.setProperty('--main_text_color', isDark ? '#f8fafc' : '#111827')
+    root.style.setProperty('--item_left_title_color', isDark ? '#f8fafc' : '#111827')
+    root.style.setProperty('--item_left_text_color', isDark ? '#e2e8f0' : '#4b5563')
+    root.style.setProperty('--footer_text_color', isDark ? '#e2e8f0' : '#374151')
+    root.style.setProperty('--fill', isDark ? '#ffffff' : '#111827')
+    root.style.setProperty('--text_bg_color', isDark ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.7)')
+    root.style.setProperty('--item_bg_color', isDark ? 'rgba(15, 23, 42, 0.52)' : 'rgba(255, 255, 255, 0.72)')
+    root.style.setProperty('--item_hover_color', isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)')
+    root.style.setProperty('--left_tag_item', isDark ? 'rgba(15, 23, 42, 0.55)' : 'rgba(255, 255, 255, 0.7)')
+    root.style.setProperty('--back_filter_color', isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.2)')
   }
 }
 
@@ -365,6 +464,20 @@ onMounted(() => {
     script.src = '/static/js/script.js'
     script.dataset.zyyoScript = 'true'
     document.body.appendChild(script)
+  }
+  startBackgroundRotation()
+  startThreeBodySimulation()
+})
+
+onBeforeUnmount(() => {
+  if (backgroundTimer) {
+    clearInterval(backgroundTimer)
+  }
+  if (threeBodyFrame) {
+    cancelAnimationFrame(threeBodyFrame)
+  }
+  if (threeBodyResize) {
+    window.removeEventListener('resize', threeBodyResize)
   }
 })
 </script>

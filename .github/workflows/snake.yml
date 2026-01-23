@@ -1,0 +1,30 @@
+name: Generate GitHub Snake
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate snake SVGs
+        uses: Platane/snk@v3
+        with:
+          github_user_name: NixumbraSolivagant
+          outputs: |
+            personal-web/public/static/svg/snake-Light.svg
+            personal-web/public/static/svg/snake-Dark.svg?palette=github-dark
+
+      - name: Commit snake SVGs
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "personal-web/public/static/svg/snake-*.svg"
+          message: "chore: update github snake"
+          default_author: github_actions
