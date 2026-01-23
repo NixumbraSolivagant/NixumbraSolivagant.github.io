@@ -1,9 +1,14 @@
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const showNav = computed(() => route.path !== '/')
 </script>
 
 <template>
   <div>
-    <b-navbar type="is-white" wrapper-class="container" fixed-top shadow>
+    <b-navbar v-if="showNav" type="is-white" wrapper-class="container" fixed-top shadow>
       <template #brand>
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <span class="has-text-weight-semibold">My Blog</span>
@@ -23,7 +28,9 @@
       </template>
     </b-navbar>
 
-    <section class="section main-section">
+    <router-view v-if="!showNav" />
+
+    <section v-else class="section main-section">
       <div class="container">
         <router-view />
       </div>
