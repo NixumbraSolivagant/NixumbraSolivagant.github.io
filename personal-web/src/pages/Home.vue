@@ -1,13 +1,22 @@
 <template>
   <div>
-    <div id="zyyo-loading">
-      <div id="zyyo-loading-center"></div>
-    </div>
-    <div class="zyyo-filter"></div>
-    <canvas id="three-body-canvas" class="three-body-canvas"></canvas>
+    <div class="nix-filter"></div>
+    <video
+      id="background-video"
+      class="background-video"
+      muted
+      loop
+      playsinline
+      preload="auto"
+    ></video>
+    <canvas
+      id="three-body-canvas"
+      class="three-body-canvas"
+      style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"
+    ></canvas>
 
-    <div class="zyyo-main">
-      <div class="zyyo-left">
+    <div class="nix-main">
+      <div class="nix-left">
         <div class="logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
           <img
             style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
@@ -54,7 +63,7 @@
           </ul>
         </div>
       </div>
-      <div class="zyyo-right">
+      <div class="nix-right">
         <header>
           <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
             <img
@@ -158,7 +167,7 @@
           </div>
         </header>
 
-        <div class="zyyo-content">
+        <div class="nix-content">
           <div class="title">
             <svg
               t="1705257422086"
@@ -277,30 +286,68 @@ const handlePop = imageUrl => {
   }
 }
 
-const backgroundImages = [
-  '/static/img/backgrounds/bg-1.png',
-  '/static/img/backgrounds/bg-2.png',
-  '/static/img/backgrounds/bg-3.png',
-  '/static/img/backgrounds/bg-4.png',
-]
+const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', {
+  eager: true,
+  as: 'url',
+})
+
+const backgroundMedia = Object.values(mediaModules)
+  .map(url => {
+    const normalized = typeof url === 'string' ? url.replace('/public', '') : ''
+    const lower = normalized.toLowerCase()
+    const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
+    return {
+      type: isVideo ? 'video' : 'image',
+      src: normalized,
+    }
+  })
+  .filter(item => item.src)
+  .sort((a, b) => a.src.localeCompare(b.src))
 
 let backgroundIndex = 0
 let backgroundTimer = null
 let threeBodyFrame = null
 let threeBodyResize = null
 
-const applyBackground = imageUrl => {
+const applyBackground = media => {
   const root = document.documentElement
-  root.style.setProperty('--main_bg_color', `url(${imageUrl})`)
-  updateTextColorFromBackground(`url(${imageUrl})`)
+  const video = document.getElementById('background-video')
+  if (media.type === 'video') {
+    root.style.setProperty('--main_bg_color', 'none')
+    if (video) {
+      video.style.display = 'block'
+      if (video.getAttribute('src') !== media.src) {
+        video.setAttribute('src', media.src)
+        video.load()
+      }
+      video.play().catch(() => {})
+    }
+    root.style.setProperty('--main_text_color', '#f8fafc')
+    root.style.setProperty('--item_left_title_color', '#f8fafc')
+    root.style.setProperty('--item_left_text_color', '#e2e8f0')
+    root.style.setProperty('--footer_text_color', '#e2e8f0')
+    root.style.setProperty('--fill', '#ffffff')
+    root.style.setProperty('--text_bg_color', 'rgba(0, 0, 0, 0.45)')
+    root.style.setProperty('--item_bg_color', 'rgba(15, 23, 42, 0.52)')
+    root.style.setProperty('--item_hover_color', 'rgba(15, 23, 42, 0.65)')
+    root.style.setProperty('--left_tag_item', 'rgba(15, 23, 42, 0.55)')
+    root.style.setProperty('--back_filter_color', 'rgba(0, 0, 0, 0.35)')
+    return
+  }
+  if (video) {
+    video.pause()
+    video.style.display = 'none'
+  }
+  root.style.setProperty('--main_bg_color', `url(${media.src})`)
+  updateTextColorFromBackground(`url(${media.src})`)
 }
 
 const startBackgroundRotation = () => {
-  if (!backgroundImages.length) return
-  applyBackground(backgroundImages[backgroundIndex])
+  if (!backgroundMedia.length) return
+  applyBackground(backgroundMedia[backgroundIndex])
   backgroundTimer = window.setInterval(() => {
-    backgroundIndex = (backgroundIndex + 1) % backgroundImages.length
-    applyBackground(backgroundImages[backgroundIndex])
+    backgroundIndex = (backgroundIndex + 1) % backgroundMedia.length
+    applyBackground(backgroundMedia[backgroundIndex])
   }, 12000)
 }
 
@@ -459,10 +506,10 @@ const updateTextColorFromBackground = (imageUrl = '') => {
 }
 
 onMounted(() => {
-  if (!document.querySelector('script[data-zyyo-script]')) {
+  if (!document.querySelector('script[data-nix-script]')) {
     const script = document.createElement('script')
     script.src = '/static/js/script.js'
-    script.dataset.zyyoScript = 'true'
+    script.dataset.nixScript = 'true'
     document.body.appendChild(script)
   }
   startBackgroundRotation()
