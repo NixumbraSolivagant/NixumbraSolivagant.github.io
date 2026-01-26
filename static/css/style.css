@@ -97,56 +97,7 @@ body {
 
 }
 
-#zyyo-loading {
-    background: radial-gradient(white, #d8eaff);
-    background-size: 100%;
-    background-position: center;
-
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    z-index: 999999;
-    margin-top: 0px;
-    top: 0px;
-    pointer-events: none;
-    opacity: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-
-
-#zyyo-loading-center {
-    height: 150px;
-    width: 150px;
-    position: relative;
-    border-radius: 50%;
-    background: #472eff;
-
-    animation: zoom 1s linear infinite;
-}
-
-@keyframes zoom {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 0;
-    }
-}
-
-
-
-
-.zyyo-filter {
+.nix-filter {
     position: fixed;
     width: 100%;
     height: 100%;
@@ -155,6 +106,17 @@ body {
     -webkit-backdrop-filter: blur(var(--back_filter));
     z-index: -99999999;
    
+}
+
+.background-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    display: none;
+    pointer-events: none;
 }
 
 .three-body-canvas {
@@ -166,19 +128,19 @@ body {
     pointer-events: none;
 }
 
-.zyyo-main {
+.nix-main {
     width: 100%;
     margin: 0 auto;
     transition: transform 0.5s ease;
     max-width: 1150px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction: row;
 }
 
 
-.zyyo-left {
+.nix-left {
     overflow-y: scroll;
     width: 230px;
     height: 100vh;
@@ -192,7 +154,7 @@ body {
 }
 
 
-.zyyo-left::-webkit-scrollbar {
+.nix-left::-webkit-scrollbar {
     display: none;
 }
 
@@ -307,7 +269,7 @@ body {
 
 
 
-.zyyo-right {
+.nix-right {
     width: calc(100% - 230px);
     display: flex;
     padding: 20px;
@@ -650,7 +612,7 @@ footer {
 }
 
 @media (max-width: 800px) {
-    .zyyo-left {
+    .nix-left {
         display: none;
     }
 
@@ -683,7 +645,7 @@ footer {
 
 
 
-    .zyyo-right {
+    .nix-right {
         width: 100%;
     }
 
