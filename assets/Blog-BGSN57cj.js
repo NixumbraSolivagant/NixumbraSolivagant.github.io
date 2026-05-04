@@ -1,4 +1,4 @@
-import{_ as E,N as K}from"./NavBar-CYGWzMLq.js";import{r as M,c as x,q as I,d as l,e as i,g as $,f as t,n as P,F as H,s as T,v as V,t as u,x as L,y as J,u as O,b as q,w as F,z as G}from"./vendor-vue-G8gUJyXG.js";import{M as U,a as Q,H as C,k as D}from"./vendor-md-Xgkp9oyW.js";const W=`# JavaScript 异步编程：从回调到 async/await
+import{_ as E,N as K}from"./NavBar-BNjj_7o1.js";import{r as M,c as x,q as I,d as l,e as i,g as $,f as t,n as P,F as H,s as T,v as V,t as u,x as L,y as J,u as O,b as q,w as F,z as G}from"./vendor-vue-G8gUJyXG.js";import{M as U,a as Q,H as C,k as D}from"./vendor-md-Xgkp9oyW.js";const W=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
