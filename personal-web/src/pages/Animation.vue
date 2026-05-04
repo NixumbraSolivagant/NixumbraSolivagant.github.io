@@ -1,454 +1,601 @@
 <template>
   <section class="animation-page">
-    <div class="animation-header">
-      <h1 class="page-title">动画展示</h1>
-      <p class="page-subtitle">Three.js 与 D3.js 创意可视化实验</p>
-    </div>
-
-    <div class="animation-grid">
-      <div class="animation-card">
-        <div class="card-preview three-preview">
-          <canvas id="three-canvas-1"></canvas>
+    <div class="anim-shell">
+      <nav class="blog-nav">
+        <div class="nav-inner">
+          <div class="nav-brand">Nix</div>
+          <div class="nav-links">
+            <router-link class="nav-link" to="/">主页</router-link>
+            <router-link class="nav-link" to="/blog">博客</router-link>
+            <router-link class="nav-link" to="/about">关于</router-link>
+            <router-link class="nav-link active" to="/animation">动画</router-link>
+          </div>
+          <a class="nav-cta" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
         </div>
-        <div class="card-info">
-          <h2 class="card-title">粒子星空</h2>
-          <p class="card-desc">基于 Three.js 的 3D 粒子系统，模拟星空流动效果</p>
-          <div class="card-tags">
-            <span>Three.js</span>
-            <span>粒子系统</span>
-            <span>WebGL</span>
+      </nav>
+      <div class="anim-body">
+        <div class="anim-hero">
+          <div class="anim-hero-content">
+            <div class="anim-title">动画展示</div>
+            <p class="anim-subtitle">Three.js 与 Canvas 创意可视化实验 · 点击卡片可全屏观看</p>
+          </div>
+          <div class="anim-hero-card">
+            <div class="hero-label">模块化动画</div>
+            <div class="hero-desc">每个动画独立文件，Three.js / Canvas 渲染</div>
+            <div class="hero-actions">
+              <span class="hero-pill">Three.js</span>
+              <span class="hero-pill">Canvas</span>
+              <span class="hero-pill">WebGL</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="animation-card">
-        <div class="card-preview d3-preview">
-          <div id="d3-chart-1" class="d3-container"></div>
-        </div>
-        <div class="card-info">
-          <h2 class="card-title">数据可视化</h2>
-          <p class="card-desc">使用 D3.js 绑定的交互式数据图表</p>
-          <div class="card-tags">
-            <span>D3.js</span>
-            <span>SVG</span>
-            <span>数据</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="animation-card">
-        <div class="card-preview three-preview">
-          <canvas id="three-canvas-2"></canvas>
-        </div>
-        <div class="card-info">
-          <h2 class="card-title">物理模拟</h2>
-          <p class="card-desc">刚体物理引擎与碰撞检测演示</p>
-          <div class="card-tags">
-            <span>Three.js</span>
-            <span>物理</span>
-            <span>WebGL</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="animation-card coming-soon">
-        <div class="card-preview empty-preview">
-          <div class="coming-soon-content">
-            <span class="coming-icon">✦</span>
-            <p>更多动画开发中...</p>
-          </div>
-        </div>
-        <div class="card-info">
-          <h2 class="card-title">敬请期待</h2>
-          <p class="card-desc">Three.js 与 D3.js 的更多创意可视化实验</p>
-          <div class="card-tags">
-            <span>待更新</span>
+        <div class="anim-grid-wrapper">
+          <div class="animation-grid">
+            <div
+              v-for="anim in animations"
+              :key="anim.id"
+              class="animation-card"
+              @click="openFullscreen(anim)"
+            >
+              <div class="card-preview">
+                <canvas :ref="el => setCanvasRef(anim.id, el)" class="anim-canvas"></canvas>
+                <div class="card-expand-hint">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M15 3h6m0 0v6m0-6l-7 7M9 21H3m0 0v-6m0 6l7-7"/>
+                  </svg>
+                  全屏
+                </div>
+              </div>
+              <div class="card-info">
+                <h2 class="card-title">{{ anim.title }}</h2>
+                <p class="card-desc">{{ anim.desc }}</p>
+                <div class="card-tags">
+                  <span v-for="tag in anim.tags" :key="tag">{{ tag }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="animation-note">
-      <p>这些动画使用 Web 技术栈构建，展示了前端可视化的可能性。</p>
-      <p>所有动画均运行在浏览器中，无需额外插件。</p>
-    </div>
+    <!-- Fullscreen Modal -->
+    <Teleport to="body">
+      <Transition name="modal-anim">
+        <div v-if="modal.visible" class="fs-overlay" @click.self="closeModal">
+          <div class="fs-box">
+            <div class="fs-header">
+              <div class="fs-title-group">
+                <span class="fs-title">{{ modal.title }}</span>
+                <span class="fs-subtitle">{{ modal.desc }}</span>
+              </div>
+              <button class="fs-close" @click="closeModal" aria-label="关闭">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="fs-body">
+              <canvas ref="modalCanvasRef" class="fs-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue'
-import * as THREE from 'three'
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { makeNebula } from '@/animations/nebula.js'
+import { makeWave } from '@/animations/wave.js'
+import { makeMatrix } from '@/animations/matrix.js'
+import { makeBalls } from '@/animations/balls.js'
+import { makeLife } from '@/animations/life.js'
+import { makeTorus } from '@/animations/torus.js'
 
-let animFrames = []
-let animationIds = []
+// ── Animation registry ──────────────────────────────────────────────────────
+const animations = [
+  { id: 'nebula', title: '星云粒子',   desc: '三维粒子系统，模拟宇宙星云的流动与色彩变幻',   tags: ['Three.js', '粒子系统', 'WebGL'] },
+  { id: 'wave',   title: '波形动画',   desc: '正弦波叠加与贝塞尔曲线，演绎数学之美',         tags: ['Canvas', '数学', '动画'] },
+  { id: 'matrix', title: '矩阵数字雨',  desc: '经典矩阵数字雨效果，重现赛博朋克美学',        tags: ['Canvas', '粒子', '经典'] },
+  { id: 'balls',  title: '引力弹珠',   desc: '多球体弹性碰撞与反弹物理模拟',                tags: ['Three.js', '物理', '碰撞'] },
+  { id: 'life',   title: '生命游戏',   desc: '康威生命游戏，元胞自动机的离散宇宙',            tags: ['Canvas', '元胞自动机', '模拟'] },
+  { id: 'torus',  title: '3D 旋转环面', desc: '参数化曲面与光照着色，展现拓扑之美',         tags: ['Three.js', '3D', '数学曲面'] },
+]
 
-const initThreeCanvas1 = () => {
-  const canvas = document.getElementById('three-canvas-1')
-  if (!canvas) return
+// ── Canvas refs ─────────────────────────────────────────────────────────────
+const canvasRefs = reactive({})
+const setCanvasRef = (id, el) => { if (el) canvasRefs[id] = el }
+const modalCanvasRef = ref(null)
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
+// ── Cleanup registry ─────────────────────────────────────────────────────────
+const registry = []
+const register = (cleanup) => { registry.push(cleanup); return cleanup }
+const cleanupAll = () => { registry.forEach(fn => fn()); registry.length = 0 }
 
-  const scene = new THREE.Scene()
-  const camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000)
-  camera.position.z = 5
+// ── Animation map ───────────────────────────────────────────────────────────
+const makers = { nebula: makeNebula, wave: makeWave, matrix: makeMatrix, balls: makeBalls, life: makeLife, torus: makeTorus }
 
-  const geometry = new THREE.BufferGeometry()
-  const count = 2000
-  const positions = new Float32Array(count * 3)
-  const colors = new Float32Array(count * 3)
-
-  for (let i = 0; i < count * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 12
-    positions[i + 1] = (Math.random() - 0.5) * 12
-    positions[i + 2] = (Math.random() - 0.5) * 12
-    const r = Math.random()
-    const g = Math.random()
-    const b = Math.random()
-    colors[i] = r
-    colors[i + 1] = g
-    colors[i + 2] = b
-  }
-
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-
-  const material = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.85 })
-  const points = new THREE.Points(geometry, material)
-  scene.add(points)
-
-  const handleResize = () => {
-    if (!canvas) return
-    const w = canvas.offsetWidth
-    const h = canvas.offsetHeight
-    renderer.setSize(w, h)
-    camera.aspect = w / h
-    camera.updateProjectionMatrix()
-  }
-
-  window.addEventListener('resize', handleResize)
-  animFrames.push(() => window.removeEventListener('resize', handleResize))
-
-  const animate = () => {
-    const id = requestAnimationFrame(animate)
-    animationIds.push(id)
-    points.rotation.y += 0.0008
-    points.rotation.x += 0.0003
-    renderer.render(scene, camera)
-  }
-
-  animate()
-}
-
-const initThreeCanvas2 = () => {
-  const canvas = document.getElementById('three-canvas-2')
-  if (!canvas) return
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
-
-  const scene = new THREE.Scene()
-  const camera = new THREE.PerspectiveCamera(60, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000)
-  camera.position.z = 8
-
-  const group = new THREE.Group()
-  scene.add(group)
-
-  const sphereGeo = new THREE.SphereGeometry(0.4, 32, 32)
-  const colors = [0x38bdf8, 0xbd34fe, 0xe0321b, 0x34d399, 0xf59e0b]
-  const spheres = []
-
-  for (let i = 0; i < 8; i++) {
-    const color = colors[i % colors.length]
-    const material = new THREE.MeshPhongMaterial({ color, transparent: true, opacity: 0.85 })
-    const mesh = new THREE.Mesh(sphereGeo, material)
-    mesh.position.set((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6)
-    mesh.userData = {
-      vx: (Math.random() - 0.5) * 0.02,
-      vy: (Math.random() - 0.5) * 0.02,
-      vz: (Math.random() - 0.5) * 0.02,
-    }
-    group.add(mesh)
-    spheres.push(mesh)
-  }
-
-  const handleResize = () => {
-    if (!canvas) return
-    const w = canvas.offsetWidth
-    const h = canvas.offsetHeight
-    renderer.setSize(w, h)
-    camera.aspect = w / h
-    camera.updateProjectionMatrix()
-  }
-  window.addEventListener('resize', handleResize)
-  animFrames.push(() => window.removeEventListener('resize', handleResize))
-
-  const animate = () => {
-    const id = requestAnimationFrame(animate)
-    animationIds.push(id)
-
-    spheres.forEach(s => {
-      s.position.x += s.userData.vx
-      s.position.y += s.userData.vy
-      s.position.z += s.userData.vz
-
-      const b = 3
-      if (Math.abs(s.position.x) > b) s.userData.vx *= -1
-      if (Math.abs(s.position.y) > b) s.userData.vy *= -1
-      if (Math.abs(s.position.z) > b) s.userData.vz *= -1
-    })
-
-    group.rotation.y += 0.004
-    renderer.render(scene, camera)
-  }
-
-  animate()
-}
-
-const initD3Chart = () => {
-  const container = document.getElementById('d3-chart-1')
-  if (!container) return
-
-  const d3 = window._d3
-  if (!d3) return
-
-  const w = container.offsetWidth
-  const h = container.offsetHeight || 200
-  const svg = d3.select(container).append('svg').attr('width', w).attr('height', h)
-
-  const data = [
-    { label: 'Vue', value: 42 },
-    { label: 'JS', value: 35 },
-    { label: 'CSS', value: 28 },
-    { label: 'Python', value: 22 },
-    { label: 'C++', value: 18 },
-    { label: 'Other', value: 15 },
-  ]
-
-  const maxVal = d3.max(data, d => d.value)
-  const barH = 28
-  const gap = 10
-  const startY = 10
-
-  svg.selectAll('rect')
-    .data(data)
-    .enter()
-    .append('rect')
-    .attr('x', 0)
-    .attr('y', (_, i) => startY + i * (barH + gap))
-    .attr('height', barH)
-    .attr('rx', 8)
-    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#38bdf8')
-    .attr('width', 0)
-    .transition()
-    .duration(1000)
-    .delay((_, i) => i * 120)
-    .attr('width', d => (d.value / maxVal) * (w - 80))
-
-  svg.selectAll('text.label')
-    .data(data)
-    .enter()
-    .append('text')
-    .attr('class', 'label')
-    .attr('x', 4)
-    .attr('y', (_, i) => startY + i * (barH + gap) + barH / 2 + 5)
-    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--main_text_color').trim() || '#eeeeee')
-    .attr('font-size', '13px')
-    .attr('font-weight', '600')
-    .text(d => d.label)
-
-  svg.selectAll('text.value')
-    .data(data)
-    .enter()
-    .append('text')
-    .attr('class', 'value')
-    .attr('x', w - 6)
-    .attr('y', (_, i) => startY + i * (barH + gap) + barH / 2 + 5)
-    .attr('text-anchor', 'end')
-    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--item_left_text_color').trim() || '#ffffff')
-    .attr('font-size', '12px')
-    .text(d => d.value)
-}
+// ── Mount & unmount ─────────────────────────────────────────────────────────
+let THREE = null
 
 onMounted(async () => {
-  initThreeCanvas1()
-  initThreeCanvas2()
+  const three = await import('three')
+  THREE = three
+  window._THREE = three
 
-  try {
-    const d3 = await import('d3')
-    window._d3 = d3
-    initD3Chart()
-  } catch (e) {
-    console.warn('D3 not loaded:', e)
-  }
+  animations.forEach(anim => {
+    const canvas = canvasRefs[anim.id]
+    if (canvas) register(makers[anim.id](canvas))
+  })
 })
 
-onBeforeUnmount(() => {
-  animationIds.forEach(id => cancelAnimationFrame(id))
-  animFrames.forEach(fn => fn())
-})
+onBeforeUnmount(cleanupAll)
+
+// ── Fullscreen modal ────────────────────────────────────────────────────────
+const modal = reactive({ visible: false, title: '', desc: '', animId: '' })
+
+const openFullscreen = async (anim) => {
+  cleanupAll()
+  modal.visible = true
+  modal.title = anim.title
+  modal.desc = anim.desc
+  modal.animId = anim.id
+  await nextTick()
+  const canvas = modalCanvasRef.value
+  if (!canvas) return
+  canvas.style.width = '100%'
+  canvas.style.height = '100%'
+  register(makers[anim.id](canvas))
+}
+
+const closeModal = () => {
+  cleanupAll()
+  modal.visible = false
+  animations.forEach(anim => {
+    const canvas = canvasRefs[anim.id]
+    if (canvas) register(makers[anim.id](canvas))
+  })
+}
 </script>
 
 <style scoped>
 .animation-page {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 16px 60px;
-}
-
-.animation-header {
-  text-align: center;
-  padding: 40px 0 36px;
-}
-
-.page-title {
-  font-size: 2.4rem;
-  font-weight: 800;
+  font-family: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: var(--main_text_color);
-  margin-bottom: 8px;
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: transparent;
+  min-height: 100vh;
 }
 
-.page-subtitle {
+.anim-shell {
+  padding: 0 0 88px;
+}
+
+.anim-body {
+  padding: 0 16px;
+}
+
+/* ── Navbar (mirrors Blog.vue blog-nav) ── */
+.blog-nav {
+  width: 100%;
+  margin: 0 0 24px;
+  padding: 0;
+  background: var(--item_bg_color);
+  border-radius: 0 0 16px 16px;
+  border-bottom: 1px solid var(--card_stroke_color);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  color: var(--main_text_color);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
   color: var(--item_left_text_color);
-  font-size: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
   opacity: 0.75;
+}
+
+.nav-link:hover,
+.nav-link.router-link-active,
+.nav-link.active {
+  color: var(--main_text_color);
+  background: var(--item_hover_color);
+  border-color: var(--card_stroke_color);
+  opacity: 1;
+}
+
+.nav-cta {
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--item_bg_color);
+  color: var(--main_text_color);
+  font-weight: 600;
+  border: 1px solid var(--card_stroke_color);
+  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2);
+  opacity: 0.9;
+}
+
+/* ── Hero section ── */
+.anim-hero {
+  max-width: 1400px;
+  margin: 0 auto 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 26px;
+}
+
+.anim-hero-content {
+  background: var(--item_bg_color);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.2);
+  color: var(--main_text_color);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--card_stroke_color);
+}
+
+.anim-hero-content::after {
+  content: "";
+  position: absolute;
+  inset: -45% -30% auto auto;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, var(--accent), transparent 65%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.anim-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.anim-subtitle {
+  color: var(--item_left_text_color);
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.anim-hero-card {
+  background: var(--item_bg_color);
+  border-radius: 18px;
+  padding: 26px;
+  border: 1px solid var(--card_stroke_color);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hero-label {
+  font-weight: 600;
+  color: var(--main_text_color);
+  margin-bottom: 6px;
+}
+
+.hero-desc {
+  color: var(--item_left_text_color);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-pill {
+  background: var(--item_hover_color);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--main_text_color);
+  border: 1px solid var(--card_stroke_color);
+}
+
+/* ── Grid ── */
+.anim-grid-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .animation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
 }
 
 .animation-card {
   background: var(--item_bg_color);
   border: 1px solid var(--card_stroke_color);
-  border-radius: 20px;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+  cursor: pointer;
 }
 
 .animation-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.14);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  border-color: var(--accent);
 }
 
 .card-preview {
   width: 100%;
-  height: 220px;
+  height: 200px;
   position: relative;
   overflow: hidden;
+  background: var(--item_hover_color);
 }
 
-.three-preview canvas,
-.d3-preview canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
-.d3-container {
+.anim-canvas {
   width: 100%;
   height: 100%;
-  padding: 12px 8px;
+  display: block;
 }
 
-.empty-preview {
-  background: var(--item_hover_color);
+.card-expand-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  color: #fff;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
-.coming-soon-content {
-  text-align: center;
-  color: var(--item_left_text_color);
-  opacity: 0.6;
-}
-
-.coming-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 8px;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
+.animation-card:hover .card-expand-hint {
+  opacity: 1;
 }
 
 .card-info {
-  padding: 20px 22px;
+  padding: 16px 18px;
 }
 
 .card-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--main_text_color);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .card-desc {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--item_left_text_color);
-  line-height: 1.6;
-  margin-bottom: 12px;
+  line-height: 1.5;
+  margin-bottom: 9px;
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .card-tags span {
   background: var(--item_hover_color);
   color: var(--accent_strong);
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   border: 1px solid var(--card_stroke_color);
 }
 
-.animation-note {
+/* ── Fullscreen modal ── */
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.fs-box {
   background: var(--item_bg_color);
   border: 1px solid var(--card_stroke_color);
-  border-radius: 14px;
-  padding: 20px 24px;
-  text-align: center;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+  width: min(90vw, 1100px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.animation-note p {
+.fs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--card_stroke_color);
+  flex-shrink: 0;
+}
+
+.fs-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fs-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--main_text_color);
+}
+
+.fs-subtitle {
+  font-size: 0.8rem;
   color: var(--item_left_text_color);
-  font-size: 0.9rem;
-  line-height: 1.7;
+  opacity: 0.65;
 }
 
-.animation-note p + p {
-  margin-top: 6px;
+.fs-close {
+  background: var(--item_hover_color);
+  border: 1px solid var(--card_stroke_color);
+  border-radius: 10px;
+  color: var(--item_left_text_color);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.fs-close:hover {
+  background: var(--accent);
+  color: var(--main_text_color);
+  border-color: transparent;
+}
+
+.fs-body {
+  flex: 1;
+  overflow: hidden;
+  background: var(--item_hover_color);
+}
+
+.fs-canvas {
+  width: 100%;
+  height: 65vh;
+  max-height: 600px;
+  display: block;
+}
+
+/* Modal transitions */
+.modal-anim-enter-active,
+.modal-anim-leave-active {
+  transition: opacity 0.28s ease;
+}
+.modal-anim-enter-from,
+.modal-anim-leave-to {
+  opacity: 0;
+}
+.modal-anim-enter-active .fs-box,
+.modal-anim-leave-active .fs-box {
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+.modal-anim-enter-from .fs-box {
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+}
+.modal-anim-leave-to .fs-box {
+  transform: scale(0.95) translateY(10px);
+  opacity: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .anim-hero {
+    grid-template-columns: 1fr;
+  }
+  .anim-hero-card {
+    order: -1;
+  }
+  .nav-inner {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .nav-links {
+    order: 3;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 640px) {
-  .animation-header {
-    padding: 24px 0 20px;
+  .anim-shell {
+    padding: 0 0 40px;
   }
 
-  .page-title {
-    font-size: 1.8rem;
+  .nav-inner {
+    gap: 10px;
+    padding: 12px 12px;
+  }
+
+  .anim-body {
+    padding: 0 12px;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .anim-hero-content {
+    padding: 22px;
   }
 
   .animation-grid {
     grid-template-columns: 1fr;
+  }
+
+  .fs-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .fs-box {
+    border-radius: 18px 18px 0 0;
+    width: 100%;
+    max-height: 80vh;
+  }
+
+  .fs-canvas {
+    height: 50vh;
   }
 }
 </style>

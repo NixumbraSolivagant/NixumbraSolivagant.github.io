@@ -86,11 +86,10 @@
                 <li v-if="!tocItems.length" class="toc-empty">暂无目录</li>
               </ul>
             </aside>
-            <div ref="postContentRef" class="post-content markdown-body">
-              <vue3-markdown-it
+            <div ref="postContentRef" class="post-content">
+              <MarkdownRenderer
                 :source="currentPost.content"
-                :options="markdownOptions"
-                :plugins="plugins"
+                @rendered="postContentRef => { if(postContentRef) buildToc(postContentRef) }"
               />
             </div>
           </div>
@@ -153,11 +152,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import Vue3MarkdownIt from 'vue3-markdown-it'
-import MarkdownItKatex from 'markdown-it-katex'
-import MarkdownItMark from 'markdown-it-mark'
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import hljs from 'highlight.js'
 
 // 自动导入所有 markdown 文件
@@ -233,16 +230,8 @@ const posts = Object.entries(modules)
     return a.sortKey < b.sortKey ? 1 : -1
   })
 
-const plugins = [MarkdownItKatex, MarkdownItMark]
-
-const markdownOptions = {
-  highlight(code, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
-    }
-    return hljs.highlightAuto(code).value
-  },
-}
+const plugins = []
+const markdownOptions = {}
 
 const route = useRoute()
 const router = useRouter()
@@ -263,8 +252,8 @@ function findPostBySlug(slug) {
   return posts.find(post => post.slug === slug)
 }
 
-function buildToc() {
-  const root = postContentRef.value
+function buildToc(el) {
+  const root = el ?? postContentRef.value
   if (!root) {
     tocItems.value = []
     return
@@ -288,11 +277,7 @@ function scrollToHeading(id) {
 watch(
   currentPost,
   post => {
-    if (post) {
-      nextTick(() => {
-        buildToc()
-      })
-    } else {
+    if (!post) {
       tocItems.value = []
     }
   },

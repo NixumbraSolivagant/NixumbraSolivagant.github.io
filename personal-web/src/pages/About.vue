@@ -1,5 +1,6 @@
 <template>
   <section class="about-page">
+    <NavBar />
     <div class="about-hero">
       <div class="about-avatar">
         <img src="/static/img/avatar.png" alt="Avatar" />
@@ -135,13 +136,14 @@
 </template>
 
 <script setup>
+import NavBar from '@/components/NavBar.vue'
 </script>
 
 <style scoped>
 .about-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px 60px;
+  padding: 70px 16px 60px;
 }
 
 .about-hero {
