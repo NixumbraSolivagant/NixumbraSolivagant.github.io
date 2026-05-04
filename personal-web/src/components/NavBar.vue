@@ -1,7 +1,7 @@
 <template>
   <nav class="blog-nav">
     <div class="nav-inner">
-      <router-link to="/" class="nav-brand">
+      <router-link to="/" class="nav-brand" :style="brandStyle">
         Nix
       </router-link>
 
@@ -25,6 +25,30 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+
+const brandStyle = ref({})
+let timer = null
+
+const hsl = (h, s, l) => `hsl(${h % 360}, ${s}%, ${l}%)`
+const pick = () => Math.floor(Math.random() * 360)
+
+const tick = () => {
+  const a = pick(), b = (a + 30 + pick() * 60) % 360
+  brandStyle.value = {
+    background: `linear-gradient(135deg, ${hsl(a, 80, 60)}, ${hsl(b, 80, 60)})`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  }
+}
+
+onMounted(() => {
+  tick()
+  timer = setInterval(tick, 2000)
+})
+
+onBeforeUnmount(() => clearInterval(timer))
 </script>
 
 <style scoped>
@@ -57,20 +81,12 @@
   font-size: 1.2rem;
   letter-spacing: 0.08em;
   text-decoration: none;
-  background: linear-gradient(
-    135deg,
-    #a855f7 0%,
-    #ec4899 25%,
-    #f43f5e 45%,
-    #f97316 65%,
-    #eab308 80%,
-    #22c55e 90%,
-    #06b6d4 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   flex-shrink: 0;
+  transition: filter 0.3s ease;
+}
+
+.nav-brand:hover {
+  filter: brightness(1.15);
 }
 
 .nav-links {
