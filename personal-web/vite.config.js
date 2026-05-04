@@ -15,10 +15,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-vue': ['vue', 'vue-router'],
-          'vendor-md': ['markdown-it', 'markdown-it-katex', 'highlight.js', 'katex', 'vue3-markdown-it'],
-          'vendor-ui': ['buefy', 'bulma'],
+        manualChunks(id) {
+          if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/') || id.includes('node_modules/vue-router/')) return 'vendor-vue'
+          if (id.includes('node_modules/three/')) return 'vendor-three'
+          if (id.includes('node_modules/markdown-it') || id.includes('node_modules/katex') || id.includes('node_modules/highlight.js')) return 'vendor-md'
         },
       },
     },
