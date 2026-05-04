@@ -156,9 +156,9 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Vue3MarkdownIt from 'vue3-markdown-it'
-import hljs from 'highlight.js'
 import MarkdownItKatex from 'markdown-it-katex'
 import MarkdownItMark from 'markdown-it-mark'
+import hljs from 'highlight.js'
 
 // 自动导入所有 markdown 文件
 const modules = import.meta.glob('../markdowns/*.md', { query: '?raw', import: 'default', eager: true })
@@ -233,14 +233,7 @@ const posts = Object.entries(modules)
     return a.sortKey < b.sortKey ? 1 : -1
   })
 
-const plugins = [
-  {
-    plugin: MarkdownItKatex,
-  },
-  {
-    plugin: MarkdownItMark,
-  },
-]
+const plugins = [MarkdownItKatex, MarkdownItMark]
 
 const markdownOptions = {
   highlight(code, lang) {

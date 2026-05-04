@@ -1,35 +1,36 @@
 /*
-|--svgcolor svg图标的颜色
-|--main-bg-color 主页背景
-|--main-text-color 文本颜色
-|--gradient 标题渐变颜色
-|--purple-text-color 描述紫色文本颜色
-|--text-bg-color 描述紫色文本背景颜色
-|--item-bg-color 项目背景颜色
-|--item-hover-color 项目鼠标移入颜色
-|--item-left-title-color 项目标题颜色
-|--item-left-text-color 项目描述颜色
-|--footer-text-color 底部文本颜色
-|--left-tag-item 左侧标签颜色
-|--card-filter 卡片模糊的数值（非常吃性能，低配手机会卡顿）
-|--back-filter 背景模糊的数值
-|--back-filter-color 全局阴影遮罩
-|--card-stroke-color 卡片边框颜色
-|--accent 强调色
-|--accent-strong 强调色（深色）
+| varname       | description
+|---------------|---------------------------------------------------
+| --main-bg-color | homepage background
+| --main-text-color | text color
+| --gradient     | title gradient color
+| --purple-text-color | description purple text color
+| --text-bg-color | description purple text background color
+| --item-bg-color | card background color
+| --item-hover-color | card hover color
+| --item-left-title-color | card title color
+| --item-left-text-color | card description color
+| --footer-text-color | footer text color
+| --left-tag-item | left sidebar tag color
+| --card-filter  | card blur value (performance-heavy, low-end mobile will lag)
+| --back-filter  | background blur value
+| --back-filter-color | global shadow overlay
+| --card-stroke-color | card border color
+| --accent       | accent color
+| --accent-strong | accent color (dark)
 
-主题说明：
-  主题1-3: 图片模糊背景方案（card_filter 吃性能，back_filter 建议为0）
-  主题4:   纯色背景（无模糊，性能最佳）
-  主题5:   背景模糊方案（back_filter 吃性能，card_filter 建议为0）
+Theme guide:
+  Theme 1-3: image blur background (card_filter is heavy, back_filter recommended 0)
+  Theme 4:   solid color background (best performance)
+  Theme 5:   background blur (back_filter is heavy, card_filter recommended 0)
 
-只有最下面的 html{} 块会生效，切换主题只需移动对应代码块到最下方
+Only the last html{} block below is active. Switch themes by moving a block to the bottom.
 */
 
-/* 主题1: 图片模糊背景 + 黑色透明卡片 + 白色svg */
+/* Theme 1: image blur background + dark translucent cards + white svg */
 html {
-    --name: 主题1;
-    --main_bg_color: url(../img/backgrounds/bg-1.png);
+    --name: Theme1;
+    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
     --main_text_color: #eeeeee;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
@@ -49,10 +50,10 @@ html {
     --accent_strong: #7dd3fc;
 }
 
-/* 主题2: 图片模糊背景 + 白色透明卡片 + 黑色svg */
+/* Theme 2: image blur background + white translucent cards + black svg */
 html {
-    --name: 主题2;
-    --main_bg_color: url(../img/backgrounds/bg-1.png);
+    --name: Theme2;
+    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
     --main_text_color: #000000;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
@@ -72,9 +73,9 @@ html {
     --accent_strong: #0284c7;
 }
 
-/* 主题3: 蓝色渐变 + 黑色svg */
+/* Theme 3: blue gradient + black svg */
 html {
-    --name: 主题3;
+    --name: Theme3;
     --main_bg_color: linear-gradient(50deg, #a2d1ff, #ffffff);
     --main_text_color: #000000;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
@@ -95,9 +96,9 @@ html {
     --accent_strong: #0284c7;
 }
 
-/* 主题4: 白色简约 + 黑色svg（性能最佳） */
+/* Theme 4: white minimal + black svg (best performance) */
 html {
-    --name: 主题4;
+    --name: Theme4;
     --main_bg_color: #ffffff;
     --main_text_color: #000000;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
@@ -118,10 +119,10 @@ html {
     --accent_strong: #0284c7;
 }
 
-/* 主题5: 图片模糊背景 + 黑色透明卡片 + 白色svg（back_filter 吃性能） */
+/* Theme 5: image blur background + dark translucent cards + white svg (back_filter is heavy) */
 html {
-    --name: 主题5;
-    --main_bg_color: url(../img/backgrounds/bg-1.png);
+    --name: Theme5;
+    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
     --main_text_color: #eeeeee;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
