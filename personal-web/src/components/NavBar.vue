@@ -28,27 +28,47 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const brandStyle = ref({})
-let timer = null
+let raf = null
+let phase = 0
+
+let ha = Math.random() * 360, sa = 80, la = 60
+let hb = Math.random() * 360, sb = 80, lb = 60
+let ta = ha, tb = hb
+let nextPhase = 0
+
+const lerp = (a, b, t) => a + (b - a) * t
 
 const hsl = (h, s, l) => `hsl(${h % 360}, ${s}%, ${l}%)`
-const pick = () => Math.floor(Math.random() * 360)
 
-const tick = () => {
-  const a = pick(), b = (a + 30 + pick() * 60) % 360
+const pickHue = () => Math.random() * 360
+
+const step = () => {
+  phase += 0.018
+
+  if (phase >= nextPhase) {
+    ha = ta; sa = 80; la = 60
+    hb = tb; sb = 80; lb = 60
+    ta = pickHue()
+    tb = pickHue()
+    phase = 0
+    nextPhase = 1
+  }
+
+  const t = phase < 0.5 ? 2 * phase * phase : 1 - Math.pow(-2 * phase + 2, 2) / 2
+
   brandStyle.value = {
-    background: `linear-gradient(135deg, ${hsl(a, 80, 60)}, ${hsl(b, 80, 60)})`,
+    background: `linear-gradient(135deg, ${hsl(lerp(ha, ta, t), lerp(sa, 80, t), lerp(la, 60, t))}, ${hsl(lerp(hb, tb, t), lerp(sb, 80, t), lerp(lb, 60, t))})`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
+    transition: 'none',
   }
+
+  raf = requestAnimationFrame(step)
 }
 
-onMounted(() => {
-  tick()
-  timer = setInterval(tick, 2000)
-})
-
-onBeforeUnmount(() => clearInterval(timer))
+onMounted(() => { raf = requestAnimationFrame(step) })
+onBeforeUnmount(() => cancelAnimationFrame(raf))
 </script>
 
 <style scoped>
