@@ -240,7 +240,7 @@ const initD3Chart = () => {
     .attr('y', (_, i) => startY + i * (barH + gap))
     .attr('height', barH)
     .attr('rx', 8)
-    .attr('fill', 'rgba(56, 189, 248, 0.7)')
+    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#38bdf8')
     .attr('width', 0)
     .transition()
     .duration(1000)
@@ -254,7 +254,7 @@ const initD3Chart = () => {
     .attr('class', 'label')
     .attr('x', 4)
     .attr('y', (_, i) => startY + i * (barH + gap) + barH / 2 + 5)
-    .attr('fill', '#0f172a')
+    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--main_text_color').trim() || '#eeeeee')
     .attr('font-size', '13px')
     .attr('font-weight', '600')
     .text(d => d.label)
@@ -267,7 +267,7 @@ const initD3Chart = () => {
     .attr('x', w - 6)
     .attr('y', (_, i) => startY + i * (barH + gap) + barH / 2 + 5)
     .attr('text-anchor', 'end')
-    .attr('fill', '#64748b')
+    .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--item_left_text_color').trim() || '#ffffff')
     .attr('font-size', '12px')
     .text(d => d.value)
 }
@@ -306,17 +306,18 @@ onBeforeUnmount(() => {
 .page-title {
   font-size: 2.4rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--main_text_color);
   margin-bottom: 8px;
-  background: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
+  background: var(--gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .page-subtitle {
-  color: #64748b;
+  color: var(--item_left_text_color);
   font-size: 1rem;
+  opacity: 0.75;
 }
 
 .animation-grid {
@@ -327,8 +328,8 @@ onBeforeUnmount(() => {
 }
 
 .animation-card {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: var(--item_bg_color);
+  border: 1px solid var(--card_stroke_color);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
@@ -361,7 +362,7 @@ onBeforeUnmount(() => {
 }
 
 .empty-preview {
-  background: linear-gradient(135deg, rgba(14, 116, 144, 0.08), rgba(56, 189, 248, 0.05));
+  background: var(--item_hover_color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,7 +370,8 @@ onBeforeUnmount(() => {
 
 .coming-soon-content {
   text-align: center;
-  color: #94a3b8;
+  color: var(--item_left_text_color);
+  opacity: 0.6;
 }
 
 .coming-icon {
@@ -391,13 +393,13 @@ onBeforeUnmount(() => {
 .card-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--main_text_color);
   margin-bottom: 6px;
 }
 
 .card-desc {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--item_left_text_color);
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -409,24 +411,25 @@ onBeforeUnmount(() => {
 }
 
 .card-tags span {
-  background: rgba(56, 189, 248, 0.12);
-  color: #0369a1;
+  background: var(--item_hover_color);
+  color: var(--accent_strong);
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .animation-note {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: var(--item_bg_color);
+  border: 1px solid var(--card_stroke_color);
   border-radius: 14px;
   padding: 20px 24px;
   text-align: center;
 }
 
 .animation-note p {
-  color: #64748b;
+  color: var(--item_left_text_color);
   font-size: 0.9rem;
   line-height: 1.7;
 }

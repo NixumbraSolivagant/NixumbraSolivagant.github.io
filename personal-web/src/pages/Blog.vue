@@ -39,7 +39,7 @@
 
         <div class="zhihu-container">
       <main class="zhihu-main">
-        <div v-if="!currentPost && !hasSlug" class="feed">
+        <div v-if="!isDetailView" class="feed">
           <article v-for="post in posts" :key="post.slug" class="feed-item">
             <router-link
               :to="{ name: 'BlogDetail', params: { slug: post.slug } }"
@@ -158,6 +158,7 @@ import { useRouter, useRoute } from 'vue-router'
 import Vue3MarkdownIt from 'vue3-markdown-it'
 import hljs from 'highlight.js'
 import MarkdownItKatex from 'markdown-it-katex'
+import MarkdownItMark from 'markdown-it-mark'
 
 // 自动导入所有 markdown 文件
 const modules = import.meta.glob('../markdowns/*.md', { query: '?raw', import: 'default', eager: true })
@@ -236,6 +237,9 @@ const plugins = [
   {
     plugin: MarkdownItKatex,
   },
+  {
+    plugin: MarkdownItMark,
+  },
 ]
 
 const markdownOptions = {
@@ -249,11 +253,12 @@ const markdownOptions = {
 
 const route = useRoute()
 const router = useRouter()
+
+const isDetailView = computed(() => Boolean(route.params.slug))
 const currentPost = computed(() => {
-  const slug = route.params.slug
-  return slug ? findPostBySlug(slug) : null
+  if (!route.params.slug) return null
+  return findPostBySlug(route.params.slug)
 })
-const hasSlug = computed(() => Boolean(route.params.slug))
 const postContentRef = ref(null)
 const tocItems = ref([])
 
@@ -304,14 +309,8 @@ watch(
 
 <style scoped>
 .zhihu-page {
-  --ink: #0f172a;
-  --muted: #3b4c66;
-  --accent: #38bdf8;
-  --accent-strong: #0284c7;
-  --card: rgba(255, 255, 255, 0.94);
-  --card-stroke: rgba(148, 163, 184, 0.18);
   font-family: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: var(--ink);
+  color: var(--main_text_color);
   background: transparent;
   min-height: 100vh;
 }
@@ -324,10 +323,10 @@ watch(
   width: 100%;
   margin: 0 0 24px;
   padding: 0;
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--item_bg_color);
   border-radius: 0 0 16px 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.28);
+  border-bottom: 1px solid var(--card_stroke_color);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.18);
   backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
@@ -335,7 +334,7 @@ watch(
 }
 
 .nav-inner {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 14px 16px;
   display: flex;
@@ -352,7 +351,7 @@ watch(
   font-weight: 700;
   font-size: 1.2rem;
   letter-spacing: 0.08em;
-  color: #f8fafc;
+  color: var(--main_text_color);
 }
 
 .nav-links {
@@ -364,50 +363,54 @@ watch(
 }
 
 .nav-link {
-  color: rgba(248, 250, 252, 0.7);
+  color: var(--item_left_text_color);
   text-decoration: none;
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 999px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  opacity: 0.75;
 }
 
 .nav-link:hover,
 .nav-link.router-link-active,
 .nav-link.active {
-  color: #f8fafc;
-  background: rgba(56, 189, 248, 0.2);
-  border-color: rgba(56, 189, 248, 0.6);
+  color: var(--main_text_color);
+  background: var(--item_hover_color);
+  border-color: var(--card_stroke_color);
+  opacity: 1;
 }
 
 .nav-cta {
   text-decoration: none;
   padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(248, 250, 252, 0.12);
-  color: #f8fafc;
+  background: var(--item_bg_color);
+  color: var(--main_text_color);
   font-weight: 600;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.3);
+  border: 1px solid var(--card_stroke_color);
+  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2);
+  opacity: 0.9;
 }
 
 .zhihu-hero {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto 28px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 26px;
 }
 
 .zhihu-hero-content {
-  background: linear-gradient(135deg, rgba(14, 116, 144, 0.92), rgba(56, 189, 248, 0.7));
+  background: var(--item_bg_color);
   border-radius: 20px;
   padding: 36px;
   box-shadow: 0 26px 60px rgba(15, 23, 42, 0.2);
-  color: #f8fafc;
+  color: var(--main_text_color);
   position: relative;
   overflow: hidden;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .zhihu-hero-content::after {
@@ -416,8 +419,9 @@ watch(
   inset: -45% -30% auto auto;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.5), transparent 65%);
+  background: radial-gradient(circle, var(--accent), transparent 65%);
   pointer-events: none;
+  opacity: 0.5;
 }
 
 .zhihu-title {
@@ -427,7 +431,8 @@ watch(
 }
 
 .zhihu-subtitle {
-  color: rgba(248, 250, 252, 0.8);
+  color: var(--item_left_text_color);
+  opacity: 0.8;
   margin-bottom: 20px;
 }
 
@@ -440,22 +445,26 @@ watch(
   border: none;
   padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(248, 250, 252, 0.12);
-  color: rgba(248, 250, 252, 0.85);
+  background: var(--item_hover_color);
+  color: var(--item_left_text_color);
   font-weight: 600;
   cursor: default;
+  opacity: 0.7;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .tab.active {
   background: var(--accent);
-  color: #e0f2fe;
+  color: var(--main_text_color);
+  opacity: 1;
+  border-color: transparent;
 }
 
 .zhihu-hero-card {
-  background: var(--card);
+  background: var(--item_bg_color);
   border-radius: 18px;
   padding: 26px;
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
   display: flex;
   flex-direction: column;
@@ -464,12 +473,12 @@ watch(
 
 .hero-label {
   font-weight: 600;
-  color: var(--ink);
+  color: var(--main_text_color);
   margin-bottom: 6px;
 }
 
 .hero-desc {
-  color: var(--muted);
+  color: var(--item_left_text_color);
   font-size: 0.95rem;
   margin-bottom: 16px;
 }
@@ -481,15 +490,16 @@ watch(
 }
 
 .hero-pill {
-  background: rgba(248, 250, 252, 0.8);
+  background: var(--item_hover_color);
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 0.85rem;
-  color: #0f172a;
+  color: var(--main_text_color);
+  border: 1px solid var(--card_stroke_color);
 }
 
 .zhihu-container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -503,10 +513,10 @@ watch(
 }
 
 .feed-item {
-  background: var(--card);
+  background: var(--item_bg_color);
   border-radius: 20px;
   padding: 28px 30px;
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
@@ -548,7 +558,7 @@ watch(
 
 .feed-arrow {
   font-size: 1.6rem;
-  color: var(--accent-strong);
+  color: var(--accent_strong);
   font-weight: 600;
 }
 
@@ -560,7 +570,7 @@ watch(
 }
 
 .feed-excerpt {
-  color: var(--muted);
+  color: var(--item_left_text_color);
   margin-bottom: 14px;
   line-height: 1.7;
   display: -webkit-box;
@@ -573,36 +583,39 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--item_left_text_color);
   font-size: 0.88rem;
+  opacity: 0.75;
 }
 
 .meta-tag,
 .post-tag {
-  background: rgba(56, 189, 248, 0.2);
-  color: #0369a1;
+  background: var(--item_hover_color);
+  color: var(--accent_strong);
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 0.75rem;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .meta-dot {
-  color: #9ca3af;
+  color: var(--item_left_text_color);
+  opacity: 0.5;
 }
 
 .post-view {
-  background: var(--card);
+  background: var(--item_bg_color);
   border-radius: 24px;
   padding: 36px 40px 44px;
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 26px 50px rgba(15, 23, 42, 0.12);
 }
 
 .post-empty {
-  background: var(--card);
+  background: var(--item_bg_color);
   border-radius: 20px;
   padding: 32px 36px;
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
   display: flex;
   flex-direction: column;
@@ -619,9 +632,9 @@ watch(
   position: sticky;
   top: 90px;
   align-self: start;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--item_bg_color);
   border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--card_stroke_color);
   padding: 18px 16px;
   box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
   max-height: calc(100vh - 140px);
@@ -631,7 +644,7 @@ watch(
 .toc-title {
   font-weight: 700;
   margin-bottom: 12px;
-  color: #0f172a;
+  color: var(--main_text_color);
 }
 
 .toc-list {
@@ -654,7 +667,7 @@ watch(
 .toc-link {
   border: none;
   background: transparent;
-  color: #334155;
+  color: var(--item_left_text_color);
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -664,12 +677,13 @@ watch(
 }
 
 .toc-link:hover {
-  color: var(--accent-strong);
+  color: var(--accent_strong);
 }
 
 .toc-empty {
-  color: #94a3b8;
+  color: var(--item_left_text_color);
   font-size: 0.85rem;
+  opacity: 0.6;
 }
 
 .post-header {
@@ -677,31 +691,34 @@ watch(
   flex-direction: column;
   gap: 10px;
   padding-bottom: 18px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  border-bottom: 1px solid var(--card_stroke_color);
   margin-bottom: 24px;
 }
 
 .back-btn {
   border: none;
-  background: rgba(56, 189, 248, 0.16);
-  color: #0369a1;
+  background: var(--item_hover_color);
+  color: var(--accent_strong);
   padding: 8px 14px;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 16px;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .post-title {
   font-size: 2.2rem;
   margin-bottom: 10px;
+  color: var(--main_text_color);
 }
 
 .post-meta {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--item_left_text_color);
+  opacity: 0.75;
   margin-bottom: 22px;
 }
 
@@ -717,10 +734,10 @@ watch(
 }
 
 .side-card {
-  background: var(--card);
+  background: var(--item_bg_color);
   border-radius: 18px;
   padding: 24px;
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
 }
 
@@ -736,16 +753,17 @@ watch(
   height: 52px;
   border-radius: 50%;
   background: url('/static/img/avatar.png') center 20% / cover no-repeat;
-  border: 3px solid rgba(56, 189, 248, 0.4);
+  border: 3px solid var(--accent);
 }
 
 .profile-name {
   font-weight: 700;
   font-size: 1.1rem;
+  color: var(--main_text_color);
 }
 
 .profile-desc {
-  color: var(--muted);
+  color: var(--item_left_text_color);
   font-size: 0.9rem;
 }
 
@@ -755,13 +773,13 @@ watch(
   text-align: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: var(--muted);
+  color: var(--item_left_text_color);
   font-size: 0.85rem;
 }
 
 .profile-stats strong {
   display: block;
-  color: #111827;
+  color: var(--main_text_color);
   font-size: 1rem;
 }
 
@@ -769,8 +787,8 @@ watch(
   display: block;
   text-align: center;
   padding: 10px 14px;
-  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--main_text_color);
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
@@ -779,6 +797,7 @@ watch(
 .side-title {
   font-weight: 600;
   margin-bottom: 12px;
+  color: var(--main_text_color);
 }
 
 .tag-list {
@@ -788,15 +807,16 @@ watch(
 }
 
 .tag {
-  background: rgba(15, 23, 42, 0.08);
-  color: #1f2937;
+  background: var(--item_hover_color);
+  color: var(--main_text_color);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 0.8rem;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .side-text {
-  color: var(--muted);
+  color: var(--item_left_text_color);
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -804,8 +824,8 @@ watch(
 .side-btn {
   width: 100%;
   border: none;
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--main_text_color);
   padding: 10px 12px;
   border-radius: 10px;
   font-weight: 600;
@@ -814,19 +834,21 @@ watch(
 .markdown-body {
   font-size: 1rem;
   line-height: 1.9;
-  color: var(--ink);
+  color: var(--main_text_color) !important;
 }
 
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
+  color: var(--main_text_color) !important;
   margin-top: 1.6rem;
   margin-bottom: 0.8rem;
   line-height: 1.3;
 }
 
 .markdown-body p {
+  color: var(--main_text_color) !important;
   margin: 0.75rem 0;
 }
 
@@ -840,28 +862,33 @@ watch(
   margin-top: 0.25rem;
 }
 
+.markdown-body li {
+  color: var(--main_text_color) !important;
+}
+
 .markdown-body code {
   padding: 0.18em 0.4em;
   border-radius: 6px;
-  background-color: rgba(14, 116, 144, 0.1);
-  color: #0f172a;
+  background-color: var(--item_hover_color);
+  color: var(--accent_strong) !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  border: 1px solid var(--card_stroke_color);
 }
 
 .markdown-body pre {
   padding: 1.2rem 1.4rem;
   border-radius: 14px;
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 45%), #0b1120;
-  color: #e5e7eb;
+  background: radial-gradient(circle at top left, var(--accent), transparent 45%), var(--item_hover_color);
+  color: var(--main_text_color) !important;
   overflow-x: auto;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.08);
 }
 
 .markdown-body pre code {
   background: transparent;
   padding: 0;
-  color: inherit;
+  color: inherit !important;
   font-size: 0.95rem;
 }
 
@@ -877,15 +904,15 @@ watch(
 .markdown-body blockquote {
   margin: 1rem 0;
   padding-left: 1rem;
-  border-left: 4px solid #e5e7eb;
-  color: #6b7280;
+  border-left: 4px solid var(--accent);
+  color: var(--item_left_text_color) !important;
 }
 
 .markdown-body img {
   max-width: 100%;
   border-radius: 14px;
   box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--card_stroke_color);
   margin: 1rem 0;
 }
 
@@ -895,19 +922,20 @@ watch(
   margin: 1.4rem 0;
   overflow: hidden;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--card_stroke_color);
 }
 
 .markdown-body th,
 .markdown-body td {
   padding: 0.75rem 0.9rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  border-bottom: 1px solid var(--card_stroke_color);
   text-align: left;
 }
 
 .markdown-body th {
-  background: rgba(14, 116, 144, 0.08);
+  background: var(--item_hover_color);
   font-weight: 600;
+  color: var(--main_text_color);
 }
 
 .markdown-body tr:last-child td {
@@ -916,7 +944,7 @@ watch(
 
 .markdown-body hr {
   border: none;
-  border-top: 1px dashed rgba(148, 163, 184, 0.4);
+  border-top: 1px dashed var(--card_stroke_color);
   margin: 2rem 0;
 }
 
@@ -924,8 +952,8 @@ watch(
   margin: 1.6rem 0;
   padding: 1rem 1.2rem;
   border-radius: 12px;
-  background: rgba(14, 116, 144, 0.08);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--item_hover_color);
+  border: 1px solid var(--card_stroke_color);
   overflow-x: auto;
   text-align: left;
 }
@@ -942,10 +970,18 @@ watch(
 .markdown-body canvas {
   max-width: 100%;
   border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--item_hover_color);
+  border: 1px solid var(--card_stroke_color);
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
   margin: 1rem 0;
+}
+
+.markdown-body mark {
+  background-color: rgba(56, 189, 248, 0.2);
+  color: var(--accent_strong) !important;
+  padding: 0.1em 0.3em;
+  border-radius: 5px;
+  font-weight: 600;
 }
 
 @media (max-width: 1024px) {

@@ -779,3 +779,25 @@ footer {
         display: none;
     }
 }
+
+/* Override github-markdown-css to respect theme variables */
+:root,
+[data-theme] {
+    --fgColor-default: var(--main_text_color);
+    --fgColor-muted: var(--item_left_text_color);
+    --bgColor-default: transparent;
+}
+
+.markdown-body,
+.markdown-body[data-theme],
+:root[data-theme] .markdown-body {
+    background-color: transparent !important;
+}
+
+.markdown-body,
+.markdown-body[data-theme=dark],
+.markdown-body[data-theme=light],
+:root[data-theme=dark] .markdown-body,
+:root[data-theme=light] .markdown-body {
+    color: var(--main_text_color) !important;
+}

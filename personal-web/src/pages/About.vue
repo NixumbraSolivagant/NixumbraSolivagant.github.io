@@ -6,8 +6,8 @@
         <div class="avatar-ring"></div>
       </div>
       <div class="about-intro">
-        <h1 class="about-name">Mingzhang HU</h1>
-        <p class="about-subtitle">胡明章 · 计算机专业学生</p>
+        <h1 class="about-name">胡明璋</h1>
+        <p class="about-subtitle">Mingzhang HU · 计算机专业学生</p>
         <p class="about-location">
           <svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor">
             <path d="M512 249.976471c-99.388235 0-180.705882 81.317647-180.705882 180.705882s81.317647 180.705882 180.705882 180.705882 180.705882-81.317647 180.705882-180.705882-81.317647-180.705882-180.705882-180.705882z m0 301.17647c-66.258824 0-120.470588-54.211765-120.470588-120.470588s54.211765-120.470588 120.470588-120.470588 120.470588 54.211765 120.470588 120.470588-54.211765 120.470588-120.470588 120.470588z"/>
@@ -139,7 +139,7 @@
 
 <style scoped>
 .about-page {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px 60px;
 }
@@ -149,7 +149,7 @@
   align-items: center;
   gap: 32px;
   padding: 40px 0 32px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  border-bottom: 1px solid var(--card_stroke_color);
   margin-bottom: 32px;
 }
 
@@ -186,12 +186,12 @@
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 4px;
-  color: #0f172a;
+  color: var(--main_text_color);
 }
 
 .about-subtitle {
   font-size: 1rem;
-  color: #64748b;
+  color: var(--item_left_text_color);
   margin-bottom: 8px;
 }
 
@@ -199,9 +199,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #94a3b8;
+  color: var(--item_left_text_color);
   font-size: 0.9rem;
   margin-bottom: 16px;
+  opacity: 0.75;
 }
 
 .about-links {
@@ -226,13 +227,16 @@
 }
 
 .github {
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--item_bg_color);
+  color: var(--main_text_color);
+  border: 1px solid var(--card_stroke_color);
 }
 
 .mail {
-  background: rgba(56, 189, 248, 0.15);
-  color: #0369a1;
+  background: var(--item_bg_color);
+  color: var(--main_text_color);
+  border: 1px solid var(--card_stroke_color);
+  opacity: 0.85;
 }
 
 .about-body {
@@ -253,16 +257,16 @@
   gap: 8px;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--main_text_color);
 }
 
 .section-title svg {
-  color: #0369a1;
+  color: var(--accent);
 }
 
 .about-card {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: var(--item_bg_color);
+  border: 1px solid var(--card_stroke_color);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
@@ -272,7 +276,7 @@
 }
 
 .about-card p {
-  color: #334155;
+  color: var(--item_left_text_color);
   line-height: 1.8;
   font-size: 0.95rem;
 }
@@ -286,7 +290,7 @@
 .skill-category h3 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--main_text_color);
   margin-bottom: 10px;
 }
 
@@ -297,8 +301,8 @@
 }
 
 .skill-tag {
-  background: rgba(56, 189, 248, 0.12);
-  color: #0369a1;
+  background: var(--item_hover_color);
+  color: var(--main_text_color);
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 0.82rem;
@@ -312,11 +316,11 @@
 }
 
 .hobby-item {
-  background: rgba(15, 23, 42, 0.04);
+  background: var(--item_hover_color);
   border-radius: 14px;
   padding: 18px 14px;
   text-align: center;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--card_stroke_color);
 }
 
 .hobby-icon {
@@ -327,13 +331,13 @@
 .hobby-item h3 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--main_text_color);
   margin-bottom: 4px;
 }
 
 .hobby-item p {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--item_left_text_color);
 }
 
 .contact-card {
@@ -348,13 +352,14 @@
 
 .contact-label {
   font-weight: 700;
-  color: #64748b;
+  color: var(--item_left_text_color);
   font-size: 0.85rem;
   min-width: 48px;
+  opacity: 0.7;
 }
 
 .contact-value {
-  color: #0369a1;
+  color: var(--accent_strong);
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
@@ -365,11 +370,12 @@
 }
 
 .contact-note {
-  color: #94a3b8;
+  color: var(--item_left_text_color);
   font-size: 0.85rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  border-top: 1px solid var(--card_stroke_color);
   padding-top: 12px;
   margin-top: 4px;
+  opacity: 0.75;
 }
 
 @media (max-width: 640px) {

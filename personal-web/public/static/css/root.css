@@ -14,6 +14,9 @@
 |--card-filter 卡片模糊的数值（非常吃性能，低配手机会卡顿）
 |--back-filter 背景模糊的数值
 |--back-filter-color 全局阴影遮罩
+|--card-stroke-color 卡片边框颜色
+|--accent 强调色
+|--accent-strong 强调色（深色）
 
 主题说明：
   主题1-3: 图片模糊背景方案（card_filter 吃性能，back_filter 建议为0）
@@ -41,6 +44,9 @@ html {
     --back_filter: 0px;
     --back_filter_color: #00000030;
     --fill: #ffffff;
+    --card_stroke_color: rgba(255, 255, 255, 0.2);
+    --accent: #38bdf8;
+    --accent_strong: #7dd3fc;
 }
 
 /* 主题2: 图片模糊背景 + 白色透明卡片 + 黑色svg */
@@ -61,6 +67,9 @@ html {
     --back_filter: 20px;
     --back_filter_color: #00000030;
     --fill: #000000;
+    --card_stroke_color: rgba(148, 163, 184, 0.18);
+    --accent: #38bdf8;
+    --accent_strong: #0284c7;
 }
 
 /* 主题3: 蓝色渐变 + 黑色svg */
@@ -81,6 +90,9 @@ html {
     --back_filter: 0px;
     --back_filter_color: #00000000;
     --fill: #000000;
+    --card_stroke_color: rgba(148, 163, 184, 0.18);
+    --accent: #38bdf8;
+    --accent_strong: #0284c7;
 }
 
 /* 主题4: 白色简约 + 黑色svg（性能最佳） */
@@ -101,6 +113,9 @@ html {
     --back_filter: 0px;
     --back_filter_color: #00000000;
     --fill: #000000;
+    --card_stroke_color: rgba(148, 163, 184, 0.18);
+    --accent: #38bdf8;
+    --accent_strong: #0284c7;
 }
 
 /* 主题5: 图片模糊背景 + 黑色透明卡片 + 白色svg（back_filter 吃性能） */
@@ -121,4 +136,7 @@ html {
     --back_filter: 19px;
     --back_filter_color: #00000030;
     --fill: #ffffff;
+    --card_stroke_color: rgba(255, 255, 255, 0.2);
+    --accent: #38bdf8;
+    --accent_strong: #7dd3fc;
 }

@@ -1,18 +1,8 @@
 <template>
   <div>
-    <div class="nix-filter"></div>
-    <video
-      id="background-video"
-      class="background-video"
-      muted
-      loop
-      playsinline
-      preload="auto"
-    ></video>
     <canvas
       id="three-body-canvas"
       class="three-body-canvas"
-      style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"
     ></canvas>
 
     <div class="nix-main">
@@ -78,7 +68,7 @@
             />
           </div>
           <div class="welcome">
-            Hello I' m <span class="gradientText">Mingzhang HU</span>
+            Hello I'm <span class="gradientText">胡明璋</span>
           </div>
           <div class="description">👦 <span class="purpleText">Computer</span> Student</div>
           <div class="description">📝 待补充</div>
@@ -291,27 +281,6 @@ const handlePop = imageUrl => {
   }
 }
 
-const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', {
-  query: '?url',
-  import: 'default',
-  eager: true,
-})
-
-const backgroundMedia = Object.values(mediaModules)
-  .map(url => {
-    const normalized = typeof url === 'string' ? url.replace('/public', '') : ''
-    const lower = normalized.toLowerCase()
-    const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
-    return {
-      type: isVideo ? 'video' : 'image',
-      src: normalized,
-    }
-  })
-  .filter(item => item.src)
-  .sort((a, b) => a.src.localeCompare(b.src))
-
-let backgroundIndex = 0
-let backgroundTimer = null
 let threeBodyFrame = null
 let threeBodyResize = null
 let quoteTimer = null
@@ -337,52 +306,10 @@ const fetchQuote = async () => {
       text,
       author: data.from_who?.trim() || data.from?.trim() || '佚名',
     }
-  } catch (error) {
+  } catch {
     quoteIndex.value = (quoteIndex.value + 1) % fallbackQuotes.length
     currentQuote.value = fallbackQuotes[quoteIndex.value]
   }
-}
-
-const applyBackground = media => {
-  const root = document.documentElement
-  const video = document.getElementById('background-video')
-  if (media.type === 'video') {
-    root.style.setProperty('--main_bg_color', 'none')
-    if (video) {
-      video.style.display = 'block'
-      if (video.getAttribute('src') !== media.src) {
-        video.setAttribute('src', media.src)
-        video.load()
-      }
-      video.play().catch(() => {})
-    }
-    root.style.setProperty('--main_text_color', '#f8fafc')
-    root.style.setProperty('--item_left_title_color', '#f8fafc')
-    root.style.setProperty('--item_left_text_color', '#e2e8f0')
-    root.style.setProperty('--footer_text_color', '#e2e8f0')
-    root.style.setProperty('--fill', '#ffffff')
-    root.style.setProperty('--text_bg_color', 'rgba(0, 0, 0, 0.45)')
-    root.style.setProperty('--item_bg_color', 'rgba(15, 23, 42, 0.52)')
-    root.style.setProperty('--item_hover_color', 'rgba(15, 23, 42, 0.65)')
-    root.style.setProperty('--left_tag_item', 'rgba(15, 23, 42, 0.55)')
-    root.style.setProperty('--back_filter_color', 'rgba(0, 0, 0, 0.35)')
-    return
-  }
-  if (video) {
-    video.pause()
-    video.style.display = 'none'
-  }
-  root.style.setProperty('--main_bg_color', `url(${media.src})`)
-  updateTextColorFromBackground(`url(${media.src})`)
-}
-
-const startBackgroundRotation = () => {
-  if (!backgroundMedia.length) return
-  applyBackground(backgroundMedia[backgroundIndex])
-  backgroundTimer = window.setInterval(() => {
-    backgroundIndex = (backgroundIndex + 1) % backgroundMedia.length
-    applyBackground(backgroundMedia[backgroundIndex])
-  }, 12000)
 }
 
 const startThreeBodySimulation = () => {
@@ -499,46 +426,6 @@ const startThreeBodySimulation = () => {
   step()
 }
 
-const updateTextColorFromBackground = (imageUrl = '') => {
-  const root = document.documentElement
-  const source = imageUrl || getComputedStyle(root).getPropertyValue('--main_bg_color').trim()
-  const urlMatch = source.match(/url\((['"]?)(.*?)\1\)/)
-  if (!urlMatch) return
-
-  const image = new Image()
-  image.crossOrigin = 'anonymous'
-  image.src = urlMatch[2]
-  image.onload = () => {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    const size = 40
-    canvas.width = size
-    canvas.height = size
-    ctx.drawImage(image, 0, 0, size, size)
-    const { data } = ctx.getImageData(0, 0, size, size)
-    let total = 0
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i]
-      const g = data[i + 1]
-      const b = data[i + 2]
-      total += 0.2126 * r + 0.7152 * g + 0.0722 * b
-    }
-    const brightness = total / (data.length / 4)
-    const isDark = brightness < 140
-    root.style.setProperty('--main_text_color', isDark ? '#f8fafc' : '#111827')
-    root.style.setProperty('--item_left_title_color', isDark ? '#f8fafc' : '#111827')
-    root.style.setProperty('--item_left_text_color', isDark ? '#e2e8f0' : '#4b5563')
-    root.style.setProperty('--footer_text_color', isDark ? '#e2e8f0' : '#374151')
-    root.style.setProperty('--fill', isDark ? '#ffffff' : '#111827')
-    root.style.setProperty('--text_bg_color', isDark ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.7)')
-    root.style.setProperty('--item_bg_color', isDark ? 'rgba(15, 23, 42, 0.52)' : 'rgba(255, 255, 255, 0.72)')
-    root.style.setProperty('--item_hover_color', isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)')
-    root.style.setProperty('--left_tag_item', isDark ? 'rgba(15, 23, 42, 0.55)' : 'rgba(255, 255, 255, 0.7)')
-    root.style.setProperty('--back_filter_color', isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.2)')
-  }
-}
-
 onMounted(() => {
   if (!document.querySelector('script[data-nix-script]')) {
     const script = document.createElement('script')
@@ -546,7 +433,6 @@ onMounted(() => {
     script.dataset.nixScript = 'true'
     document.body.appendChild(script)
   }
-  startBackgroundRotation()
   startThreeBodySimulation()
   fetchQuote()
   quoteTimer = window.setInterval(() => {
@@ -555,17 +441,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (backgroundTimer) {
-    clearInterval(backgroundTimer)
-  }
-  if (threeBodyFrame) {
-    cancelAnimationFrame(threeBodyFrame)
-  }
-  if (threeBodyResize) {
-    window.removeEventListener('resize', threeBodyResize)
-  }
-  if (quoteTimer) {
-    clearInterval(quoteTimer)
-  }
+  if (threeBodyFrame) cancelAnimationFrame(threeBodyFrame)
+  if (threeBodyResize) window.removeEventListener('resize', threeBodyResize)
+  if (quoteTimer) clearInterval(quoteTimer)
 })
 </script>
