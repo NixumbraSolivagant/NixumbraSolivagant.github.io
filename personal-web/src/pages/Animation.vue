@@ -1,20 +1,7 @@
 <template>
   <section class="animation-page">
+    <NavBar />
     <div class="anim-shell">
-      <nav class="blog-nav">
-        <div class="nav-inner">
-          <div class="nav-brand">Nix</div>
-          <div class="nav-links">
-            <router-link class="nav-link" to="/">主页</router-link>
-            <router-link class="nav-link" to="/blog">博客</router-link>
-            <router-link class="nav-link" to="/about">关于</router-link>
-            <router-link class="nav-link active" to="/animation">动画</router-link>
-          </div>
-          <a class="nav-cta" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
-            GitHub
-          </a>
-        </div>
-      </nav>
       <div class="anim-body">
         <div class="anim-hero">
           <div class="anim-hero-content">
@@ -90,6 +77,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import NavBar from '@/components/NavBar.vue'
 import { makeNebula } from '@/animations/nebula.js'
 import { makeWave } from '@/animations/wave.js'
 import { makeMatrix } from '@/animations/matrix.js'
@@ -177,78 +165,6 @@ const closeModal = () => {
 
 .anim-body {
   padding: 0 16px;
-}
-
-/* ── Navbar (mirrors Blog.vue blog-nav) ── */
-.blog-nav {
-  width: 100%;
-  margin: 0 0 24px;
-  padding: 0;
-  background: var(--item_bg_color);
-  border-radius: 0 0 16px 16px;
-  border-bottom: 1px solid var(--card_stroke_color);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.18);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.nav-inner {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.nav-brand {
-  font-weight: 700;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  color: var(--main_text_color);
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex: 1;
-  justify-content: center;
-}
-
-.nav-link {
-  color: var(--item_left_text_color);
-  text-decoration: none;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 999px;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  opacity: 0.75;
-}
-
-.nav-link:hover,
-.nav-link.router-link-active,
-.nav-link.active {
-  color: var(--main_text_color);
-  background: var(--item_hover_color);
-  border-color: var(--card_stroke_color);
-  opacity: 1;
-}
-
-.nav-cta {
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--item_bg_color);
-  color: var(--main_text_color);
-  font-weight: 600;
-  border: 1px solid var(--card_stroke_color);
-  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2);
-  opacity: 0.9;
 }
 
 /* ── Hero section ── */

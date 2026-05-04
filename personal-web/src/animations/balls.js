@@ -5,6 +5,8 @@
  */
 export function makeBalls(canvas) {
   const THREE = window._THREE
+  canvas.width = canvas.offsetWidth
+  canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
