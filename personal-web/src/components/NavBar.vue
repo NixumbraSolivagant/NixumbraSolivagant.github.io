@@ -1,7 +1,7 @@
 <template>
   <nav class="blog-nav">
     <div class="nav-inner">
-      <router-link to="/" class="nav-brand" :style="brandStyle">
+      <router-link to="/" class="nav-brand">
         Nix
       </router-link>
 
@@ -25,50 +25,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-
-const brandStyle = ref({})
-let raf = null
-let phase = 0
-
-let ha = Math.random() * 360, sa = 80, la = 60
-let hb = Math.random() * 360, sb = 80, lb = 60
-let ta = ha, tb = hb
-let nextPhase = 0
-
-const lerp = (a, b, t) => a + (b - a) * t
-
-const hsl = (h, s, l) => `hsl(${h % 360}, ${s}%, ${l}%)`
-
-const pickHue = () => Math.random() * 360
-
-const step = () => {
-  phase += 0.018
-
-  if (phase >= nextPhase) {
-    ha = ta; sa = 80; la = 60
-    hb = tb; sb = 80; lb = 60
-    ta = pickHue()
-    tb = pickHue()
-    phase = 0
-    nextPhase = 1
-  }
-
-  const t = phase < 0.5 ? 2 * phase * phase : 1 - Math.pow(-2 * phase + 2, 2) / 2
-
-  brandStyle.value = {
-    background: `linear-gradient(135deg, ${hsl(lerp(ha, ta, t), lerp(sa, 80, t), lerp(la, 60, t))}, ${hsl(lerp(hb, tb, t), lerp(sb, 80, t), lerp(lb, 60, t))})`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    transition: 'none',
-  }
-
-  raf = requestAnimationFrame(step)
-}
-
-onMounted(() => { raf = requestAnimationFrame(step) })
-onBeforeUnmount(() => cancelAnimationFrame(raf))
 </script>
 
 <style scoped>
@@ -102,11 +58,35 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
   letter-spacing: 0.08em;
   text-decoration: none;
   flex-shrink: 0;
+  background: linear-gradient(
+    90deg,
+    hsl(280, 80%, 60%),
+    hsl(320, 80%, 60%),
+    hsl(0,   80%, 60%),
+    hsl(40,  80%, 60%),
+    hsl(80,  80%, 60%),
+    hsl(140, 80%, 60%),
+    hsl(200, 80%, 60%),
+    hsl(260, 80%, 60%),
+    hsl(280, 80%, 60%)
+  );
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: brand-rainbow 6s ease-in-out infinite;
   transition: filter 0.3s ease;
 }
 
 .nav-brand:hover {
   filter: brightness(1.15);
+}
+
+@keyframes brand-rainbow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .nav-links {
