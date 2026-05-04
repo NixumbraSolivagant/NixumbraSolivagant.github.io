@@ -6,10 +6,11 @@ import 'github-markdown-css/github-markdown.css'
 import 'highlight.js/styles/github-dark.css'
 import 'katex/dist/katex.min.css'
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from './pages/Home.vue'
-import Blog from './pages/Blog.vue'
-import About from './pages/About.vue'
-import Animation from './pages/Animation.vue'
+
+const Home = () => import('./pages/Home.vue')
+const Blog = () => import('./pages/Blog.vue')
+const About = () => import('./pages/About.vue')
+const Animation = () => import('./pages/Animation.vue')
 
 const routes = [
   { path: '/', component: Home },
@@ -22,6 +23,9 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 createApp(App).use(router).mount('#app')

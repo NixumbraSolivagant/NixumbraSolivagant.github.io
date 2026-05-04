@@ -65,6 +65,11 @@
       </div>
       <div class="nix-right">
         <header>
+          <div class="quote-panel">
+            <span class="quote-label">今日名言</span>
+            <p class="quote-text">“{{ currentQuote.text }}”</p>
+            <div class="quote-author">— {{ currentQuote.author }}</div>
+          </div>
           <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
             <img
               style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
@@ -278,7 +283,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const handlePop = imageUrl => {
   if (typeof window !== 'undefined' && typeof window.pop === 'function') {
@@ -287,8 +292,9 @@ const handlePop = imageUrl => {
 }
 
 const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', {
+  query: '?url',
+  import: 'default',
   eager: true,
-  as: 'url',
 })
 
 const backgroundMedia = Object.values(mediaModules)
@@ -308,6 +314,34 @@ let backgroundIndex = 0
 let backgroundTimer = null
 let threeBodyFrame = null
 let threeBodyResize = null
+let quoteTimer = null
+
+const fallbackQuotes = [
+  { text: '天才是99%的努力加上1%的灵感。', author: '爱迪生' },
+  { text: '生活的理想，就是为了理想的生活。', author: '张闻天' },
+  { text: '知者不惑，仁者不忧，勇者不惧。', author: '孔子' },
+  { text: '成功并非终点，勇气才是继续前行的真正力量。', author: '丘吉尔' },
+  { text: '要成就伟业，除了梦想，必须行动。', author: '安纳托尔·法朗士' },
+]
+const quoteIndex = ref(0)
+const currentQuote = ref(fallbackQuotes[0])
+
+const fetchQuote = async () => {
+  try {
+    const response = await fetch('https://v1.hitokoto.cn/?encode=json')
+    if (!response.ok) throw new Error('Quote response error')
+    const data = await response.json()
+    const text = data.hitokoto?.trim()
+    if (!text) throw new Error('Quote content empty')
+    currentQuote.value = {
+      text,
+      author: data.from_who?.trim() || data.from?.trim() || '佚名',
+    }
+  } catch (error) {
+    quoteIndex.value = (quoteIndex.value + 1) % fallbackQuotes.length
+    currentQuote.value = fallbackQuotes[quoteIndex.value]
+  }
+}
 
 const applyBackground = media => {
   const root = document.documentElement
@@ -514,6 +548,10 @@ onMounted(() => {
   }
   startBackgroundRotation()
   startThreeBodySimulation()
+  fetchQuote()
+  quoteTimer = window.setInterval(() => {
+    fetchQuote()
+  }, 9000)
 })
 
 onBeforeUnmount(() => {
@@ -525,6 +563,9 @@ onBeforeUnmount(() => {
   }
   if (threeBodyResize) {
     window.removeEventListener('resize', threeBodyResize)
+  }
+  if (quoteTimer) {
+    clearInterval(quoteTimer)
   }
 })
 </script>

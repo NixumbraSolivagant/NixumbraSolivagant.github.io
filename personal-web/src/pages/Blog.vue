@@ -39,7 +39,7 @@
 
         <div class="zhihu-container">
       <main class="zhihu-main">
-        <div v-if="!currentPost" class="feed">
+        <div v-if="!currentPost && !hasSlug" class="feed">
           <article v-for="post in posts" :key="post.slug" class="feed-item">
             <router-link
               :to="{ name: 'BlogDetail', params: { slug: post.slug } }"
@@ -47,7 +47,7 @@
             >
               <div class="feed-content">
                 <h2 class="feed-title">{{ post.title }}</h2>
-                <p class="feed-excerpt">{{ getExcerpt(post.content) }}</p>
+                <p class="feed-excerpt">{{ post.excerpt }}</p>
               </div>
               <div class="feed-footer">
                 <div class="feed-meta">
@@ -55,14 +55,14 @@
                   <span class="meta-dot">·</span>
                   <span class="meta-date">{{ post.date || '未标注日期' }}</span>
                   <span class="meta-dot">·</span>
-                  <span class="meta-read">阅读更多</span>
+                  <span class="meta-read">阅读 {{ post.readMinutes }} 分钟</span>
                 </div>
                 <span class="feed-arrow">→</span>
               </div>
             </router-link>
           </article>
         </div>
-        <div v-else class="post-view">
+        <div v-else-if="currentPost" class="post-view">
           <div class="post-header">
             <button class="back-btn" @click="goBack">← 返回列表</button>
             <h1 class="post-title">{{ currentPost.title }}</h1>
@@ -71,7 +71,7 @@
               <span class="meta-dot">·</span>
               <span>{{ currentPost.date || '未标注日期' }}</span>
               <span class="meta-dot">·</span>
-              <span>阅读记录</span>
+              <span>约 {{ currentPost.readMinutes }} 分钟阅读</span>
             </div>
           </div>
           <div class="post-layout">
@@ -94,6 +94,11 @@
               />
             </div>
           </div>
+        </div>
+        <div v-else class="post-empty">
+          <h2>文章未找到</h2>
+          <p>可能是链接已更新，返回列表查看最新文章。</p>
+          <button class="back-btn" @click="goBack">返回博客首页</button>
         </div>
       </main>
 
@@ -148,14 +153,40 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Vue3MarkdownIt from 'vue3-markdown-it'
 import hljs from 'highlight.js'
 import MarkdownItKatex from 'markdown-it-katex'
 
 // 自动导入所有 markdown 文件
-const modules = import.meta.glob('../markdowns/*.md', { as: 'raw', eager: true })
+const modules = import.meta.glob('../markdowns/*.md', { query: '?raw', import: 'default', eager: true })
+
+function buildExcerpt(content) {
+  return content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/[#>*_\-`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120)
+    .concat('…')
+}
+
+function getReadingStats(content) {
+  const trimmed = content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/[#>*_\-`]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const chineseChars = trimmed.match(/[\u4e00-\u9fa5]/g)?.length ?? 0
+  const wordCount = trimmed.replace(/[\u4e00-\u9fa5]/g, ' ').split(/\s+/).filter(Boolean).length
+  const total = wordCount + chineseChars
+  return {
+    wordCount: total,
+    readMinutes: Math.max(1, Math.round(total / 300)),
+    excerpt: buildExcerpt(trimmed),
+  }
+}
 
 // 解析文件名和内容，生成元信息（slug、标题、日期等）
 const posts = Object.entries(modules)
@@ -181,8 +212,19 @@ const posts = Object.entries(modules)
     }
 
     const sortKey = date ?? decoded
+    const stats = getReadingStats(content)
 
-    return { path, slug, title: displayTitle, content, date, sortKey }
+    return {
+      path,
+      slug,
+      title: displayTitle,
+      content,
+      date,
+      sortKey,
+      excerpt: stats.excerpt,
+      readMinutes: stats.readMinutes,
+      wordCount: stats.wordCount,
+    }
   })
   // 按日期或文件名倒序（最新的在上面）
   .sort((a, b) => {
@@ -207,7 +249,11 @@ const markdownOptions = {
 
 const route = useRoute()
 const router = useRouter()
-const currentPost = ref(null)
+const currentPost = computed(() => {
+  const slug = route.params.slug
+  return slug ? findPostBySlug(slug) : null
+})
+const hasSlug = computed(() => Boolean(route.params.slug))
 const postContentRef = ref(null)
 const tocItems = ref([])
 
@@ -217,16 +263,6 @@ function goBack() {
 
 function findPostBySlug(slug) {
   return posts.find(post => post.slug === slug)
-}
-
-function getExcerpt(content) {
-  return content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/[#>*_\-`]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 120)
-    .concat('…')
 }
 
 function buildToc() {
@@ -251,18 +287,19 @@ function scrollToHeading(id) {
   target.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-watchEffect(() => {
-  const slug = route.params.slug
-  if (slug) {
-    currentPost.value = findPostBySlug(slug)
-    nextTick(() => {
-      buildToc()
-    })
-  } else {
-    currentPost.value = null
-    tocItems.value = []
-  }
-})
+watch(
+  currentPost,
+  post => {
+    if (post) {
+      nextTick(() => {
+        buildToc()
+      })
+    } else {
+      tocItems.value = []
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -561,6 +598,17 @@ watchEffect(() => {
   box-shadow: 0 26px 50px rgba(15, 23, 42, 0.12);
 }
 
+.post-empty {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px 36px;
+  border: 1px solid var(--card-stroke);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .post-layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -793,18 +841,37 @@ watchEffect(() => {
 }
 
 .markdown-body code {
-  padding: 0.1em 0.3em;
-  border-radius: 4px;
-  background-color: #f3f4f6;
+  padding: 0.18em 0.4em;
+  border-radius: 6px;
+  background-color: rgba(14, 116, 144, 0.1);
+  color: #0f172a;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .markdown-body pre {
-  padding: 1rem;
-  border-radius: 6px;
-  background-color: #0b1120;
+  padding: 1.2rem 1.4rem;
+  border-radius: 14px;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 45%), #0b1120;
   color: #e5e7eb;
   overflow-x: auto;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.08);
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.95rem;
+}
+
+.markdown-body pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-body pre::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
 }
 
 .markdown-body blockquote {
@@ -814,8 +881,52 @@ watchEffect(() => {
   color: #6b7280;
 }
 
-.markdown-body .katex-display {
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  margin: 1rem 0;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
   margin: 1.4rem 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  text-align: left;
+}
+
+.markdown-body th {
+  background: rgba(14, 116, 144, 0.08);
+  font-weight: 600;
+}
+
+.markdown-body tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px dashed rgba(148, 163, 184, 0.4);
+  margin: 2rem 0;
+}
+
+.markdown-body .katex-display {
+  margin: 1.6rem 0;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  background: rgba(14, 116, 144, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  overflow-x: auto;
   text-align: left;
 }
 
@@ -825,6 +936,16 @@ watchEffect(() => {
 
 .markdown-body .katex {
   line-height: 1.4;
+}
+
+.markdown-body svg,
+.markdown-body canvas {
+  max-width: 100%;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+  margin: 1rem 0;
 }
 
 @media (max-width: 1024px) {
