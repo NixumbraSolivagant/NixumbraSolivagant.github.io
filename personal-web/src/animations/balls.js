@@ -5,6 +5,8 @@
  */
 export function makeBalls(canvas) {
   const THREE = window._THREE
+  if (!THREE) return () => {}
+  if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return () => {}
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })

@@ -61,25 +61,12 @@
               <span>约 {{ currentPost.readMinutes }} 分钟阅读</span>
             </div>
           </div>
-          <div class="post-layout">
-            <aside class="post-toc">
-              <div class="toc-title">目录</div>
-              <ul class="toc-list">
-                <li v-for="item in tocItems" :key="item.id" :class="['toc-item', item.level]">
-                  <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
-                    {{ item.text }}
-                  </button>
-                </li>
-                <li v-if="!tocItems.length" class="toc-empty">暂无目录</li>
-              </ul>
-            </aside>
-            <div ref="postContentRef" class="post-content">
+          <div ref="postContentRef" class="post-content">
               <MarkdownRenderer
                 :source="currentPost.content"
                 @rendered="postContentRef => { if(postContentRef) buildToc(postContentRef) }"
               />
             </div>
-          </div>
         </div>
         <div v-else class="post-empty">
           <h2>文章未找到</h2>
@@ -130,6 +117,18 @@
           <div class="side-title">更新提醒</div>
           <p class="side-text">每周整理一次学习收获，欢迎交流。</p>
           <button class="side-btn">关注专栏</button>
+        </div>
+
+        <div v-if="isDetailView" class="side-card post-toc">
+          <div class="toc-title">目录</div>
+          <ul class="toc-list">
+            <li v-for="item in tocItems" :key="item.id" :class="['toc-item', item.level]">
+              <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
+                {{ item.text }}
+              </button>
+            </li>
+            <li v-if="!tocItems.length" class="toc-empty">暂无目录</li>
+          </ul>
         </div>
       </aside>
     </div>
@@ -506,6 +505,11 @@ watch(
   box-shadow: 0 26px 50px rgba(15, 23, 42, 0.12);
 }
 
+.post-toc {
+  position: sticky;
+  top: 90px;
+}
+
 .post-empty {
   background: var(--item_bg_color);
   border-radius: 20px;
@@ -515,25 +519,6 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.post-layout {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 24px;
-}
-
-.post-toc {
-  position: sticky;
-  top: 90px;
-  align-self: start;
-  background: var(--item_bg_color);
-  border-radius: 14px;
-  border: 1px solid var(--card_stroke_color);
-  padding: 18px 16px;
-  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
-  max-height: calc(100vh - 140px);
-  overflow: auto;
 }
 
 .toc-title {
@@ -889,13 +874,6 @@ watch(
     order: -1;
   }
 
-  .post-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .post-toc {
-    position: static;
-  }
 }
 
 @media (max-width: 640px) {

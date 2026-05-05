@@ -25,9 +25,9 @@
     "vue3-markdown-it": "^1.0.10"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.6",
+    "@vitejs/plugin-vue": "^5.2.4",
     "gh-pages": "^6.3.0",
     "sass-embedded": "^1.99.0",
-    "vite": "^7.0.4"
+    "vite": "^6.4.2"
   }
 }

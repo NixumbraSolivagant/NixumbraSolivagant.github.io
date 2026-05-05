@@ -274,6 +274,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useThreeBody } from '../composables/useThreeBody.js'
 
 const handlePop = imageUrl => {
   if (typeof window !== 'undefined' && typeof window.pop === 'function') {
@@ -281,8 +282,6 @@ const handlePop = imageUrl => {
   }
 }
 
-let threeBodyFrame = null
-let threeBodyResize = null
 let quoteTimer = null
 
 const fallbackQuotes = [
@@ -312,119 +311,7 @@ const fetchQuote = async () => {
   }
 }
 
-const startThreeBodySimulation = () => {
-  const canvas = document.getElementById('three-body-canvas')
-  if (!(canvas instanceof HTMLCanvasElement)) return
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  const dpr = window.devicePixelRatio || 1
-  const resize = () => {
-    const width = window.innerWidth
-    const height = window.innerHeight
-    canvas.width = width * dpr
-    canvas.height = height * dpr
-    canvas.style.width = `${width}px`
-    canvas.style.height = `${height}px`
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  }
-
-  resize()
-  threeBodyResize = resize
-  window.addEventListener('resize', resize)
-
-  const createPoint = (center = null) => {
-    const width = canvas.width / dpr
-    const height = canvas.height / dpr
-    const depth = 600
-    const spread = 140
-    const origin = center ?? {
-      x: width * (0.45 + Math.random() * 0.1),
-      y: height * (0.45 + Math.random() * 0.1),
-      z: (Math.random() - 0.5) * (depth * 0.3),
-    }
-    return {
-      x: origin.x + (Math.random() - 0.5) * spread,
-      y: origin.y + (Math.random() - 0.5) * spread,
-      z: origin.z + (Math.random() - 0.5) * spread,
-      dx: (Math.random() - 0.5) * 1.4,
-      dy: (Math.random() - 0.5) * 1.4,
-      dz: (Math.random() - 0.5) * 1.2,
-      m: 80 + Math.random() * 80,
-    }
-  }
-
-  const clusterCenter = {
-    x: (canvas.width / dpr) * 0.5,
-    y: (canvas.height / dpr) * 0.5,
-    z: 0,
-  }
-  const points = [createPoint(clusterCenter), createPoint(clusterCenter), createPoint(clusterCenter)]
-  const g = 0.08
-  const minDistance = 80
-  const depth = 600
-  const fov = 500
-  const margin = 120
-
-  const step = () => {
-    const width = canvas.width / dpr
-    const height = canvas.height / dpr
-    const cx = width / 2
-    const cy = height / 2
-    const time = performance.now() * 0.001
-    ctx.clearRect(0, 0, width, height)
-
-    points.forEach(p => {
-      points.forEach(other => {
-        if (p === other) return
-        const dx = other.x - p.x
-        const dy = other.y - p.y
-        const dz = other.z - p.z
-        const r2 = dx * dx + dy * dy + dz * dz
-        const dist = Math.max(Math.sqrt(r2), minDistance)
-        const k = g * other.m / (dist * dist * dist)
-        p.dx += k * dx
-        p.dy += k * dy
-        p.dz += k * dz
-      })
-    })
-
-    points.forEach((p, index) => {
-      p.x += p.dx
-      p.y += p.dy
-      p.z += p.dz
-
-      if (
-        p.x < -margin ||
-        p.x > width + margin ||
-        p.y < -margin ||
-        p.y > height + margin ||
-        p.z < -depth ||
-        p.z > depth
-      ) {
-        points[index] = createPoint()
-        return
-      }
-
-      const scale = fov / (fov + p.z)
-      const px = (p.x - cx) * scale + cx
-      const py = (p.y - cy) * scale + cy
-      const r = Math.max(16, (Math.sqrt(p.m) / 0.9) * scale)
-      const alpha = Math.min(1, Math.max(0.4, 0.6 * scale))
-      const hue = (time * 40 + index * 120) % 360
-      ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`
-      ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.85)`
-      ctx.shadowBlur = 44 * scale
-      ctx.beginPath()
-      ctx.arc(px, py, r, 0, Math.PI * 2)
-      ctx.fill()
-    })
-
-    threeBodyFrame = requestAnimationFrame(step)
-  }
-
-  step()
-}
+const { start: startThreeBody, stop: stopThreeBody } = useThreeBody()
 
 onMounted(() => {
   if (!document.querySelector('script[data-nix-script]')) {
@@ -433,7 +320,10 @@ onMounted(() => {
     script.dataset.nixScript = 'true'
     document.body.appendChild(script)
   }
-  startThreeBodySimulation()
+  const canvas = document.getElementById('three-body-canvas')
+  if (canvas instanceof HTMLCanvasElement) {
+    startThreeBody(canvas)
+  }
   fetchQuote()
   quoteTimer = window.setInterval(() => {
     fetchQuote()
@@ -441,8 +331,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (threeBodyFrame) cancelAnimationFrame(threeBodyFrame)
-  if (threeBodyResize) window.removeEventListener('resize', threeBodyResize)
+  stopThreeBody()
   if (quoteTimer) clearInterval(quoteTimer)
 })
 </script>

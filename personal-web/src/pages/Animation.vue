@@ -119,9 +119,18 @@ const cleanupAll = () => { registry.forEach(fn => fn()); registry.length = 0 }
 
 // ── Animation map ───────────────────────────────────────────────────────────
 const makers = {
-  nebula, wave, matrix, balls, life, torus,
-  galaxy: makeGalaxy, firework: makeFirework, plasma: makePlasma,
-  rubik: makeRubik, constellation: makeConstellation, tunnel: makeTunnel,
+  nebula:       makeNebula,
+  wave:         makeWave,
+  matrix:       makeMatrix,
+  balls:        makeBalls,
+  life:         makeLife,
+  torus:        makeTorus,
+  galaxy:       makeGalaxy,
+  firework:     makeFirework,
+  plasma:       makePlasma,
+  rubik:        makeRubik,
+  constellation: makeConstellation,
+  tunnel:       makeTunnel,
 }
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
@@ -135,14 +144,20 @@ onMounted(async () => {
   animations.forEach(anim => {
     const canvas = canvasRefs[anim.id]
     if (!canvas) return
+    let inited = false
     const init = () => {
+      if (!window._THREE || inited) return
       if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return
-      register(makers[anim.id](canvas))
+      inited = true
+      try {
+        register(makers[anim.id](canvas))
+      } catch (e) {
+        console.error(`[Animation] init failed for "${anim.id}":`, e)
+      }
     }
-    if (canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
-      init()
-    } else {
-      const mo = new MutationObserver(() => { init(); mo.disconnect() })
+    init()
+    if (!inited) {
+      const mo = new MutationObserver(() => { init(); if (inited) mo.disconnect() })
       mo.observe(canvas, { attributes: true, attributeFilter: ['style', 'class'] })
     }
   })
@@ -167,12 +182,20 @@ const openFullscreen = async (anim) => {
   }, 50)
 }
 
-const closeModal = () => {
+const closeModal = async () => {
   cleanupAll()
   modal.visible = false
+  await nextTick()
+  await nextTick()
   animations.forEach(anim => {
     const canvas = canvasRefs[anim.id]
-    if (canvas) register(makers[anim.id](canvas))
+    if (!canvas) return
+    if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return
+    try {
+      register(makers[anim.id](canvas))
+    } catch (e) {
+      console.error(`[Animation] re-init failed for "${anim.id}":`, e)
+    }
   })
 }
 </script>

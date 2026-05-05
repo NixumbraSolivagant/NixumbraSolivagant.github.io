@@ -2,6 +2,7 @@
  * Constellation — Star field with connecting lines via Canvas 2D.
  */
 export function makeConstellation(canvas) {
+  if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return () => {}
   const ctx = canvas.getContext('2d')
   const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight }
   resize()
