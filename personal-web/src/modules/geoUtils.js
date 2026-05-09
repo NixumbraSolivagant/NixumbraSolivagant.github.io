@@ -195,13 +195,11 @@ export const COUNTRY_COORDS = {
 }
 
 /**
- * Convert umami country stats to cobe marker format.
+ * Convert umami country stats to marker format for EarthRenderer.
  * @param {Array<{x: string, y: number}>} stats - umami country data
- * @param {number} minSize - min marker size (default 0.04)
- * @param {number} maxSize - max marker size (default 0.12)
- * @returns {Array<{location: [number, number], size: number}>}
+ * @returns {Array<{location: [number, number], size: number, count: number}>}
  */
-export function statsToMarkers(stats, minSize = 0.04, maxSize = 0.12) {
+export function statsToMarkers(stats) {
   if (!stats || stats.length === 0) return []
 
   const max = Math.max(...stats.map(s => s.y))
@@ -211,6 +209,7 @@ export function statsToMarkers(stats, minSize = 0.04, maxSize = 0.12) {
     .filter(s => s.x && COUNTRY_COORDS[s.x])
     .map(s => ({
       location: COUNTRY_COORDS[s.x],
-      size: minSize + (s.y / max) * (maxSize - minSize),
+      size: s.y / max,
+      count: s.y,
     }))
 }

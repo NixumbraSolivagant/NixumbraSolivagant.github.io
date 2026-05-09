@@ -64,7 +64,7 @@
           <div ref="postContentRef" class="post-content">
               <MarkdownRenderer
                 :source="currentPost.content"
-                @rendered="postContentRef => { if(postContentRef) buildToc(postContentRef) }"
+                @rendered="buildToc"
               />
             </div>
         </div>

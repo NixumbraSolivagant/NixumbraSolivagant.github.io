@@ -90,6 +90,7 @@ import { makePlasma } from '@/animations/plasma.js'
 import { makeRubik } from '@/animations/rubik.js'
 import { makeConstellation } from '@/animations/constellation.js'
 import { makeTunnel } from '@/animations/tunnel.js'
+import { makeParticleLife } from '@/animations/particleLife.js'
 
 // ── Animation registry ──────────────────────────────────────────────────────
 const animations = [
@@ -105,6 +106,7 @@ const animations = [
   { id: 'rubik',        title: '量子魔方',   desc: '悬浮的魔方体矩阵，随机量子运动',               tags: ['Three.js', '3D', '几何'] },
   { id: 'constellation', title: '星图连线',  desc: '星空连线与闪烁，随机漂移的星座图',             tags: ['Canvas', '星空', '连线'] },
   { id: 'tunnel',       title: '波形隧道',   desc: '无限延伸的波形隧道，穿越视觉错觉',             tags: ['Three.js', '3D', '透视'] },
+  { id: 'particleLife', title: '粒子生命',   desc: '创世纪引擎：粒子涌现生命形态，重置法则创造新宇宙', tags: ['Canvas', '涌现', '粒子生命'] },
 ]
 
 // ── Canvas refs ─────────────────────────────────────────────────────────────
@@ -131,6 +133,7 @@ const makers = {
   rubik:        makeRubik,
   constellation: makeConstellation,
   tunnel:       makeTunnel,
+  particleLife: makeParticleLife,
 }
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
@@ -159,6 +162,16 @@ onMounted(async () => {
     if (!inited) {
       const mo = new MutationObserver(() => { init(); if (inited) mo.disconnect() })
       mo.observe(canvas, { attributes: true, attributeFilter: ['style', 'class'] })
+      const ro = new ResizeObserver(() => {
+        if (canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
+          init()
+          if (inited) {
+            mo.disconnect()
+            ro.disconnect()
+          }
+        }
+      })
+      ro.observe(canvas)
     }
   })
 })

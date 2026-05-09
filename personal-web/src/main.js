@@ -1,10 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './style.css'
-import 'bulma/css/bulma.css'
-import 'github-markdown-css/github-markdown.css'
 import 'highlight.js/styles/github-dark.css'
-import 'katex/dist/katex.min.css'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const Home = () => import('./pages/Home.vue')

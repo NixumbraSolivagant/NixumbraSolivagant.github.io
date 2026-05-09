@@ -59,9 +59,7 @@ watch(renderedHtml, () => {
 })
 </script>
 
-<style>
-@import 'katex/dist/katex.min.css';
-
+<style scoped>
 .md-renderer {
   font-size: 1rem;
   line-height: 1.9;
@@ -215,4 +213,3 @@ watch(renderedHtml, () => {
   vertical-align: middle;
 }
 </style>
-

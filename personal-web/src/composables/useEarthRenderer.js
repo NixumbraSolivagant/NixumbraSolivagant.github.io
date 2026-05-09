@@ -1,11 +1,11 @@
 /**
- * EarthRenderer — lightweight WebGL globe with SVG-derived textures
+ * EarthRenderer — lightweight WebGL globe with local SVG textures
  *
  * Design:
- *   - Static local PNG textures (SVG sourced, no network on load)
+ *   - Local PNG textures (SVG-sourced, no network dependency)
  *   - Fixed camera at (0,0,2.5), globe vertices rotated each frame
- *   - Terminator computed in world space
- *   - HTML pins via exact globe projection math
+ *   - Day/night terminator computed in world space via shader
+ *   - HTML pins via exact globe projection math (no CDN, no bloat)
  */
 
 const PI = Math.PI
@@ -67,8 +67,8 @@ function perspective(fov, aspect, near, far) {
   return new Float32Array([
     f/aspect, 0, 0,              0,
     0,         f, 0,              0,
-    0,         0, (far+near)*nf, -1,
-    0,         0, 2*far*near*nf, 0,
+    0,         0, (far+near)*nf,  2*far*near*nf,
+    0,         0, -1,             0,
   ])
 }
 
@@ -126,7 +126,7 @@ function mkProg(gl, vert, frag) {
   return p
 }
 
-// ── Texture loading (local PNG) ───────────────────────────────────────────────
+// ── Texture loading ──────────────────────────────────────────────────────────────
 
 function uploadTexFromImg(gl, tex, img) {
   gl.bindTexture(gl.TEXTURE_2D, tex)
@@ -154,7 +154,7 @@ function loadLocalTex(gl, tex, path) {
 
 function buildSphere() {
   const verts = [], idx = []
-  const LB = 60, Ln = 120  // lower resolution = lighter
+  const LB = 60, Ln = 120
   for (let la = 0; la <= LB; la++) {
     const th = la * PI / LB
     const st = Math.sin(th), ct = Math.cos(th)
@@ -185,14 +185,18 @@ export class EarthRenderer {
     this.sunPhi   = 0.1
     this.sunDrift = 0.0002
 
-    this.rotSpeed   = 0.0022
-    this.autoRotate = true
-    this._drag = false
-    this._dragFrom = { x:0, y:0 }
+    this.rotSpeed    = 0.0022
+    this._drag       = false
+    this._dragFrom   = { x:0, y:0 }
     this._phi0 = 0; this._theta0 = 0
 
-    this._texReady = false
-    this._raf = null
+    this._markers    = []
+    this._renderCB   = null
+    this._texReady   = false
+    this._raf        = null
+    this._destroyed  = false
+    this._mode       = 'day'
+
     this._init()
   }
 
@@ -228,10 +232,9 @@ export class EarthRenderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Load local PNG textures (SVG-derived world maps)
-    loadLocalTex(gl, this._dayTex,   '/world-day.png')
+    loadLocalTex(gl, this._dayTex,   '/world-day.svg')
       .catch(e => console.warn('[Earth] day texture failed:', e))
-    loadLocalTex(gl, this._nightTex, '/world-night.png')
+    loadLocalTex(gl, this._nightTex, '/world-night.svg')
       .catch(e => console.warn('[Earth] night texture failed:', e))
     this._texReady = true
 
@@ -259,7 +262,7 @@ export class EarthRenderer {
     }
 
     this.canvas.addEventListener('mousedown',  this._onDown)
-    this.canvas.addEventListener('touchstart', this._onDown, { passive: true })
+    this.canvas.addEventListener('touchstart',  this._onDown, { passive: true })
     this.canvas.addEventListener('mousemove',  this._onMove)
     this.canvas.addEventListener('touchmove',  this._onMove, { passive: true })
     this.canvas.addEventListener('mouseup',    this._onUp)
@@ -275,55 +278,63 @@ export class EarthRenderer {
 
   /**
    * Register a callback called every frame to update pin positions.
-   * @param {(w: number, h: number) => void} cb
+   * @param {(W: number, H: number) => void} cb
    */
   onRender(cb) { this._renderCB = cb }
 
   /**
+   * Set visitor markers. Each marker needs { lat, lon }.
+   * @param {Array} markers
+   */
+  setVisitorMarkers(markers) {
+    this._markers = markers || []
+  }
+
+  /**
+   * Switch between day and night mode.
+   * @param {'day'|'night'} mode
+   */
+  setMode(mode) {
+    this._mode = mode
+    this._texReady = true
+  }
+
+  /**
    * Update pin screen positions every frame.
-   * Mirrors the globe vertex shader's MVP pipeline exactly:
-   *   clip = Perspective * View * [rotZ(phi) * rotX(theta)] * spherePoint
-   * so pins always sit precisely on the rendered surface.
+   * Mirrors the globe vertex shader's MVP pipeline exactly.
    */
   updatePinPositions(pins, canvasW, canvasH) {
-    const halfFov = PI / 3.5        // must match perspective(PI/3.5, 1, ...)
+    const halfFov = PI / 3.5
     const f  = 1 / Math.tan(halfFov / 2)
-    const nf = 1 / (0.1 - 100)      // near=0.1, far=100
+    const nf = 1 / (0.1 - 100)
 
     const cx = Math.cos(this.theta), sx = Math.sin(this.theta)
     const cz = Math.cos(this.phi),   sz = Math.sin(this.phi)
 
     for (const pin of pins) {
-      // lat/lon → unit sphere (same as globe fragment shader)
       const lr = pin.lat * PI / 180
       const pr = pin.lon * PI / 180
       const nx =  Math.cos(lr) * Math.cos(pr)
       const ny =  Math.sin(lr)
       const nz =  Math.cos(lr) * Math.sin(pr)
 
-      // Step 1 — globe rotation (same as buildMVP: rotX(theta) * rotZ(phi) applied to col vector)
       const gx =  cx * nx       + sx * ny
       const gy = -sx * nz
       const gz =  cz * nz
 
-      // Step 2 — view transform (lookAt [0,0,2.5] → [0,0,0])
-      // Right=(0,1,0)×(0,0,-1)=(1,0,0), Up=(0,0,-1), dir=(0,0,-1)
       const vx = gx
       const vy = gz
       const vz = -gy + 2.5
 
-      // Step 3 — perspective divide (clip space)
       const clipW = f * vz
       const ndcX =  vx / clipW
       const ndcY =  vy / clipW
       const ndcZ = (2.0 * 100 * 0.1 * nf) / clipW + (100 + 0.1) * nf
 
-      // Visibility: behind camera OR clipped by sphere (same as COBE rim logic)
       const behind = vz < 0 && ndcX * ndcX + ndcY * ndcY < 1.0
 
-      // NDC [-1,+1] → CSS pixels (canvas uses clientWidth × clientHeight)
       pin._x =       (ndcX + 1) * 0.5 * canvasW
-      pin._y = (1 - (ndcY + 1) * 0.5) * canvasH  // y-flip to match WebGL
+      pin._y = (1 - (ndcY + 1) * 0.5) * canvasH
       pin._z = ndcZ
       pin._visible = !behind
     }
@@ -362,52 +373,17 @@ export class EarthRenderer {
 
     gl.drawElements(gl.TRIANGLES, this._idxCnt, gl.UNSIGNED_SHORT, 0)
 
-    // Sync pin positions — mutates pinList in-place so Vue's reactivity fires
     if (this._renderCB) {
       this._renderCB(W / window.devicePixelRatio, H / window.devicePixelRatio)
     }
-  }
-
-  /**
-   * Project lat/lon to canvas pixel coordinates.
-   * @param {number} lat  Latitude in degrees
-   * @param {number} lon  Longitude in degrees
-   * @returns {{ x: number, y: number, visible: boolean } | null}
-   */
-  project(lat, lon) {
-    const lr = lat * PI / 180
-    const pr = lon * PI / 180
-
-    const nx =  Math.cos(lr) * Math.cos(pr)
-    const ny =  Math.sin(lr)
-    const nz =  Math.cos(lr) * Math.sin(pr)
-
-    const cx = Math.cos(this.theta), sx = Math.sin(this.theta)
-    const cz = Math.cos(this.phi),   sz = Math.sin(this.phi)
-
-    const rx =  cz * nx       + sz * nz
-    const ry =  sx * sz * nx  + cx * ny - sx * cz * nz
-    const rz = -cx * sz * nx  + sx * ny + cx * cz * nz
-
-    // Hide points on the back hemisphere (behind the camera)
-    const behind = rz < 0
-
-    const W = this.canvas.clientWidth
-    const H = this.canvas.clientHeight
-    const halfFov = PI / 7
-    const zEye = -rz * 2.5
-    const viewW = Math.abs(zEye) * 2 * Math.tan(halfFov)
-
-    const screenX = (rx / viewW + 0.5) * W
-    const screenY = (-ry / viewW + 0.5) * H
-
-    return { x: screenX, y: screenY, visible: !behind }
   }
 
   get loaded()     { return this._texReady }
   get isDragging() { return this._drag }
 
   destroy() {
+    if (this._destroyed) return
+    this._destroyed = true
     cancelAnimationFrame(this._raf)
     const gl = this.gl
     if (this._vbo) gl.deleteBuffer(this._vbo)

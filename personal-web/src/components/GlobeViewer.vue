@@ -1,23 +1,30 @@
 <template>
   <div class="gv-wrap">
     <div class="gv-viewport" ref="viewportEl">
-      <!-- Loading ring -->
       <Transition name="fade">
         <div v-if="!earthReady" class="gv-loading">
           <div class="gv-ring" />
         </div>
       </Transition>
 
-      <!-- Three.js globe canvas -->
       <canvas ref="canvasEl" class="gv-canvas" />
 
-      <!-- HUD overlay -->
+      <div
+        v-for="pin in visiblePins"
+        :key="pin.key"
+        class="gv-pin"
+        :style="{
+          left: pin.x + 'px',
+          top: pin.y + 'px',
+          transform: `translate(-50%, -50%) scale(${0.5 + pin.normSize * 0.5})`,
+        }"
+      />
+
       <div class="gv-hud">
         <div class="hud-title">{{ hudTitle }}</div>
         <div class="hud-sub">{{ hudSub }}</div>
       </div>
 
-      <!-- Mode toggle controls -->
       <div class="gv-controls" v-if="earthReady">
         <button
           class="ctrl-btn"
@@ -31,7 +38,6 @@
         >Night Lights</button>
       </div>
 
-      <!-- Hint -->
       <Transition name="fade">
         <div v-if="earthReady && !hasInteracted" class="gv-hint">
           Drag to rotate · Visit locations worldwide
@@ -39,7 +45,6 @@
       </Transition>
     </div>
 
-    <!-- Footer stats -->
     <div v-if="earthReady && total > 0" class="gv-footer">
       <span class="footer-dot" />
       <span>{{ total }} visits · {{ countryCount }} countries</span>
@@ -49,22 +54,23 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { ThreeGlobe } from '@/composables/ThreeGlobe.js'
+import { EarthRenderer } from '@/composables/useEarthRenderer.js'
 import { fetchTopCountries } from '@/modules/umamiClient.js'
-import { COUNTRY_COORDS } from '@/modules/geoUtils.js'
+import { COUNTRY_COORDS, statsToMarkers } from '@/modules/geoUtils.js'
 
 const props = defineProps({
-  refreshMs: { type: Number, default: 60_000 },
+  refreshInterval: { type: Number, default: 60_000 },
 })
 
-// ── State ─────────────────────────────────────────────────────────────────────
-const canvasEl      = ref(null)
-const viewportEl    = ref(null)
-const earthReady    = ref(false)
-const hasInteracted = ref(false)
-const total         = ref(0)
-const countryCount  = ref(0)
-const globeMode     = ref('day')
+const canvasEl       = ref(null)
+const viewportEl     = ref(null)
+const earthReady     = ref(false)
+const hasInteracted  = ref(false)
+const total          = ref(0)
+const countryCount   = ref(0)
+const globeMode      = ref('day')
+const pins           = ref([])
+const visiblePins    = ref([])
 
 const hudTitle = 'GEO-SYS // VISITOR MAP'
 const hudSub   = computed(() => {
@@ -72,20 +78,19 @@ const hudSub   = computed(() => {
   return modes[globeMode.value]
 })
 
-let globe     = null
-let pollTimer = null
+let renderer   = null
+let pollTimer  = null
+let pinKeySeq  = 0
 
-// ── Event handlers ───────────────────────────────────────────────────────────
 function onInteract() {
   hasInteracted.value = true
 }
 
 function setGlobeMode(mode) {
   globeMode.value = mode
-  globe?.setMode(mode)
+  renderer?.setMode(mode)
 }
 
-// ── Data load ────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
     const countries = await fetchTopCountries(20)
@@ -94,30 +99,39 @@ async function loadData() {
     total.value        = countries.reduce((s, c) => s + c.y, 0)
     countryCount.value = countries.length
 
-    const maxCount = countries[0]?.y || 1
-    const pins = countries
-      .map(c => {
-        const coords = COUNTRY_COORDS[c.x]
-        if (!coords) return null
-        return {
-          lat:      coords[0],
-          lon:      coords[1],
-          count:    c.y,
-          normSize: c.y / maxCount,
-        }
-      })
-      .filter(Boolean)
+    const markers = statsToMarkers(countries)
+    pins.value = markers.map(m => ({
+      key:      ++pinKeySeq,
+      lat:      m.location[0],
+      lon:      m.location[1],
+      count:    m.count ?? 0,
+      normSize: m.size ?? 0,
+      x:        0,
+      y:        0,
+      visible:  false,
+    }))
 
-    globe?.setVisitorMarkers(pins)
+    if (renderer) {
+      renderer.setVisitorMarkers(pins.value)
+    }
   } catch (e) {
     console.warn('[GlobeViewer] load failed:', e)
   }
 }
 
-// ── Lifecycle ───────────────────────────────────────────────────────────────
 onMounted(async () => {
   await nextTick()
-  globe = new ThreeGlobe(canvasEl.value)
+  renderer = new EarthRenderer(canvasEl.value)
+
+  renderer.onRender((W, H) => {
+    renderer.updatePinPositions(pins.value, W, H)
+    visiblePins.value = pins.value.filter(p => {
+      p.x = p._x ?? p.x
+      p.y = p._y ?? p.y
+      p.visible = p._visible ?? false
+      return p.visible
+    })
+  })
 
   viewportEl.value?.addEventListener('mousedown',  onInteract)
   viewportEl.value?.addEventListener('touchstart',  onInteract, { passive: true })
@@ -125,15 +139,15 @@ onMounted(async () => {
   earthReady.value = true
   await loadData()
 
-  if (props.refreshMs > 0) {
-    pollTimer = setInterval(loadData, props.refreshMs)
+  if (props.refreshInterval > 0) {
+    pollTimer = setInterval(loadData, props.refreshInterval)
   }
 })
 
 onBeforeUnmount(() => {
   clearInterval(pollTimer)
-  globe?.destroy()
-  globe = null
+  renderer?.destroy()
+  renderer = null
 })
 
 defineExpose({ reload: loadData, setGlobeMode })
@@ -147,7 +161,6 @@ defineExpose({ reload: loadData, setGlobeMode })
   gap: 10px;
 }
 
-/* ── Viewport ── */
 .gv-viewport {
   position: relative;
   width: 100%;
@@ -156,7 +169,6 @@ defineExpose({ reload: loadData, setGlobeMode })
   overflow: hidden;
 }
 
-/* ── Canvas ── */
 .gv-canvas {
   position: absolute;
   inset: 0;
@@ -191,6 +203,19 @@ defineExpose({ reload: loadData, setGlobeMode })
   animation: spin 1.1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Visitor pins ── */
+.gv-pin {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent, #38bdf8);
+  box-shadow: 0 0 8px 2px rgba(56, 189, 248, 0.6);
+  pointer-events: none;
+  z-index: 10;
+  transition: left 0.05s linear, top 0.05s linear;
+}
 
 /* ── HUD ── */
 .gv-hud {
