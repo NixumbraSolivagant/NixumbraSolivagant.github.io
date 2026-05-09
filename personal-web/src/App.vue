@@ -92,11 +92,17 @@ const startBgRotation = () => {
   if (!backgroundMedia.value.length) return
   if (!bgLoaded) {
     bgLoaded = true
-    applyBackground(backgroundMedia.value[currentBgIndex.value])
+    const randomIndex = Math.floor(Math.random() * backgroundMedia.value.length)
+    currentBgIndex.value = randomIndex
+    applyBackground(backgroundMedia.value[randomIndex])
   }
   bgTimer = window.setInterval(() => {
-    currentBgIndex.value = (currentBgIndex.value + 1) % backgroundMedia.value.length
-    applyBackground(backgroundMedia.value[currentBgIndex.value])
+    let nextIndex
+    do {
+      nextIndex = Math.floor(Math.random() * backgroundMedia.value.length)
+    } while (nextIndex === currentBgIndex.value && backgroundMedia.value.length > 1)
+    currentBgIndex.value = nextIndex
+    applyBackground(backgroundMedia.value[nextIndex])
   }, 12000)
 }
 
