@@ -134,7 +134,7 @@ html {
     --footer_text_color: #ffffff;
     --left_tag_item: rgb(27 42 57 / 20%);
     --card_filter: 0px;
-    --back_filter: 19px;
+    --back_filter: 0px;
     --back_filter_color: #00000030;
     --fill: #ffffff;
     --card_stroke_color: rgba(255, 255, 255, 0.2);
