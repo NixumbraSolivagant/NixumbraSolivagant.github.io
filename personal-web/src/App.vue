@@ -109,13 +109,12 @@ const startBgRotation = () => {
 onMounted(async () => {
   // 动态加载背景媒体文件
   const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
-  backgroundMedia.value = Object.values(mediaModules)
-    .filter(Boolean)
-    .map(url => {
-      const normalized = typeof url === 'string' ? url.replace('/public', '') : ''
-      const lower = normalized.toLowerCase()
+  backgroundMedia.value = Object.entries(mediaModules)
+    .filter(([, url]) => Boolean(url))
+    .map(([key, url]) => {
+      const lower = (key || '').toLowerCase()
       const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
-      return { type: isVideo ? 'video' : 'image', src: normalized }
+      return { type: isVideo ? 'video' : 'image', src: url }
     })
     .sort((a, b) => a.src.localeCompare(b.src))
 
