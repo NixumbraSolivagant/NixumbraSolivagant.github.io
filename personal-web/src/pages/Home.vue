@@ -35,7 +35,7 @@
             </svg>
             Jiangxi Nanchang
           </div>
-          <div class="left-des-item">待补充</div>
+          <div class="left-des-item">📍 江西 · 南昌</div>
         </div>
         <div class="left-div left-tag">
           <div class="left-tag-item">骑行</div>
@@ -71,7 +71,7 @@
             Hello I'm <span class="gradientText">胡明璋</span>
           </div>
           <div class="description">👦 <span class="purpleText">Computer</span> Student</div>
-          <div class="description">📝 待补充</div>
+          <div class="description">📚 计算机专业学生 · 热爱技术与创意</div>
 
           <div class="iconContainer">
             <a class="iconItem" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">

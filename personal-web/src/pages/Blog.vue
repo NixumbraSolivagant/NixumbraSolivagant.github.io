@@ -145,7 +145,7 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import hljs from 'highlight.js'
 
 // 自动导入所有 markdown 文件
-const modules = import.meta.glob('../markdowns/*.md', { query: '?raw', import: 'default', eager: true })
+const modules = import.meta.glob('../markdowns/*.md?raw', { eager: true })
 
 function buildExcerpt(content) {
   return content

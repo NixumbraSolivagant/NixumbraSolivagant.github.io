@@ -143,28 +143,18 @@
   .nav-inner {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 10px;
+    padding: 12px 12px;
   }
 
   .nav-links {
     order: 3;
     flex-wrap: wrap;
-  }
-
-  .zhihu-shell {
-    padding: 0 0 40px;
-  }
-
-  .nav-inner {
-    gap: 10px;
-    padding: 12px 12px;
+    gap: 12px;
   }
 
   .nav-link {
     padding: 0 12px;
-  }
-
-  .nav-links {
-    gap: 12px;
   }
 }
 </style>

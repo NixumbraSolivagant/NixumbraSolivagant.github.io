@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
 import MarkdownItMark from 'markdown-it-mark'
 import hljs from 'highlight.js'

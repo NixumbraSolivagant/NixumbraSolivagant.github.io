@@ -102,11 +102,7 @@ const startBgRotation = () => {
 
 onMounted(async () => {
   // 动态加载背景媒体文件
-  const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', {
-    query: '?url',
-    import: 'default',
-    eager: true,
-  })
+  const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
   backgroundMedia.value = Object.values(mediaModules)
     .filter(Boolean)
     .map(url => {

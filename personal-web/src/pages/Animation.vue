@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import { makeNebula } from '@/animations/nebula.js'
 import { makeWave } from '@/animations/wave.js'
