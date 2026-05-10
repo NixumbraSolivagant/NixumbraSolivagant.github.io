@@ -33,21 +33,21 @@
                 p-id="1480"
               ></path>
             </svg>
-            Jiangxi Nanchang
+            {{ t('home.location') }}
           </div>
-          <div class="left-des-item">📍 江西 · 南昌</div>
+          <div class="left-des-item">📍 {{ t('home.location') }}</div>
         </div>
         <div class="left-div left-tag">
-          <div class="left-tag-item">骑行</div>
-          <div class="left-tag-item">魔方</div>
-          <div class="left-tag-item">徒步</div>
-          <div class="left-tag-item">武术</div>
+          <div class="left-tag-item">{{ t('home.tagCycling') }}</div>
+          <div class="left-tag-item">{{ t('home.tagCube') }}</div>
+          <div class="left-tag-item">{{ t('home.tagHiking') }}</div>
+          <div class="left-tag-item">{{ t('home.tagMartial') }}</div>
         </div>
         <div class="left-div left-time">
           <ul id="line">
             <li>
               <div class="focus"></div>
-              <div>搭建网站初版</div>
+              <div>{{ t('home.timelineEvent') }}</div>
               <div>2026.1.24</div>
             </li>
           </ul>
@@ -56,8 +56,8 @@
       <div class="nix-right">
         <header>
           <div class="quote-panel">
-            <span class="quote-label">今日名言</span>
-            <p class="quote-text">“{{ currentQuote.text }}”</p>
+            <span class="quote-label">{{ t('home.todayQuote') }}</span>
+            <p class="quote-text">"{{ currentQuote.text }}"</p>
             <div class="quote-author">— {{ currentQuote.author }}</div>
           </div>
           <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
@@ -68,10 +68,10 @@
             />
           </div>
           <div class="welcome">
-            Hello I'm <span class="gradientText">胡明璋</span>
+            {{ t('home.greetingBase') }} <span class="gradientText">胡明璋</span>
           </div>
-          <div class="description">👦 <span class="purpleText">Computer</span> Student</div>
-          <div class="description">📚 计算机专业学生 · 热爱技术与创意</div>
+          <div class="description">👦 <span class="purpleText">{{ t('home.roleLabel') }}</span> {{ t('home.roleStudent') }}</div>
+          <div class="description">{{ t('home.roleDesc') }}</div>
 
           <div class="iconContainer">
             <a class="iconItem" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
@@ -88,7 +88,7 @@
                   p-id="2488"
                 ></path>
               </svg>
-              <div class="iconTip">Github</div>
+              <div class="iconTip">{{ t('home.iconTipGithub') }}</div>
             </a>
             <a class="iconItem" href="mailto:Hmzemc333@outlook.com">
               <svg
@@ -104,7 +104,7 @@
                   p-id="3175"
                 ></path>
               </svg>
-              <div class="iconTip">Mail</div>
+              <div class="iconTip">{{ t('home.iconTipMail') }}</div>
             </a>
             <a class="iconItem" href="#" @click.prevent="handlePop('/static/img/wxzsm.jpg')">
               <svg
@@ -128,7 +128,7 @@
                   p-id="4990"
                 ></path>
               </svg>
-              <div class="iconTip">赞助</div>
+              <div class="iconTip">{{ t('home.iconTipSponsor') }}</div>
             </a>
             <a class="iconItem" href="#" @click.prevent="handlePop('/static/img/qq.jpg')">
               <svg
@@ -144,8 +144,11 @@
                   p-id="1862"
                 ></path>
               </svg>
-              <div class="iconTip">QQ</div>
+              <div class="iconTip">{{ t('home.iconTipQQ') }}</div>
             </a>
+            <button class="lang-switch" :title="locale === 'zh' ? t('common.switchToEn') : t('common.switchToZh')" @click="toggleLocale">
+              {{ locale === 'zh' ? 'EN' : '中文' }}
+            </button>
             <a class="switch" href="javascript:void(0)">
               <div class="onoffswitch">
                 <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked />
@@ -177,13 +180,13 @@
                 p-id="1892"
               ></path>
             </svg>
-            site
+            {{ t('home.siteTitle') }}
           </div>
           <div class="projectList">
             <router-link class="projectItem a" to="/blog">
               <div class="projectItemLeft">
-                <h1>博客</h1>
-                <p>查看我的文章与笔记</p>
+                <h1>{{ t('home.projectBlogTitle') }}</h1>
+                <p>{{ t('home.projectBlogDesc') }}</p>
               </div>
               <div class="projectItemRight">
                 <img src="/static/img/i1.png" alt="" />
@@ -191,8 +194,8 @@
             </router-link>
             <router-link class="projectItem a" to="/about">
               <div class="projectItemLeft">
-                <h1>关于我</h1>
-                <p>个人简介与更多信息</p>
+                <h1>{{ t('home.projectAboutTitle') }}</h1>
+                <p>{{ t('home.projectAboutDesc') }}</p>
               </div>
               <div class="projectItemRight">
                 <img src="/static/img/i2.png" alt="" />
@@ -200,8 +203,8 @@
             </router-link>
             <router-link class="projectItem a" to="/animation">
               <div class="projectItemLeft">
-                <h1>动画</h1>
-                <p>我的动画与演示页面</p>
+                <h1>{{ t('home.projectAnimTitle') }}</h1>
+                <p>{{ t('home.projectAnimDesc') }}</p>
               </div>
               <div class="projectItemRight">
                 <img src="/static/img/i4.png" alt="" />
@@ -209,8 +212,8 @@
             </router-link>
             <a class="projectItem a" target="_blank" rel="noreferrer" href="https://github.com/NixumbraSolivagant">
               <div class="projectItemLeft">
-                <h1>GitHub</h1>
-                <p>我的代码仓库</p>
+                <h1>{{ t('home.projectGithubTitle') }}</h1>
+                <p>{{ t('home.projectGithubDesc') }}</p>
               </div>
               <div class="projectItemRight">
                 <img src="/static/img/i3.png" alt="" />
@@ -231,7 +234,7 @@
                 p-id="7834"
               ></path>
             </svg>
-            skills
+            {{ t('home.skillsTitle') }}
           </div>
           <div class="skill">
             <img id="skillPc" src="/static/svg/skillPc.svg" alt="" />
@@ -251,7 +254,7 @@
                 p-id="1892"
               ></path>
             </svg>
-            github
+            {{ t('home.githubTitle') }}
           </div>
           <div class="github-heatmap" style="display: flex; justify-content: center;">
             <img
@@ -276,7 +279,7 @@
                 p-id="7834"
               ></path>
             </svg>
-            visitor map
+            {{ t('home.visitorMapTitle') }}
           </div>
           <GlobeViewer :refresh-interval="60000" />
         </div>
@@ -294,8 +297,17 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useThreeBody } from '../composables/useThreeBody.js'
 import GlobeViewer from '../components/GlobeViewer.vue'
+
+const { t, locale } = useI18n()
+
+function toggleLocale() {
+  const next = locale.value === 'zh' ? 'en' : 'zh'
+  locale.value = next
+  localStorage.setItem('locale', next)
+}
 
 const handlePop = imageUrl => {
   if (typeof window !== 'undefined' && typeof window.pop === 'function') {
@@ -356,3 +368,29 @@ onBeforeUnmount(() => {
   if (quoteTimer) clearInterval(quoteTimer)
 })
 </script>
+
+<style scoped>
+.lang-switch {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--item_hover_color);
+  color: var(--main_text_color);
+  font-weight: 700;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border: 1px solid var(--card_stroke_color);
+  transition: all 0.2s ease;
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.lang-switch:hover {
+  opacity: 1;
+  background: var(--accent);
+  border-color: transparent;
+}
+</style>

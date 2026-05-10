@@ -5,16 +5,16 @@
       <div class="anim-body">
         <div class="anim-hero">
           <div class="anim-hero-content">
-            <div class="anim-title">动画展示</div>
-            <p class="anim-subtitle">Three.js 与 Canvas 创意可视化实验 · 点击卡片可全屏观看</p>
+            <div class="anim-title">{{ t('animation.heroTitle') }}</div>
+            <p class="anim-subtitle">{{ t('animation.heroSubtitle') }}</p>
           </div>
           <div class="anim-hero-card">
-            <div class="hero-label">模块化动画</div>
-            <div class="hero-desc">每个动画独立文件，Three.js / Canvas 渲染</div>
+            <div class="hero-label">{{ t('animation.heroLabel') }}</div>
+            <div class="hero-desc">{{ t('animation.heroDesc') }}</div>
             <div class="hero-actions">
-              <span class="hero-pill">Three.js</span>
-              <span class="hero-pill">Canvas</span>
-              <span class="hero-pill">WebGL</span>
+              <span class="hero-pill">{{ t('animation.heroTechThree') }}</span>
+              <span class="hero-pill">{{ t('animation.heroTechCanvas') }}</span>
+              <span class="hero-pill">{{ t('animation.heroTechWebgl') }}</span>
             </div>
           </div>
         </div>
@@ -33,7 +33,7 @@
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M15 3h6m0 0v6m0-6l-7 7M9 21H3m0 0v-6m0 6l7-7"/>
                   </svg>
-                  全屏
+                  {{ t('animation.cardFullscreen') }}
                 </div>
               </div>
               <div class="card-info">
@@ -59,7 +59,7 @@
                 <span class="fs-title">{{ modal.title }}</span>
                 <span class="fs-subtitle">{{ modal.desc }}</span>
               </div>
-              <button class="fs-close" @click="closeModal" aria-label="关闭">
+              <button class="fs-close" @click="closeModal" :aria-label="t('animation.modalClose')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
@@ -76,7 +76,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavBar from '@/components/NavBar.vue'
 import { makeNebula } from '@/animations/nebula.js'
 import { makeWave } from '@/animations/wave.js'
@@ -91,21 +92,43 @@ import { makeRubik } from '@/animations/rubik.js'
 import { makeConstellation } from '@/animations/constellation.js'
 import { makeTunnel } from '@/animations/tunnel.js'
 
-// ── Animation registry ──────────────────────────────────────────────────────
-const animations = [
-  { id: 'nebula',       title: '星云粒子',   desc: '三维粒子系统，模拟宇宙星云的流动与色彩变幻',   tags: ['Three.js', '粒子系统', 'WebGL'] },
-  { id: 'wave',         title: '波形动画',   desc: '正弦波叠加与贝塞尔曲线，演绎数学之美',         tags: ['Canvas', '数学', '动画'] },
-  { id: 'matrix',       title: '矩阵数字雨', desc: '经典矩阵数字雨效果，重现赛博朋克美学',        tags: ['Canvas', '粒子', '经典'] },
-  { id: 'balls',        title: '引力弹珠',   desc: '多球体弹性碰撞与反弹物理模拟',                tags: ['Three.js', '物理', '碰撞'] },
-  { id: 'life',         title: '生命游戏',   desc: '康威生命游戏，元胞自动机的离散宇宙',            tags: ['Canvas', '元胞自动机', '模拟'] },
-  { id: 'torus',        title: '3D 旋转环面', desc: '参数化曲面与光照着色，展现拓扑之美',         tags: ['Three.js', '3D', '数学曲面'] },
-  { id: 'galaxy',       title: '粒子星系',   desc: '旋转星系结构，臂膀色彩随距离渐变',              tags: ['Three.js', '粒子', '星系'] },
-  { id: 'firework',     title: '烟花绽放',   desc: '粒子烟花爆炸效果，随机色彩与物理衰减',         tags: ['Canvas', '粒子', '特效'] },
-  { id: 'plasma',       title: '等离子波',   desc: '有机等离子流体，色彩随时间连续变化',           tags: ['Canvas', '色彩', '动态'] },
-  { id: 'rubik',        title: '量子魔方',   desc: '悬浮的魔方体矩阵，随机量子运动',               tags: ['Three.js', '3D', '几何'] },
-  { id: 'constellation', title: '星图连线',  desc: '星空连线与闪烁，随机漂移的星座图',             tags: ['Canvas', '星空', '连线'] },
-  { id: 'tunnel',       title: '波形隧道',   desc: '无限延伸的波形隧道，穿越视觉错觉',             tags: ['Three.js', '3D', '透视'] },
+const { t } = useI18n()
+
+// ── Animation registry — IDs only, text is resolved via computed ─────────────
+const ANIM_IDS = [
+  'nebula', 'wave', 'matrix', 'balls', 'life',
+  'torus', 'galaxy', 'firework', 'plasma', 'rubik',
+  'constellation', 'tunnel',
 ]
+
+// map: animId -> keys in locale files
+const ANIM_KEYS = {
+  nebula:        { title: 'animation.animNebulaTitle',     desc: 'animation.animNebulaDesc',     tags: 'animation.animNebulaTags'     },
+  wave:          { title: 'animation.animWaveTitle',       desc: 'animation.animWaveDesc',       tags: 'animation.animWaveTags'       },
+  matrix:        { title: 'animation.animMatrixTitle',      desc: 'animation.animMatrixDesc',     tags: 'animation.animMatrixTags'     },
+  balls:         { title: 'animation.animBallsTitle',      desc: 'animation.animBallsDesc',      tags: 'animation.animBallsTags'      },
+  life:          { title: 'animation.animLifeTitle',       desc: 'animation.animLifeDesc',       tags: 'animation.animLifeTags'       },
+  torus:         { title: 'animation.animTorusTitle',     desc: 'animation.animTorusDesc',      tags: 'animation.animTorusTags'     },
+  galaxy:        { title: 'animation.animGalaxyTitle',      desc: 'animation.animGalaxyDesc',     tags: 'animation.animGalaxyTags'     },
+  firework:      { title: 'animation.animFireworkTitle',   desc: 'animation.animFireworkDesc',   tags: 'animation.animFireworkTags'   },
+  plasma:        { title: 'animation.animPlasmaTitle',      desc: 'animation.animPlasmaDesc',     tags: 'animation.animPlasmaTags'     },
+  rubik:         { title: 'animation.animRubikTitle',      desc: 'animation.animRubikDesc',      tags: 'animation.animRubikTags'      },
+  constellation: { title: 'animation.animConstellationTitle', desc: 'animation.animConstellationDesc', tags: 'animation.animConstellationTags' },
+  tunnel:        { title: 'animation.animTunnelTitle',     desc: 'animation.animTunnelDesc',     tags: 'animation.animTunnelTags'     },
+}
+
+// Reactive animations list — re-computes when locale changes
+const animations = computed(() =>
+  ANIM_IDS.map(id => {
+    const k = ANIM_KEYS[id]
+    return {
+      id,
+      title:  t(k.title),
+      desc:   t(k.desc),
+      tags:   t(k.tags).split(','),
+    }
+  })
+)
 
 // ── Canvas refs ─────────────────────────────────────────────────────────────
 const canvasRefs = reactive({})
@@ -119,29 +142,25 @@ const cleanupAll = () => { registry.forEach(fn => fn()); registry.length = 0 }
 
 // ── Animation map ───────────────────────────────────────────────────────────
 const makers = {
-  nebula:       makeNebula,
-  wave:         makeWave,
-  matrix:       makeMatrix,
-  balls:        makeBalls,
-  life:         makeLife,
-  torus:        makeTorus,
-  galaxy:       makeGalaxy,
-  firework:     makeFirework,
-  plasma:       makePlasma,
-  rubik:        makeRubik,
+  nebula:        makeNebula,
+  wave:          makeWave,
+  matrix:        makeMatrix,
+  balls:         makeBalls,
+  life:          makeLife,
+  torus:         makeTorus,
+  galaxy:        makeGalaxy,
+  firework:      makeFirework,
+  plasma:        makePlasma,
+  rubik:         makeRubik,
   constellation: makeConstellation,
-  tunnel:       makeTunnel,
+  tunnel:        makeTunnel,
 }
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
 let THREE = null
 
-onMounted(async () => {
-  const three = await import('three')
-  THREE = three
-  window._THREE = three
-
-  animations.forEach(anim => {
+const initAnimations = () => {
+  animations.value.forEach(anim => {
     const canvas = canvasRefs[anim.id]
     if (!canvas) return
     let inited = false
@@ -171,6 +190,13 @@ onMounted(async () => {
       ro.observe(canvas)
     }
   })
+}
+
+onMounted(async () => {
+  const three = await import('three')
+  THREE = three
+  window._THREE = three
+  initAnimations()
 })
 
 onBeforeUnmount(cleanupAll)
@@ -197,16 +223,7 @@ const closeModal = async () => {
   modal.visible = false
   await nextTick()
   await nextTick()
-  animations.forEach(anim => {
-    const canvas = canvasRefs[anim.id]
-    if (!canvas) return
-    if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return
-    try {
-      register(makers[anim.id](canvas))
-    } catch (e) {
-      console.error(`[Animation] re-init failed for "${anim.id}":`, e)
-    }
-  })
+  initAnimations()
 }
 </script>
 

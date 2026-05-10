@@ -4,134 +4,129 @@
     <div class="zhihu-shell">
       <div class="zhihu-body">
         <div class="zhihu-hero">
-      <div class="zhihu-hero-content">
-        <div class="zhihu-title">博客</div>
-        <p class="zhihu-subtitle">记录学习、思考与项目沉淀</p>
-        <div class="zhihu-tabs">
-          <button class="tab active">推荐</button>
-          <button class="tab">最新</button>
-          <button class="tab">随笔</button>
+          <div class="zhihu-hero-content">
+            <div class="zhihu-title">{{ t('blog.heroTitle') }}</div>
+            <p class="zhihu-subtitle">{{ t('blog.heroSubtitle') }}</p>
+            <div class="zhihu-tabs">
+              <button class="tab active">{{ t('blog.tabRecommend') }}</button>
+              <button class="tab">{{ t('blog.tabLatest') }}</button>
+              <button class="tab">{{ t('blog.tabEssay') }}</button>
+            </div>
+          </div>
+          <div class="zhihu-hero-card">
+            <div class="hero-label">{{ t('blog.heroLabel') }}</div>
+            <div class="hero-desc">{{ t('blog.heroDesc') }}</div>
+            <div class="hero-actions">
+              <span class="hero-pill">{{ t('blog.heroTechMarkdown') }}</span>
+              <span class="hero-pill">{{ t('blog.heroTechVue') }}</span>
+              <span class="hero-pill">{{ t('blog.heroTechStudy') }}</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="zhihu-hero-card">
-        <div class="hero-label">本地 Markdown</div>
-        <div class="hero-desc">文章自动加载于 /src/markdowns</div>
-        <div class="hero-actions">
-          <span class="hero-pill">Markdown</span>
-          <span class="hero-pill">Vue</span>
-          <span class="hero-pill">Study</span>
-        </div>
-      </div>
-    </div>
-
         <div class="zhihu-container">
-      <main class="zhihu-main">
-        <div v-if="!isDetailView" class="feed">
-          <article v-for="post in posts" :key="post.slug" class="feed-item">
-            <router-link
-              :to="{ name: 'BlogDetail', params: { slug: post.slug } }"
-              class="feed-link"
-            >
-              <div class="feed-content">
-                <h2 class="feed-title">{{ post.title }}</h2>
-                <p class="feed-excerpt">{{ post.excerpt }}</p>
-              </div>
-              <div class="feed-footer">
-                <div class="feed-meta">
-                  <span class="meta-tag">专栏</span>
+          <main class="zhihu-main">
+            <div v-if="!isDetailView" class="feed">
+              <article v-for="post in posts" :key="post.slug" class="feed-item">
+                <router-link
+                  :to="{ name: 'BlogDetail', params: { slug: post.slug } }"
+                  class="feed-link"
+                >
+                  <div class="feed-content">
+                    <h2 class="feed-title">{{ post.title }}</h2>
+                    <p class="feed-excerpt">{{ post.excerpt }}</p>
+                  </div>
+                  <div class="feed-footer">
+                    <div class="feed-meta">
+                      <span class="meta-tag">{{ t('blog.metaColumn') }}</span>
+                      <span class="meta-dot">·</span>
+                      <span class="meta-date">{{ post.date || t('blog.metaNoDate') }}</span>
+                      <span class="meta-dot">·</span>
+                      <span class="meta-read">{{ t('blog.metaReadMinutes', { n: post.readMinutes }) }}</span>
+                    </div>
+                    <span class="feed-arrow">→</span>
+                  </div>
+                </router-link>
+              </article>
+            </div>
+            <div v-else-if="currentPost" class="post-view">
+              <div class="post-header">
+                <button class="back-btn" @click="goBack">{{ t('blog.backToList') }}</button>
+                <h1 class="post-title">{{ currentPost.title }}</h1>
+                <div class="post-meta">
+                  <span class="post-tag">{{ t('blog.metaColumn') }}</span>
                   <span class="meta-dot">·</span>
-                  <span class="meta-date">{{ post.date || '未标注日期' }}</span>
+                  <span>{{ currentPost.date || t('blog.postMetaDate') }}</span>
                   <span class="meta-dot">·</span>
-                  <span class="meta-read">阅读 {{ post.readMinutes }} 分钟</span>
+                  <span>{{ t('blog.postMetaReadTime', { n: currentPost.readMinutes }) }}</span>
                 </div>
-                <span class="feed-arrow">→</span>
               </div>
-            </router-link>
-          </article>
-        </div>
-        <div v-else-if="currentPost" class="post-view">
-          <div class="post-header">
-            <button class="back-btn" @click="goBack">← 返回列表</button>
-            <h1 class="post-title">{{ currentPost.title }}</h1>
-            <div class="post-meta">
-              <span class="post-tag">专栏</span>
-              <span class="meta-dot">·</span>
-              <span>{{ currentPost.date || '未标注日期' }}</span>
-              <span class="meta-dot">·</span>
-              <span>约 {{ currentPost.readMinutes }} 分钟阅读</span>
+              <div ref="postContentRef" class="post-content">
+                <MarkdownRenderer
+                  :source="currentPost.content"
+                  @rendered="buildToc"
+                />
+              </div>
             </div>
-          </div>
-          <div ref="postContentRef" class="post-content">
-              <MarkdownRenderer
-                :source="currentPost.content"
-                @rendered="buildToc"
-              />
+            <div v-else class="post-empty">
+              <h2>{{ t('blog.postNotFound') }}</h2>
+              <p>{{ t('blog.postNotFoundDesc') }}</p>
+              <button class="back-btn" @click="goBack">{{ t('blog.backToBlog') }}</button>
             </div>
-        </div>
-        <div v-else class="post-empty">
-          <h2>文章未找到</h2>
-          <p>可能是链接已更新，返回列表查看最新文章。</p>
-          <button class="back-btn" @click="goBack">返回博客首页</button>
-        </div>
-      </main>
-
-      <aside class="zhihu-side">
-        <div class="side-card profile">
-          <div class="profile-header">
-            <div class="profile-avatar"></div>
-            <div>
-              <div class="profile-name">Mingzhang HU</div>
-              <div class="profile-desc">Computer Student · 南昌</div>
+          </main>
+          <aside class="zhihu-side">
+            <div class="side-card profile">
+              <div class="profile-header">
+                <div class="profile-avatar"></div>
+                <div>
+                  <div class="profile-name">{{ t('blog.profileName') }}</div>
+                  <div class="profile-desc">{{ t('blog.profileDesc') }}</div>
+                </div>
+              </div>
+              <div class="profile-stats">
+                <div>
+                  <strong>{{ posts.length }}</strong>
+                  <span>{{ t('blog.statsArticles') }}</span>
+                </div>
+                <div>
+                  <strong>{{ t('blog.statsActive') }}</strong>
+                  <span>{{ t('blog.statsCode') }}</span>
+                </div>
+                <div>
+                  <strong>{{ t('blog.statsGithub') }}</strong>
+                  <span>{{ t('blog.statsCode') }}</span>
+                </div>
+              </div>
+              <a class="profile-link" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
+                {{ t('blog.visitGithub') }}
+              </a>
             </div>
-          </div>
-          <div class="profile-stats">
-            <div>
-              <strong>{{ posts.length }}</strong>
-              <span>文章</span>
+            <div class="side-card">
+              <div class="side-title">{{ t('blog.sidebarTags') }}</div>
+              <div class="tag-list">
+                <span class="tag">{{ t('blog.tagLearning') }}</span>
+                <span class="tag">{{ t('blog.tagAlgorithm') }}</span>
+                <span class="tag">{{ t('blog.tagFrontend') }}</span>
+                <span class="tag">{{ t('blog.tagLife') }}</span>
+              </div>
             </div>
-            <div>
-              <strong>活跃</strong>
-              <span>更新</span>
+            <div class="side-card">
+              <div class="side-title">{{ t('blog.sidebarUpdate') }}</div>
+              <p class="side-text">{{ t('blog.sidebarUpdateDesc') }}</p>
+              <button class="side-btn">{{ t('blog.sidebarFollow') }}</button>
             </div>
-            <div>
-              <strong>GitHub</strong>
-              <span>代码</span>
+            <div v-if="isDetailView" class="side-card post-toc">
+              <div class="toc-title">{{ t('blog.tocTitle') }}</div>
+              <ul class="toc-list">
+                <li v-for="item in tocItems" :key="item.id" :class="['toc-item', item.level]">
+                  <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
+                    {{ item.text }}
+                  </button>
+                </li>
+                <li v-if="!tocItems.length" class="toc-empty">{{ t('blog.tocEmpty') }}</li>
+              </ul>
             </div>
-          </div>
-          <a class="profile-link" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
-            访问 GitHub
-          </a>
+          </aside>
         </div>
-
-        <div class="side-card">
-          <div class="side-title">专栏标签</div>
-          <div class="tag-list">
-            <span class="tag">学习笔记</span>
-            <span class="tag">算法</span>
-            <span class="tag">前端</span>
-            <span class="tag">生活</span>
-          </div>
-        </div>
-
-        <div class="side-card">
-          <div class="side-title">更新提醒</div>
-          <p class="side-text">每周整理一次学习收获，欢迎交流。</p>
-          <button class="side-btn">关注专栏</button>
-        </div>
-
-        <div v-if="isDetailView" class="side-card post-toc">
-          <div class="toc-title">目录</div>
-          <ul class="toc-list">
-            <li v-for="item in tocItems" :key="item.id" :class="['toc-item', item.level]">
-              <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
-                {{ item.text }}
-              </button>
-            </li>
-            <li v-if="!tocItems.length" class="toc-empty">暂无目录</li>
-          </ul>
-        </div>
-      </aside>
-    </div>
       </div>
     </div>
   </section>
@@ -139,14 +134,16 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavBar from '@/components/NavBar.vue'
 import { useRouter, useRoute } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
-// 自动导入所有 markdown 文件（用 ?url 获取路径，再用 fetch 读取内容）
+const { t } = useI18n()
+
+// auto import all markdown files
 const markdownModules = import.meta.glob('../markdowns/*.md', { eager: true, query: '?raw', import: 'default' })
 
-// 提取模块对象的 .default（即 raw 文件内容）
 function extractContent(mod) {
   if (!mod) return ''
   if (typeof mod === 'string') return mod
@@ -179,7 +176,6 @@ function getReadingStats(content) {
   }
 }
 
-// 解析文件名和内容，生成元信息（slug、标题、日期等）
 const posts = Object.entries(markdownModules)
   .map(([path, mod]) => {
     const content = extractContent(mod)
@@ -190,14 +186,12 @@ const posts = Object.entries(markdownModules)
     let date = null
     let displayTitle = decoded
 
-    // 文件名形如：2025-01-01-我的第一篇博客.md
     const dateMatch = decoded.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/)
     if (dateMatch) {
       date = dateMatch[1]
       displayTitle = dateMatch[2]
     }
 
-    // 如果 markdown 第一行有一级标题，则用它作为最终标题
     const headingMatch = content.match(/^#\s+(.+)$/m)
     if (headingMatch) {
       displayTitle = headingMatch[1].trim()
@@ -218,7 +212,6 @@ const posts = Object.entries(markdownModules)
       wordCount: stats.wordCount,
     }
   })
-  // 按日期或文件名倒序（最新的在上面）
   .sort((a, b) => {
     if (a.sortKey === b.sortKey) return 0
     return a.sortKey < b.sortKey ? 1 : -1

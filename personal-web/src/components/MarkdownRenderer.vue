@@ -4,6 +4,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MarkdownIt from 'markdown-it'
 import MarkdownItMark from 'markdown-it-mark'
 import anchor from 'markdown-it-anchor'
@@ -17,6 +18,8 @@ const props = defineProps({
     default: '',
   },
 })
+
+const { t } = useI18n()
 
 const containerRef = ref(null)
 const emit = defineEmits(['rendered'])
@@ -137,7 +140,7 @@ function injectCopyButtons() {
     const btn = document.createElement('button')
     btn.className = 'copy-btn'
     btn.type = 'button'
-    btn.setAttribute('aria-label', '复制代码')
+    btn.setAttribute('aria-label', t('common.copyCode'))
     btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`
     btn.addEventListener('click', () => {
       const code = decodeURIComponent(wrapper.getAttribute('data-code') || '')

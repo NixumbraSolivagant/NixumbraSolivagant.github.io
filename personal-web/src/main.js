@@ -3,6 +3,7 @@ import App from './App.vue'
 import './style.css'
 import 'highlight.js/styles/github-dark.css'
 import { createRouter, createWebHistory } from 'vue-router'
+import { i18n } from './i18n/index.js'
 
 const Home = () => import('./pages/Home.vue')
 const Blog = () => import('./pages/Blog.vue')
@@ -25,4 +26,4 @@ const router = createRouter({
   },
 })
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(router).use(i18n).mount('#app')

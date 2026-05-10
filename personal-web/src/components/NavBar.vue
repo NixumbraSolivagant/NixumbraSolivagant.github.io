@@ -6,25 +6,46 @@
       </router-link>
 
       <div class="nav-links">
-        <router-link to="/" class="nav-link">主页</router-link>
-        <router-link to="/blog" class="nav-link">博客</router-link>
-        <router-link to="/about" class="nav-link">关于</router-link>
-        <router-link to="/animation" class="nav-link">动画</router-link>
+        <router-link to="/" class="nav-link">{{ t('nav.home') }}</router-link>
+        <router-link to="/blog" class="nav-link">{{ t('nav.blog') }}</router-link>
+        <router-link to="/about" class="nav-link">{{ t('nav.about') }}</router-link>
+        <router-link to="/animation" class="nav-link">{{ t('nav.animation') }}</router-link>
       </div>
 
-      <a
-        class="nav-cta"
-        href="https://github.com/NixumbraSolivagant"
-        target="_blank"
-        rel="noreferrer"
-      >
-        GitHub
-      </a>
+      <div class="nav-right">
+        <button
+          class="lang-switch"
+          :title="locale === 'zh' ? t('common.switchToEn') : t('common.switchToZh')"
+          @click="toggleLocale"
+        >
+          {{ locale === 'zh' ? 'EN' : '中文' }}
+        </button>
+
+        <a
+          class="nav-cta"
+          href="https://github.com/NixumbraSolivagant"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {{ t('nav.github') }}
+        </a>
+      </div>
     </div>
   </nav>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+import { SUPPORTED_LOCALES, i18n } from '@/i18n/index.js'
+
+const { t, locale: currentLocale } = useI18n()
+const locale = currentLocale
+
+function toggleLocale() {
+  const next = locale.value === 'zh' ? 'en' : 'zh'
+  locale.value = next
+  localStorage.setItem('locale', next)
+}
 </script>
 
 <style scoped>
@@ -135,6 +156,35 @@
   transform: translateY(-1px);
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.lang-switch {
+  border: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--item_hover_color);
+  color: var(--main_text_color);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid var(--card_stroke_color);
+  transition: all 0.2s ease;
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+}
+
+.lang-switch:hover {
+  opacity: 1;
+  background: var(--accent);
+  border-color: transparent;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
   .blog-nav {
     border-radius: 0;
@@ -155,6 +205,10 @@
 
   .nav-link {
     padding: 0 12px;
+  }
+
+  .nav-right {
+    order: 2;
   }
 }
 </style>
