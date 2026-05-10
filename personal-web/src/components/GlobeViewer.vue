@@ -9,17 +9,6 @@
 
       <canvas ref="canvasEl" class="gv-canvas" />
 
-      <div
-        v-for="pin in visiblePins"
-        :key="pin.key"
-        class="gv-pin"
-        :style="{
-          left: pin.x + 'px',
-          top: pin.y + 'px',
-          transform: `translate(-50%, -50%) scale(${0.5 + pin.normSize * 0.5})`,
-        }"
-      />
-
       <div class="gv-hud">
         <div class="hud-title">{{ hudTitle }}</div>
         <div class="hud-sub">{{ hudSub }}</div>
@@ -56,31 +45,22 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { EarthRenderer } from '@/composables/useEarthRenderer.js'
 import { fetchTopCountries } from '@/modules/umamiClient.js'
-import { COUNTRY_COORDS, statsToMarkers } from '@/modules/geoUtils.js'
+import { statsToMarkers } from '@/modules/geoUtils.js'
 
 const props = defineProps({
   refreshInterval: { type: Number, default: 60_000 },
 })
 
-const canvasEl       = ref(null)
-const viewportEl     = ref(null)
-const earthReady     = ref(false)
-const hasInteracted  = ref(false)
-const total          = ref(0)
-const countryCount   = ref(0)
-const globeMode      = ref('day')
-const pins           = ref([])
-const visiblePins    = ref([])
+const canvasEl     = ref(null)
+const viewportEl   = ref(null)
+const earthReady   = ref(false)
+const hasInteracted = ref(false)
+const total        = ref(0)
+const countryCount = ref(0)
+const globeMode    = ref('day')
 
-const hudTitle = 'GEO-SYS // VISITOR MAP'
-const hudSub   = computed(() => {
-  const modes = { day: 'Daylight Mode · Online', night: 'Night Lights Mode · Online' }
-  return modes[globeMode.value]
-})
-
-let renderer   = null
-let pollTimer  = null
-let pinKeySeq  = 0
+let renderer  = null
+let pollTimer = null
 
 function onInteract() {
   hasInteracted.value = true
@@ -100,19 +80,15 @@ async function loadData() {
     countryCount.value = countries.length
 
     const markers = statsToMarkers(countries)
-    pins.value = markers.map(m => ({
-      key:      ++pinKeySeq,
+    const pins = markers.map(m => ({
       lat:      m.location[0],
       lon:      m.location[1],
       count:    m.count ?? 0,
       normSize: m.size ?? 0,
-      x:        0,
-      y:        0,
-      visible:  false,
     }))
 
     if (renderer) {
-      renderer.setVisitorMarkers(pins.value)
+      renderer.setVisitorMarkers(pins)
     }
   } catch (e) {
     console.warn('[GlobeViewer] load failed:', e)
@@ -123,18 +99,8 @@ onMounted(async () => {
   await nextTick()
   renderer = new EarthRenderer(canvasEl.value)
 
-  renderer.onRender((W, H) => {
-    renderer.updatePinPositions(pins.value, W, H)
-    visiblePins.value = pins.value.filter(p => {
-      p.x = p._x ?? p.x
-      p.y = p._y ?? p.y
-      p.visible = p._visible ?? false
-      return p.visible
-    })
-  })
-
-  viewportEl.value?.addEventListener('mousedown',  onInteract)
-  viewportEl.value?.addEventListener('touchstart',  onInteract, { passive: true })
+  canvasEl.value?.addEventListener('mousedown',  onInteract)
+  canvasEl.value?.addEventListener('touchstart', onInteract, { passive: true })
 
   earthReady.value = true
   await loadData()
@@ -203,19 +169,6 @@ defineExpose({ reload: loadData, setGlobeMode })
   animation: spin 1.1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Visitor pins ── */
-.gv-pin {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--accent, #38bdf8);
-  box-shadow: 0 0 8px 2px rgba(56, 189, 248, 0.6);
-  pointer-events: none;
-  z-index: 10;
-  transition: left 0.05s linear, top 0.05s linear;
-}
 
 /* ── HUD ── */
 .gv-hud {
