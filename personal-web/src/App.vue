@@ -110,8 +110,10 @@ onMounted(async () => {
   // 动态加载背景媒体文件
   const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
   backgroundMedia.value = Object.entries(mediaModules)
-    .filter(([, url]) => Boolean(url))
-    .map(([key, url]) => {
+    .filter(([, mod]) => Boolean(mod))
+    .map(([key, mod]) => {
+      // Vite glob 返回 module 对象，URL 在 .default 中
+      const url = mod && typeof mod === 'object' && 'default' in mod ? mod.default : mod
       const lower = (key || '').toLowerCase()
       const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
       return { type: isVideo ? 'video' : 'image', src: url }
