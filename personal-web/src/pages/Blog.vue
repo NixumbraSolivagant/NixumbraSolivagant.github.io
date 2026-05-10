@@ -147,6 +147,13 @@ import hljs from 'highlight.js'
 // 自动导入所有 markdown 文件
 const modules = import.meta.glob('../markdowns/*.md?raw', { eager: true })
 
+// 提取模块对象的 .default（即 raw 文件内容）
+function extractContent(mod) {
+  if (!mod) return ''
+  if (typeof mod === 'string') return mod
+  return mod && typeof mod === 'object' && 'default' in mod ? mod.default : String(mod)
+}
+
 function buildExcerpt(content) {
   return content
     .replace(/```[\s\S]*?```/g, '')
@@ -175,7 +182,8 @@ function getReadingStats(content) {
 
 // 解析文件名和内容，生成元信息（slug、标题、日期等）
 const posts = Object.entries(modules)
-  .map(([path, content]) => {
+  .map(([path, mod]) => {
+    const content = extractContent(mod)
     const match = path.match(/\/([^/]+)\.md$/)
     const slug = match ? match[1] : path
     const decoded = match ? decodeURIComponent(match[1]) : path
