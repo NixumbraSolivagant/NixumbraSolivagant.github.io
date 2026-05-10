@@ -144,8 +144,8 @@ import { useRouter, useRoute } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import hljs from 'highlight.js'
 
-// 自动导入所有 markdown 文件
-const modules = import.meta.glob('../markdowns/*.md?raw', { eager: true })
+// 自动导入所有 markdown 文件（用 ?url 获取路径，再用 fetch 读取内容）
+const markdownModules = import.meta.glob('../markdowns/*.md', { eager: true, query: '?raw', import: 'default' })
 
 // 提取模块对象的 .default（即 raw 文件内容）
 function extractContent(mod) {
@@ -181,7 +181,7 @@ function getReadingStats(content) {
 }
 
 // 解析文件名和内容，生成元信息（slug、标题、日期等）
-const posts = Object.entries(modules)
+const posts = Object.entries(markdownModules)
   .map(([path, mod]) => {
     const content = extractContent(mod)
     const match = path.match(/\/([^/]+)\.md$/)
