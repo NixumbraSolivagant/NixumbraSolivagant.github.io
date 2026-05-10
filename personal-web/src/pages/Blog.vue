@@ -142,7 +142,6 @@ import { ref, computed, watch } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import { useRouter, useRoute } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
-import hljs from 'highlight.js'
 
 // 自动导入所有 markdown 文件（用 ?url 获取路径，再用 fetch 读取内容）
 const markdownModules = import.meta.glob('../markdowns/*.md', { eager: true, query: '?raw', import: 'default' })
@@ -225,9 +224,6 @@ const posts = Object.entries(markdownModules)
     return a.sortKey < b.sortKey ? 1 : -1
   })
 
-const plugins = []
-const markdownOptions = {}
-
 const route = useRoute()
 const router = useRouter()
 
@@ -254,11 +250,8 @@ function buildToc(el) {
     return
   }
   const headings = Array.from(root.querySelectorAll('h2, h3'))
-  tocItems.value = headings.map((heading, index) => {
+  tocItems.value = headings.map(heading => {
     const level = heading.tagName.toLowerCase()
-    if (!heading.id) {
-      heading.id = `heading-${index + 1}`
-    }
     return { id: heading.id, text: heading.textContent?.trim() || '标题', level }
   })
 }
@@ -716,159 +709,6 @@ watch(
   color: var(--main_text_color);
   padding: 10px 12px;
   border-radius: 10px;
-  font-weight: 600;
-}
-
-.markdown-body {
-  font-size: 1rem;
-  line-height: 1.9;
-  color: var(--main_text_color) !important;
-}
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4 {
-  color: var(--main_text_color) !important;
-  margin-top: 1.6rem;
-  margin-bottom: 0.8rem;
-  line-height: 1.3;
-}
-
-.markdown-body p {
-  color: var(--main_text_color) !important;
-  margin: 0.75rem 0;
-}
-
-.markdown-body ul,
-.markdown-body ol {
-  padding-left: 1.5rem;
-  margin: 0.75rem 0;
-}
-
-.markdown-body li + li {
-  margin-top: 0.25rem;
-}
-
-.markdown-body li {
-  color: var(--main_text_color) !important;
-}
-
-.markdown-body code {
-  padding: 0.18em 0.4em;
-  border-radius: 6px;
-  background-color: var(--item_hover_color);
-  color: var(--accent_strong) !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  border: 1px solid var(--card_stroke_color);
-}
-
-.markdown-body pre {
-  padding: 1.2rem 1.4rem;
-  border-radius: 14px;
-  background: radial-gradient(circle at top left, var(--accent), transparent 45%), var(--item_hover_color);
-  color: var(--main_text_color) !important;
-  overflow-x: auto;
-  border: 1px solid var(--card_stroke_color);
-  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.08);
-}
-
-.markdown-body pre code {
-  background: transparent;
-  padding: 0;
-  color: inherit !important;
-  font-size: 0.95rem;
-}
-
-.markdown-body pre::-webkit-scrollbar {
-  height: 8px;
-}
-
-.markdown-body pre::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 999px;
-}
-
-.markdown-body blockquote {
-  margin: 1rem 0;
-  padding-left: 1rem;
-  border-left: 4px solid var(--accent);
-  color: var(--item_left_text_color) !important;
-}
-
-.markdown-body img {
-  max-width: 100%;
-  border-radius: 14px;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
-  border: 1px solid var(--card_stroke_color);
-  margin: 1rem 0;
-}
-
-.markdown-body table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.4rem 0;
-  overflow: hidden;
-  border-radius: 12px;
-  border: 1px solid var(--card_stroke_color);
-}
-
-.markdown-body th,
-.markdown-body td {
-  padding: 0.75rem 0.9rem;
-  border-bottom: 1px solid var(--card_stroke_color);
-  text-align: left;
-}
-
-.markdown-body th {
-  background: var(--item_hover_color);
-  font-weight: 600;
-  color: var(--main_text_color);
-}
-
-.markdown-body tr:last-child td {
-  border-bottom: none;
-}
-
-.markdown-body hr {
-  border: none;
-  border-top: 1px dashed var(--card_stroke_color);
-  margin: 2rem 0;
-}
-
-.markdown-body .katex-display {
-  margin: 1.6rem 0;
-  padding: 1rem 1.2rem;
-  border-radius: 12px;
-  background: var(--item_hover_color);
-  border: 1px solid var(--card_stroke_color);
-  overflow-x: auto;
-  text-align: left;
-}
-
-.markdown-body .katex-display > .katex {
-  font-size: 1.02em;
-}
-
-.markdown-body .katex {
-  line-height: 1.4;
-}
-
-.markdown-body svg,
-.markdown-body canvas {
-  max-width: 100%;
-  border-radius: 12px;
-  background: var(--item_hover_color);
-  border: 1px solid var(--card_stroke_color);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
-  margin: 1rem 0;
-}
-
-.markdown-body mark {
-  background-color: rgba(56, 189, 248, 0.2);
-  color: var(--accent_strong) !important;
-  padding: 0.1em 0.3em;
-  border-radius: 5px;
   font-weight: 600;
 }
 
