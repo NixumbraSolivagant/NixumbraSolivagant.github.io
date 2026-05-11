@@ -44,7 +44,8 @@ const md = new MarkdownIt({
     const highlighted = language
       ? hljs.highlight(code, { language, ignoreIllegals: true }).value
       : hljs.highlightAuto(code).value
-    return `<div class="code-block-wrapper" data-code="${encodeURIComponent(code)}"><pre class="hljs"><code class="hljs language-${language || 'plaintext'}">${highlighted}</code></pre></div>`
+    // Store only a hash reference, not the raw code, to avoid XSS
+    return `<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${language || 'plaintext'}">${highlighted}</code></pre></div>`
   },
 })
 
@@ -138,15 +139,16 @@ function injectCopyButtons() {
   const wrappers = containerRef.value.querySelectorAll('.code-block-wrapper:not(.copy-injected)')
   wrappers.forEach(wrapper => {
     wrapper.classList.add('copy-injected')
+    const codeEl = wrapper.querySelector('code')
+    const originalCode = codeEl?.textContent || ''
     const btn = document.createElement('button')
     btn.className = 'copy-btn'
     btn.type = 'button'
     btn.setAttribute('aria-label', t('common.copyCode'))
     btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`
     btn.addEventListener('click', () => {
-      const code = decodeURIComponent(wrapper.getAttribute('data-code') || '')
-      if (!code) return
-      navigator.clipboard.writeText(code).then(() => {
+      if (!originalCode) return
+      navigator.clipboard.writeText(originalCode).then(() => {
         btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
         btn.classList.add('copied')
         setTimeout(() => {

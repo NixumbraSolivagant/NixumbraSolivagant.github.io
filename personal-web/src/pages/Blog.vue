@@ -191,23 +191,28 @@ const posts = Object.entries(markdownModules)
     const content = extractContent(mod)
     const match = path.match(/\/([^/]+)\.md$/)
     const slug = match ? match[1] : path
-    const decoded = match ? decodeURIComponent(match[1]) : path
 
+    // Extract display title: try heading first, then date-prefixed name
+    let displayTitle = slug
     let date = null
-    let displayTitle = decoded
 
-    const dateMatch = decoded.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/)
-    if (dateMatch) {
-      date = dateMatch[1]
-      displayTitle = dateMatch[2]
-    }
-
+    // Title from first H1 in content
     const headingMatch = content.match(/^#\s+(.+)$/m)
     if (headingMatch) {
       displayTitle = headingMatch[1].trim()
     }
 
-    const sortKey = date ?? decoded
+    // Date prefix in filename: YYYY-MM-DD-title or YYYY-MM-DD_title
+    const dateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/)
+    if (dateMatch) {
+      date = dateMatch[1]
+      // Only override displayTitle if no H1 was found
+      if (!headingMatch) {
+        displayTitle = dateMatch[2]
+      }
+    }
+
+    const sortKey = date ?? slug
     const stats = getCachedStats(content)
 
     return {

@@ -20,14 +20,14 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
-// ── CDN textures ──────────────────────────────────────────────────────────
+// ── CDN textures — primary + fallback mirrors ─────────────────────────────
 
 const TEXTURES = {
-  day:     'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_atmos_2048.jpg',
-  night:   'https://unpkg.com/three-globe/example/img/earth-night.jpg',
-  normal:  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_normal_2048.jpg',
-  specular:'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg',
-  clouds:  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_clouds_1024.png',
+  day:     ['https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_atmos_2048.jpg', 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'],
+  night:   ['https://unpkg.com/three-globe/example/img/earth-night.jpg', 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg'],
+  normal:  ['https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_normal_2048.jpg', 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg'],
+  specular:['https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg', 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg'],
+  clouds:  ['https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_clouds_1024.png', 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png'],
 }
 
 // ── Earth shaders — blends day / night by sun angle ─────────────────────
@@ -129,12 +129,33 @@ function latLonToVec3(lat, lon, r = 1.01) {
   )
 }
 
-function loadTex(url) {
+function loadTex(urls) {
   return new Promise((resolve, reject) => {
-    new THREE.TextureLoader().load(url, t => {
-      t.colorSpace = THREE.SRGBColorSpace
-      resolve(t)
-    }, undefined, reject)
+    const candidates = Array.isArray(urls) ? [...urls] : [urls]
+    let tried = 0
+
+    function tryLoad() {
+      if (tried >= candidates.length) {
+        reject(new Error(`[EarthRenderer] All texture sources failed`))
+        return
+      }
+
+      const url = candidates[tried++]
+      new THREE.TextureLoader().load(
+        url,
+        t => {
+          t.colorSpace = THREE.SRGBColorSpace
+          resolve(t)
+        },
+        undefined,
+        () => {
+          console.warn(`[EarthRenderer] texture load failed from ${url}, trying fallback`)
+          tryLoad()
+        }
+      )
+    }
+
+    tryLoad()
   })
 }
 
@@ -383,8 +404,39 @@ export class EarthRenderer {
     if (this._destroyed) return
     this._destroyed = true
     cancelAnimationFrame(this._raf)
-    window.removeEventListener('resize', this._onResize)
+
+    // Dispose all Three.js objects
+    if (this._markers) {
+      this._markers.forEach(m => {
+        m._ring?.geometry.dispose()
+        m._ring?.material.dispose()
+        m._pillar?.geometry.dispose()
+        m._pillar?.material.dispose()
+      })
+      this._markers = []
+    }
+
+    this.scene?.traverse(obj => {
+      if (obj.geometry) obj.geometry.dispose()
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(mat => {
+            if (mat.map) mat.map.dispose()
+            mat.dispose()
+          })
+        } else {
+          if (obj.material.map) obj.material.map.dispose()
+          obj.material.dispose()
+        }
+      }
+    })
+
     this.controls?.dispose()
-    this.renderer.dispose()
+    this.composer?.dispose()
+    this.renderer?.dispose()
+
+    if (this._onResize) {
+      window.removeEventListener('resize', this._onResize)
+    }
   }
 }

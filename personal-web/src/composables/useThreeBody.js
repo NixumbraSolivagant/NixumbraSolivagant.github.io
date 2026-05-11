@@ -398,7 +398,7 @@ export function useThreeBody(config = {}) {
     observer.observe(canvas)
 
     animate()
-    return () => observer.disconnect()
+    return observer  // caller must call observer.disconnect() on cleanup
   }
 
   const stop = () => {

@@ -300,16 +300,19 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useThreeBody } from '../composables/useThreeBody.js'
 import GlobeViewer from '../components/GlobeViewer.vue'
+import { i18n } from '../i18n/index.js'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
+
+const locale = computed(() => i18n.global.locale.value)
 
 function toggleLocale() {
   const next = locale.value === 'zh' ? 'en' : 'zh'
-  locale.value = next
+  i18n.global.locale.value = next
   localStorage.setItem('locale', next)
 }
 
@@ -354,6 +357,7 @@ const fetchQuote = async () => {
 }
 
 const { start: startThreeBody, stop: stopThreeBody } = useThreeBody()
+let threeBodyObserver = null
 
 onMounted(() => {
   if (!document.querySelector('script[data-nix-script]')) {
@@ -364,7 +368,7 @@ onMounted(() => {
   }
   const canvas = document.getElementById('three-body-canvas')
   if (canvas instanceof HTMLCanvasElement) {
-    startThreeBody(canvas)
+    threeBodyObserver = startThreeBody(canvas)
   }
   fetchQuote()
   quoteTimer = window.setInterval(() => {
@@ -373,6 +377,10 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (threeBodyObserver) {
+    threeBodyObserver.disconnect()
+    threeBodyObserver = null
+  }
   stopThreeBody()
   if (quoteTimer) clearInterval(quoteTimer)
 })
