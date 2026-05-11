@@ -147,10 +147,11 @@ const startBgRotation = () => {
 }
 
 onMounted(async () => {
-  const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true, query: '?url', import: 'default' })
+  const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
   backgroundMedia.value = Object.values(mediaModules)
     .filter(Boolean)
-    .map((src) => {
+    .map((mod) => {
+      const src = typeof mod === 'string' ? mod : mod.default
       const lower = (src || '').toLowerCase()
       const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
       return { type: isVideo ? 'video' : 'image', src }
@@ -168,6 +169,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
+    <!-- Skip to main content link for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- 全局背景（双层 crossfade） -->
     <div class="nix-filter"></div>
     <div ref="layerA" class="bg-layer bg-layer--active" />
@@ -181,7 +185,7 @@ onBeforeUnmount(() => {
       preload="auto"
     ></video>
 
-    <router-view v-slot="{ Component, route: r }">
+    <router-view id="main-content" v-slot="{ Component, route: r }">
       <Transition name="page" mode="out-in">
         <component :is="Component" :key="r.fullPath" />
       </Transition>
@@ -190,6 +194,23 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 99999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
 .brand-logo {
   font-size: 1.2rem;
   letter-spacing: 0.06em;
@@ -216,9 +237,6 @@ onBeforeUnmount(() => {
 }
 
 @media (hover: none), (max-width: 768px) {
-  body {
-    background-attachment: scroll;
-  }
   .bg-layer {
     background-attachment: scroll;
   }

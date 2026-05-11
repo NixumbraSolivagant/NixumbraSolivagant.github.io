@@ -313,13 +313,14 @@ export class EarthRenderer {
 
     // Visitor marker pulse
     this._markers.forEach(m => {
+      const t_norm = (t % 2) / 2  // 0 → 1 → 0
       if (m._ring) {
-        const pulse          = 1 + (t % 2)
-        m._ring.scale.set(pulse, pulse, pulse)
-        m._ring.material.opacity = 1 - (t % 2) / 2
+        const s = 1 + t_norm * 0.6
+        m._ring.scale.set(s, s, s)
+        m._ring.material.opacity = 1 - t_norm * 0.6
       }
       if (m._pillar) {
-        m._pillar.material.opacity = 0.3 + Math.sin(t * 8) * 0.3
+        m._pillar.material.opacity = 0.35 + Math.sin(t_norm * Math.PI) * 0.45
       }
     })
 

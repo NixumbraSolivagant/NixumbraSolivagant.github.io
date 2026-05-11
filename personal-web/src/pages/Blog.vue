@@ -176,7 +176,7 @@ function getReadingStats(content) {
   }
 }
 
-// stats cache — avoids re-running regex over large content
+// stats cache — keyed by content hash so Map lookup is O(1)
 const statsCache = new Map()
 
 const getCachedStats = (content) => {

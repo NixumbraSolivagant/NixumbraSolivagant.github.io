@@ -27,7 +27,8 @@ const emit = defineEmits(['rendered'])
 function slugify(str) {
   return str
     .toLowerCase()
-    .replace(/[\u4e00-\u9fa5]/g, char => char.charCodeAt(0).toString(36))
+    .normalize('NFC')
+    .replace(/[\u4e00-\u9fff]/g, char => char.charCodeAt(0).toString(36))
     .replace(/[^\w\s-]/g, '')
     .trim()
     .replace(/[\s_-]+/g, '-')
