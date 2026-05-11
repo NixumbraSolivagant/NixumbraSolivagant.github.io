@@ -56,6 +56,7 @@ export function useThreeBody(config = {}) {
   let canvas, ctx
   let frameId = null
   let resizeHandler = null
+  let isVisible = true
 
   let bodies = []
   let trails = [[], [], []]
@@ -68,6 +69,9 @@ export function useThreeBody(config = {}) {
     { r: 255, g: 182, b: 193 },
     { r: 135, g: 206, b: 250 },
   ]
+
+  let lastTime = 0
+  let accumDt = 0
 
   function createBodies() {
     const cx = canvas.width / 2
@@ -362,22 +366,39 @@ export function useThreeBody(config = {}) {
     createBodies()
     createParticles()
 
-    let lastTime = performance.now()
+    lastTime = performance.now()
 
     const animate = () => {
       frameId = requestAnimationFrame(animate)
+
+      if (!isVisible) {
+        lastTime = performance.now()
+        return
+      }
 
       const now = performance.now()
       const dt = (now - lastTime) / 1000
       lastTime = now
 
-      updatePhysics(dt)
-      updateTrails()
+      accumDt += dt
+      const step = 1 / 60
+      while (accumDt >= step) {
+        updatePhysics(step)
+        updateTrails()
+        accumDt -= step
+      }
       updateExplosions(dt)
       render()
     }
 
+    // Pause when canvas leaves viewport (tab switch / scroll away)
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0].isIntersecting
+    }, { threshold: 0.05 })
+    observer.observe(canvas)
+
     animate()
+    return () => observer.disconnect()
   }
 
   const stop = () => {
@@ -393,6 +414,7 @@ export function useThreeBody(config = {}) {
     trails = [[], [], []]
     particles = []
     explosions = []
+    accumDt = 0
   }
 
   return { start, stop }

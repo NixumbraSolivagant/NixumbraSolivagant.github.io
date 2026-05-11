@@ -328,8 +328,13 @@ const quoteIndex = ref(0)
 const currentQuote = ref(fallbackQuotes[0])
 
 const fetchQuote = async () => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 4000)
   try {
-    const response = await fetch('https://v1.hitokoto.cn/?encode=json')
+    const response = await fetch('https://v1.hitokoto.cn/?encode=json', {
+      signal: controller.signal,
+    })
+    clearTimeout(timeoutId)
     if (!response.ok) throw new Error('Quote response error')
     const data = await response.json()
     const text = data.hitokoto?.trim()

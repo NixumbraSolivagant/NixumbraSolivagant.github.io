@@ -176,6 +176,16 @@ function getReadingStats(content) {
   }
 }
 
+// stats cache — avoids re-running regex over large content
+const statsCache = new Map()
+
+const getCachedStats = (content) => {
+  if (!statsCache.has(content)) {
+    statsCache.set(content, getReadingStats(content))
+  }
+  return statsCache.get(content)
+}
+
 const posts = Object.entries(markdownModules)
   .map(([path, mod]) => {
     const content = extractContent(mod)
@@ -198,7 +208,7 @@ const posts = Object.entries(markdownModules)
     }
 
     const sortKey = date ?? decoded
-    const stats = getReadingStats(content)
+    const stats = getCachedStats(content)
 
     return {
       path,

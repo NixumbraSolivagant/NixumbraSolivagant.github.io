@@ -103,6 +103,12 @@ body {
     pointer-events: none;
 }
 
+@media (hover: none), (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
 .three-body-canvas {
     position: fixed;
     inset: 0;

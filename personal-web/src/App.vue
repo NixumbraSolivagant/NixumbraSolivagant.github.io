@@ -6,25 +6,62 @@ const route = useRoute()
 const showNav = computed(() => route.path !== '/')
 
 // ===== 全局背景轮播 =====
-// 使用懒加载避免在 App.vue 初始化时阻塞
+// 预加载 + 双层 crossfade + 亮度缓存
 const backgroundMedia = ref([])
 const currentBgIndex = ref(0)
 let bgTimer = null
-let bgLoaded = false
 
-const applyBackground = (media) => {
-  const root = document.documentElement
-  const video = document.getElementById('background-video')
-  if (media.type === 'video') {
-    root.style.setProperty('--main_bg_color', 'none')
-    if (video) {
-      video.style.display = 'block'
-      if (video.getAttribute('src') !== media.src) {
-        video.setAttribute('src', media.src)
-        video.load()
-      }
-      video.play().catch(() => {})
+// 双层 DOM 节点引用
+const layerA = ref(null)  // 当前显示层
+const layerB = ref(null)  // 下一张层
+let activeLayer = 'A'
+
+// 亮度缓存
+const luminanceCache = new Map()
+
+const preloadImages = (medias) => {
+  medias.forEach(m => {
+    if (m.type === 'image') {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.src = m.src
     }
+  })
+}
+
+const detectLuminance = (imageUrl) => {
+  if (luminanceCache.has(imageUrl)) return luminanceCache.get(imageUrl)
+
+  const img = new Image()
+  img.crossOrigin = 'anonymous'
+
+  return new Promise(resolve => {
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { resolve(false); return }
+      const size = 40
+      canvas.width = size
+      canvas.height = size
+      ctx.drawImage(img, 0, 0, size, size)
+      const { data } = ctx.getImageData(0, 0, size, size)
+      let total = 0
+      for (let i = 0; i < data.length; i += 4) {
+        total += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]
+      }
+      const brightness = total / (data.length / 4)
+      const isDark = brightness < 140
+      luminanceCache.set(imageUrl, isDark)
+      resolve(isDark)
+    }
+    img.onerror = () => resolve(false)
+    img.src = imageUrl
+  })
+}
+
+const applyTheme = (isDark) => {
+  const root = document.documentElement
+  if (isDark) {
     root.style.setProperty('--main_text_color', '#f8fafc')
     root.style.setProperty('--item_left_title_color', '#f8fafc')
     root.style.setProperty('--item_left_text_color', '#e2e8f0')
@@ -38,63 +75,66 @@ const applyBackground = (media) => {
     root.style.setProperty('--card_stroke_color', 'rgba(255, 255, 255, 0.2)')
     root.style.setProperty('--accent', '#38bdf8')
     root.style.setProperty('--accent_strong', '#7dd3fc')
-    return
+  } else {
+    root.style.setProperty('--main_text_color', '#111827')
+    root.style.setProperty('--item_left_title_color', '#111827')
+    root.style.setProperty('--item_left_text_color', '#4b5563')
+    root.style.setProperty('--footer_text_color', '#374151')
+    root.style.setProperty('--fill', '#111827')
+    root.style.setProperty('--text_bg_color', 'rgba(255, 255, 255, 0.7)')
+    root.style.setProperty('--item_bg_color', 'rgba(255, 255, 255, 0.72)')
+    root.style.setProperty('--item_hover_color', 'rgba(255, 255, 255, 0.85)')
+    root.style.setProperty('--left_tag_item', 'rgba(255, 255, 255, 0.7)')
+    root.style.setProperty('--back_filter_color', 'rgba(255, 255, 255, 0.2)')
+    root.style.setProperty('--card_stroke_color', 'rgba(148, 163, 184, 0.18)')
+    root.style.setProperty('--accent', '#38bdf8')
+    root.style.setProperty('--accent_strong', '#0284c7')
   }
-  if (video) {
-    video.pause()
-    video.style.display = 'none'
-  }
-  root.style.setProperty('--main_bg_color', `url(${media.src})`)
-  updateTextColorFromBackground(`url(${media.src})`)
 }
 
-const updateTextColorFromBackground = (imageUrl = '') => {
-  const root = document.documentElement
-  const source = imageUrl || getComputedStyle(root).getPropertyValue('--main_bg_color').trim()
-  const urlMatch = source.match(/url\((['"]?)(.*?)\1\)/)
-  if (!urlMatch) return
+const switchToBg = async (media) => {
+  const video = document.getElementById('background-video')
 
-  const img = new Image()
-  img.crossOrigin = 'anonymous'
-  img.src = urlMatch[2]
-  img.onload = () => {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    const size = 40
-    canvas.width = size
-    canvas.height = size
-    ctx.drawImage(img, 0, 0, size, size)
-    const { data } = ctx.getImageData(0, 0, size, size)
-    let total = 0
-    for (let i = 0; i < data.length; i += 4) {
-      total += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]
+  if (media.type === 'video') {
+    if (video) {
+      video.style.display = 'block'
+      if (video.getAttribute('src') !== media.src) {
+        video.setAttribute('src', media.src)
+        video.load()
+      }
+      video.play().catch(() => {})
     }
-    const brightness = total / (data.length / 4)
-    const isDark = brightness < 140
-    root.style.setProperty('--main_text_color', isDark ? '#f8fafc' : '#111827')
-    root.style.setProperty('--item_left_title_color', isDark ? '#f8fafc' : '#111827')
-    root.style.setProperty('--item_left_text_color', isDark ? '#e2e8f0' : '#4b5563')
-    root.style.setProperty('--footer_text_color', isDark ? '#e2e8f0' : '#374151')
-    root.style.setProperty('--fill', isDark ? '#ffffff' : '#111827')
-    root.style.setProperty('--text_bg_color', isDark ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.7)')
-    root.style.setProperty('--item_bg_color', isDark ? 'rgba(15, 23, 42, 0.52)' : 'rgba(255, 255, 255, 0.72)')
-    root.style.setProperty('--item_hover_color', isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)')
-    root.style.setProperty('--left_tag_item', isDark ? 'rgba(15, 23, 42, 0.55)' : 'rgba(255, 255, 255, 0.7)')
-    root.style.setProperty('--back_filter_color', isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.2)')
-    root.style.setProperty('--card_stroke_color', isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(148, 163, 184, 0.18)')
-    root.style.setProperty('--accent', isDark ? '#38bdf8' : '#38bdf8')
-    root.style.setProperty('--accent_strong', isDark ? '#7dd3fc' : '#0284c7')
+    applyTheme(false)
+    return
   }
+
+  if (video) { video.pause(); video.style.display = 'none' }
+
+  const targetLayer = activeLayer === 'A' ? layerB.value : layerA.value
+  if (!targetLayer) return
+
+  targetLayer.style.backgroundImage = `url(${media.src})`
+  targetLayer.style.opacity = '0'
+
+  await new Promise(r => requestAnimationFrame(r))
+  targetLayer.style.opacity = '1'
+
+  const oldLayer = activeLayer === 'A' ? layerA.value : layerB.value
+  if (oldLayer) oldLayer.style.opacity = '0'
+
+  activeLayer = activeLayer === 'A' ? 'B' : 'A'
+
+  const isDark = await detectLuminance(media.src)
+  applyTheme(isDark)
 }
 
 const startBgRotation = () => {
   if (!backgroundMedia.value.length) return
-  if (!bgLoaded) {
-    bgLoaded = true
-    const randomIndex = Math.floor(Math.random() * backgroundMedia.value.length)
-    currentBgIndex.value = randomIndex
-    applyBackground(backgroundMedia.value[randomIndex])
+  const first = backgroundMedia.value[currentBgIndex.value]
+  if (first) {
+    if (layerA.value) layerA.value.style.backgroundImage = `url(${first.src})`
+    if (first.type === 'image') detectLuminance(first.src).then(applyTheme)
+    else applyTheme(false)
   }
   bgTimer = window.setInterval(() => {
     let nextIndex
@@ -102,12 +142,11 @@ const startBgRotation = () => {
       nextIndex = Math.floor(Math.random() * backgroundMedia.value.length)
     } while (nextIndex === currentBgIndex.value && backgroundMedia.value.length > 1)
     currentBgIndex.value = nextIndex
-    applyBackground(backgroundMedia.value[nextIndex])
+    switchToBg(backgroundMedia.value[nextIndex])
   }, 12000)
 }
 
 onMounted(async () => {
-  // 动态加载背景媒体文件
   const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true, query: '?url', import: 'default' })
   backgroundMedia.value = Object.values(mediaModules)
     .filter(Boolean)
@@ -118,6 +157,7 @@ onMounted(async () => {
     })
     .sort((a, b) => a.src.localeCompare(b.src))
 
+  preloadImages(backgroundMedia.value)
   startBgRotation()
 })
 
@@ -128,8 +168,10 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <!-- 全局背景 -->
+    <!-- 全局背景（双层 crossfade） -->
     <div class="nix-filter"></div>
+    <div ref="layerA" class="bg-layer bg-layer--active" />
+    <div ref="layerB" class="bg-layer" />
     <video
       id="background-video"
       class="background-video"
@@ -155,6 +197,34 @@ onBeforeUnmount(() => {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* 双层 crossfade 背景 */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  pointer-events: none;
+}
+
+@media (hover: none), (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+  .bg-layer {
+    background-attachment: scroll;
+  }
+}
+.bg-layer--active {
+  opacity: 1;
 }
 
 .page-enter-active,

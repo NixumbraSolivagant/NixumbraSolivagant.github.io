@@ -157,45 +157,39 @@ const makers = {
 }
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
-let THREE = null
+let THREEloaded = false
 
 const initAnimations = () => {
+  if (!THREEloaded) return
   animations.value.forEach(anim => {
     const canvas = canvasRefs[anim.id]
     if (!canvas) return
-    let inited = false
+
     const init = () => {
-      if (!window._THREE || inited) return
       if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return
-      inited = true
       try {
         register(makers[anim.id](canvas))
       } catch (e) {
         console.error(`[Animation] init failed for "${anim.id}":`, e)
       }
     }
-    init()
-    if (!inited) {
-      const mo = new MutationObserver(() => { init(); if (inited) mo.disconnect() })
-      mo.observe(canvas, { attributes: true, attributeFilter: ['style', 'class'] })
-      const ro = new ResizeObserver(() => {
-        if (canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
-          init()
-          if (inited) {
-            mo.disconnect()
-            ro.disconnect()
-          }
-        }
-      })
-      ro.observe(canvas)
-    }
+
+    // Lazy-init: only when card scrolls into view
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        init()
+        io.disconnect()
+      }
+    }, { rootMargin: '100px' })
+    io.observe(canvas)
   })
 }
 
 onMounted(async () => {
-  const three = await import('three')
-  THREE = three
-  window._THREE = three
+  await import('three')
+  THREEloaded = true
+  // Refs aren't populated until after first render, so defer
+  await nextTick()
   initAnimations()
 })
 
