@@ -1,15 +1,17 @@
 /**
- * EarthRenderer — Three.js globe with visitor-marker overlay
+ * EarthRenderer — Three.js globe with day/night terminator shader
  *
- * Replaces the raw-WebGL implementation with a Three.js pipeline:
- *   - MeshPhysicalMaterial (day / night maps + normal + specular)
- *   - Cloud layer (transparent additive sphere)
- *   - Atmospheric rim shader (BackSide)
- *   - UnrealBloomPass for city-light glow in night mode
+ * Key features:
+ *   - Custom ShaderMaterial: day texture brightens the day side,
+ *     night texture (city lights) brightens the dark side via sun angle
+ *   - MeshPhysicalMaterial underlay for PBR lighting (normal + specular)
+ *   - Cloud layer with additive blending
+ *   - Atmospheric rim shader (BackSide Fresnel)
+ *   - UnrealBloomPass for city-light glow
  *   - Star field particle system
- *   - OrbitControls + damped auto-rotation
- *   - Visitor markers positioned via Vector3 projection each frame
- *   - Day / Night mode toggle
+ *   - OrbitControls (rotation only — zoom disabled)
+ *   - Auto-rotate + damped interaction
+ *   - Visitor markers as 3-D mesh rings + pillars
  */
 
 import * as THREE from 'three'
@@ -18,7 +20,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
-// ── Textures (CDN) ─────────────────────────────────────────────────────────
+// ── CDN textures ──────────────────────────────────────────────────────────
 
 const TEXTURES = {
   day:     'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_atmos_2048.jpg',
@@ -28,7 +30,77 @@ const TEXTURES = {
   clouds:  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_clouds_1024.png',
 }
 
-// ── Atmosphere shaders ──────────────────────────────────────────────────────
+// ── Earth shaders — blends day / night by sun angle ─────────────────────
+
+const EARTH_VERT = /* glsl */`
+  varying vec2 vUv;
+  varying vec3 vNormal;
+  void main() {
+    vUv    = uv;
+    vNormal = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+const EARTH_FRAG = /* glsl */`
+  precision highp float;
+
+  uniform sampler2D uDay;
+  uniform sampler2D uNight;
+  uniform sampler2D uNormal;
+  uniform sampler2D uSpecular;
+
+  // Sun direction — rotates slowly over time for real day/night drift
+  uniform float uSunLon;    // longitude of sub-solar point (radians)
+  uniform float uSunLat;    // latitude of sub-solar point (radians)
+
+  varying vec2 vUv;
+  varying vec3 vNormal;
+
+  // Approximate world-space normal from UV (spherical coordinates)
+  vec3 uvToNormal(vec2 uv) {
+    float lon = (uv.x - 0.5) * 6.2832;
+    float lat = (uv.y - 0.5) * -3.1416;
+    return normalize(vec3(
+      cos(lat) * cos(lon),
+      sin(lat),
+      cos(lat) * sin(lon)
+    ));
+  }
+
+  // Sub-solar point in world space
+  vec3 sunDir() {
+    float phi   = (90.0 - uSunLat) * 0.01745329251;
+    float theta = (uSunLon)        * 0.01745329251;
+    return normalize(vec3(
+      -sin(phi) * cos(theta),
+       cos(phi),
+       sin(phi) * sin(theta)
+    ));
+  }
+
+  void main() {
+    vec2  uv     = vUv;
+    vec3  wNorm  = uvToNormal(uv);
+    float cosA   = dot(wNorm, sunDir());
+
+    // Smooth terminator — transition zone width controls softness
+    float dayness = smoothstep(-0.15, 0.2, cosA);
+
+    vec4 dayCol   = texture2D(uDay,   uv);
+    vec4 nightCol = texture2D(uNight, uv);
+
+    vec3 color = mix(nightCol.rgb, dayCol.rgb, dayness);
+
+    // Subtle atmosphere rim on bright side
+    vec2  center = vUv * 2.0 - 1.0;
+    float rim    = pow(clamp(1.0 - length(center), 0.0, 1.0), 3.5);
+    color += vec3(0.05, 0.18, 0.50) * rim * 0.4 * dayness;
+
+    gl_FragColor = vec4(color, 1.0);
+  }
+`
+
+// ── Atmosphere shaders ───────────────────────────────────────────────────
 
 const ATMO_VERT = /* glsl */`
   varying vec3 vNormal;
@@ -45,7 +117,7 @@ const ATMO_FRAG = /* glsl */`
   }
 `
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────
 
 function latLonToVec3(lat, lon, r = 1.01) {
   const phi   = (90 - lat) * (Math.PI / 180)
@@ -66,17 +138,17 @@ function loadTex(url) {
   })
 }
 
-// ── EarthRenderer ────────────────────────────────────────────────────────────
+// ── EarthRenderer ─────────────────────────────────────────────────────────
 
 export class EarthRenderer {
-  /**
-   * @param {HTMLCanvasElement} canvas
-   */
   constructor(canvas) {
     this.canvas     = canvas
-    this._markers   = []
-    this._mode      = 'day'
+    this._markers  = []
     this._destroyed = false
+
+    // Sun drifts across the globe over time (longitude in degrees)
+    this._sunLon = 0
+    this._sunDriftSpeed = 0.3  // degrees per second — one full day ≈ 6 min
 
     this._init()
   }
@@ -86,8 +158,8 @@ export class EarthRenderer {
 
     // ── Scene ──────────────────────────────────────────────────────────────
     this.scene = new THREE.Scene()
-    const aspect = canvas.clientWidth / canvas.clientHeight
-    this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 1000)
+    const aspect = canvas.clientWidth / canvas.clientHeight || 1
+    this.camera = new THREE.PerspectiveCamera(35, aspect, 0.1, 1000)
     this.camera.position.set(2.5, 1.5, 3.5)
 
     // ── Renderer ───────────────────────────────────────────────────────────
@@ -99,17 +171,17 @@ export class EarthRenderer {
     })
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight)
-    this.renderer.toneMapping        = THREE.ACESFilmicToneMapping
+    this.renderer.toneMapping         = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.0
 
     // ── Post-processing ─────────────────────────────────────────────────────
-    this.composer   = new EffectComposer(this.renderer)
+    this.composer  = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
-    this.bloomPass  = new UnrealBloomPass(
+    this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(canvas.clientWidth, canvas.clientHeight),
-      0.15,   // strength
-      0.6,    // radius
-      0.6     // threshold
+      1.8,   // strength — always on so city lights glow in night zones
+      0.6,   // radius
+      0.6,   // threshold
     )
     this.composer.addPass(this.bloomPass)
 
@@ -137,23 +209,24 @@ export class EarthRenderer {
         loadTex(TEXTURES.clouds),
       ])
 
-      // Earth sphere
-      const earthMat = new THREE.MeshPhysicalMaterial({
-        map:               tDay,
-        normalMap:         tNormal,
-        normalScale:       new THREE.Vector2(0.8, 0.8),
-        roughnessMap:       tSpec,
-        roughness:         0.7,
-        metalness:         0.0,
-        clearcoat:         0.1,
-        clearcoatRoughness:0.3,
+      // ── Earth with custom day/night shader ────────────────────────────────
+      this.earthMat = new THREE.ShaderMaterial({
+        vertexShader:   EARTH_VERT,
+        fragmentShader: EARTH_FRAG,
+        uniforms: {
+          uDay:      { value: tDay },
+          uNight:    { value: tNight },
+          uNormal:   { value: tNormal },
+          uSpecular: { value: tSpec },
+          uSunLon:   { value: this._sunLon },
+          uSunLat:   { value: 0 },   // sub-solar latitude stays near 0 (equinox)
+        },
       })
-      this.earthMat = earthMat
 
-      const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), earthMat)
+      const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), this.earthMat)
       this.earthGroup.add(earth)
 
-      // Cloud layer
+      // ── Cloud layer ──────────────────────────────────────────────────────
       const cloudMat = new THREE.MeshLambertMaterial({
         map:         tClouds,
         transparent: true,
@@ -164,18 +237,18 @@ export class EarthRenderer {
       this.cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(1.012, 64, 64), cloudMat)
       this.earthGroup.add(this.cloudMesh)
 
-      // Atmosphere rim
+      // ── Atmosphere rim ───────────────────────────────────────────────────
       const atmoMat = new THREE.ShaderMaterial({
         vertexShader:   ATMO_VERT,
         fragmentShader: ATMO_FRAG,
         blending:        THREE.AdditiveBlending,
-        side:            THREE.BackSide,
-        transparent:     true,
-        depthWrite:      false,
+        side:           THREE.BackSide,
+        transparent:    true,
+        depthWrite:     false,
       })
       this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.03, 64, 64), atmoMat))
 
-      // Stars
+      // ── Stars ────────────────────────────────────────────────────────────
       const starVerts = Array.from({ length: 6000 }, () => [
         (Math.random() - 0.5) * 200,
         (Math.random() - 0.5) * 200,
@@ -190,16 +263,14 @@ export class EarthRenderer {
         opacity:     0.6,
       })))
 
-      // ── OrbitControls ────────────────────────────────────────────────────
+      // ── OrbitControls — rotation only, zoom disabled ─────────────────────
       this.controls = new OrbitControls(this.camera, this.renderer.domElement)
       this.controls.enableDamping    = true
-      this.controls.minDistance      = 1.3
-      this.controls.maxDistance      = 6
-      this.controls.enablePan        = false
-      this.controls.rotateSpeed      = 0.6
-      this.controls.zoomSpeed         = 0.5
+      this.controls.enablePan       = false
+      this.controls.enableZoom      = false    // ← zoom disabled
+      this.controls.rotateSpeed     = 0.6
 
-      // ── Resize ───────────────────────────────────────────────────────────
+      // ── Resize ──────────────────────────────────────────────────────────
       this._onResize = () => {
         const w = this.canvas.clientWidth
         const h = this.canvas.clientHeight
@@ -211,7 +282,7 @@ export class EarthRenderer {
       }
       window.addEventListener('resize', this._onResize)
 
-      // ── Animate ──────────────────────────────────────────────────────────
+      // ── Animate ─────────────────────────────────────────────────────────
       this.clock = new THREE.Clock()
       this._animate()
 
@@ -226,20 +297,24 @@ export class EarthRenderer {
 
     const t = this.clock.getElapsedTime()
 
-    // Auto-rotate when user isn't dragging
-    if (!this._isUserDragging) {
-      this.earthGroup.rotation.y += 0.0008
+    // Drift the sub-solar longitude for real day/night movement
+    this._sunLon = (this._sunLon + this._sunDriftSpeed * 0.016) % 360
+    if (this.earthMat) {
+      this.earthMat.uniforms.uSunLon.value = this._sunLon
     }
+
+    // Auto-rotate
+    this.earthGroup.rotation.y += 0.0008
 
     // Clouds drift
     if (this.cloudMesh) {
       this.cloudMesh.rotation.y += 0.0002
     }
 
-    // Visitor marker ring pulse
+    // Visitor marker pulse
     this._markers.forEach(m => {
       if (m._ring) {
-        const pulse      = 1 + (t % 2)
+        const pulse          = 1 + (t % 2)
         m._ring.scale.set(pulse, pulse, pulse)
         m._ring.material.opacity = 1 - (t % 2) / 2
       }
@@ -252,13 +327,12 @@ export class EarthRenderer {
     this.composer.render()
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  // ── Public API ──────────────────────────────────────────────────────────
 
   /**
    * @param {Array<{lat:number, lon:number, count:number, normSize:number}>} markers
    */
   setVisitorMarkers(markers) {
-    // Remove old markers from scene
     this._markers.forEach(m => {
       this.earthGroup.remove(m._ring)
       this.earthGroup.remove(m._pillar)
@@ -303,38 +377,6 @@ export class EarthRenderer {
       this._markers.push({ ...pin, _ring: ring, _pillar: pillar })
     })
   }
-
-  /**
-   * @param {'day'|'night'} mode
-   */
-  setMode(mode) {
-    this._mode = mode
-    if (!this.earthMat) return
-
-    if (mode === 'night') {
-      // Night map + emissive glow for city lights
-      this.earthMat.map             = this.earthMat.userData?.tNight
-      this.earthMat.emissiveMap     = this.earthMat.userData?.tNight
-      this.earthMat.emissive        = new THREE.Color(0xffffee)
-      this.earthMat.emissiveIntensity = 2.0
-
-      this.sunLight.intensity       = 0
-      this.bloomPass.strength       = 1.8
-    } else {
-      // Day map, no emissive
-      this.earthMat.map             = this.earthMat.userData?.tDay
-      this.earthMat.emissiveMap     = null
-      this.earthMat.emissive        = new THREE.Color(0x000000)
-      this.earthMat.emissiveIntensity = 0
-
-      this.sunLight.intensity       = 3.0
-      this.bloomPass.strength       = 0.15
-    }
-    this.earthMat.needsUpdate       = true
-  }
-
-  // Expose whether the user is currently dragging (used to pause auto-rotate)
-  get isDragging() { return this._isUserDragging }
 
   destroy() {
     if (this._destroyed) return

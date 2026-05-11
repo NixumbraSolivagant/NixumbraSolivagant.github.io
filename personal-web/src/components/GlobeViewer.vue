@@ -1,48 +1,43 @@
 <template>
   <div class="gv-wrap">
     <div class="gv-viewport" ref="viewportEl">
+
+      <!-- ── HUD: above the globe ── -->
+      <div class="gv-hud">
+        <div class="hud-inner">
+          <span class="hud-label">GEO-SYS</span>
+          <span class="hud-sep">//</span>
+          <span class="hud-label-sub">VISITOR MAP</span>
+        </div>
+        <div class="hud-meta">
+          <span class="hud-live-dot" />
+          <span class="hud-text">{{ total > 0 ? total.toLocaleString() : '—' }}</span>
+          <span class="hud-text-sub">visits · {{ countryCount > 0 ? countryCount : '—' }} countries</span>
+        </div>
+      </div>
+
+      <!-- ── Loading ── -->
       <Transition name="fade">
         <div v-if="!earthReady" class="gv-loading">
           <div class="gv-ring" />
         </div>
       </Transition>
 
+      <!-- ── Globe canvas ── -->
       <canvas ref="canvasEl" class="gv-canvas" />
 
-      <div class="gv-hud">
-        <div class="hud-title">{{ hudTitle }}</div>
-        <div class="hud-sub">{{ hudSub }}</div>
-      </div>
-
-      <div class="gv-controls" v-if="earthReady">
-        <button
-          class="ctrl-btn"
-          :class="{ active: globeMode === 'day' }"
-          @click="setGlobeMode('day')"
-        >Daylight</button>
-        <button
-          class="ctrl-btn"
-          :class="{ active: globeMode === 'night' }"
-          @click="setGlobeMode('night')"
-        >Night Lights</button>
-      </div>
-
+      <!-- ── Hint ── -->
       <Transition name="fade">
         <div v-if="earthReady && !hasInteracted" class="gv-hint">
           Drag to rotate · Visit locations worldwide
         </div>
       </Transition>
     </div>
-
-    <div v-if="earthReady && total > 0" class="gv-footer">
-      <span class="footer-dot" />
-      <span>{{ total }} visits · {{ countryCount }} countries</span>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { EarthRenderer } from '@/composables/useEarthRenderer.js'
 import { fetchTopCountries } from '@/modules/umamiClient.js'
 import { statsToMarkers } from '@/modules/geoUtils.js'
@@ -51,24 +46,18 @@ const props = defineProps({
   refreshInterval: { type: Number, default: 60_000 },
 })
 
-const canvasEl     = ref(null)
-const viewportEl   = ref(null)
-const earthReady   = ref(false)
+const canvasEl      = ref(null)
+const viewportEl    = ref(null)
+const earthReady    = ref(false)
 const hasInteracted = ref(false)
-const total        = ref(0)
-const countryCount = ref(0)
-const globeMode    = ref('day')
+const total         = ref(0)
+const countryCount  = ref(0)
 
 let renderer  = null
 let pollTimer = null
 
 function onInteract() {
   hasInteracted.value = true
-}
-
-function setGlobeMode(mode) {
-  globeMode.value = mode
-  renderer?.setMode(mode)
 }
 
 async function loadData() {
@@ -116,10 +105,11 @@ onBeforeUnmount(() => {
   renderer = null
 })
 
-defineExpose({ reload: loadData, setGlobeMode })
+defineExpose({ reload: loadData })
 </script>
 
 <style scoped>
+/* ── Layout ── */
 .gv-wrap {
   display: flex;
   flex-direction: column;
@@ -135,6 +125,7 @@ defineExpose({ reload: loadData, setGlobeMode })
   overflow: hidden;
 }
 
+/* ── Canvas ── */
 .gv-canvas {
   position: absolute;
   inset: 0;
@@ -150,7 +141,7 @@ defineExpose({ reload: loadData, setGlobeMode })
 }
 .gv-canvas:active { cursor: grabbing; }
 
-/* ── Loading ring ── */
+/* ── Loading ── */
 .gv-loading {
   position: absolute;
   inset: 0;
@@ -170,98 +161,110 @@ defineExpose({ reload: loadData, setGlobeMode })
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── HUD ── */
+/* ── HUD (above globe) ── */
 .gv-hud {
   position: absolute;
-  top: 22px;
-  left: 26px;
-  color: #fff;
-  pointer-events: none;
-  z-index: 10;
-}
-.hud-title {
-  font-size: 22px;
-  font-weight: 100;
-  letter-spacing: 3px;
-  border-left: 2px solid #00aaff;
-  padding-left: 12px;
-  margin-bottom: 4px;
-  color: rgba(255,255,255,0.9);
-}
-.hud-sub {
-  font-size: 10px;
-  color: #88ccff;
-  letter-spacing: 1.5px;
-  padding-left: 14px;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-
-/* ── Mode controls ── */
-.gv-controls {
-  position: absolute;
-  bottom: 24px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+
+  background: var(--item_bg_color);
+  border: 1px solid var(--card_stroke_color);
+  border-radius: 12px;
+  padding: 8px 20px 7px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
   display: flex;
-  gap: 12px;
-  pointer-events: auto;
-  z-index: 10;
-}
-.ctrl-btn {
-  background: rgba(0, 20, 40, 0.6);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  color: #fff;
-  padding: 8px 22px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-}
-.ctrl-btn:hover {
-  background: rgba(0, 170, 255, 0.2);
-  box-shadow: 0 0 16px rgba(0, 170, 255, 0.4);
-}
-.ctrl-btn.active {
-  background: rgba(0, 170, 255, 0.25);
-  border-color: #00aaff;
-  box-shadow: 0 0 24px rgba(0, 170, 255, 0.6) inset;
-}
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
 
-/* ── Hint ── */
-.gv-hint {
-  position: absolute;
-  bottom: 72px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10.5px;
-  color: var(--item_left_text_color);
-  opacity: 0.38;
-  pointer-events: none;
+  min-width: 160px;
   white-space: nowrap;
-  z-index: 10;
 }
 
-/* ── Footer ── */
-.gv-footer {
+.hud-inner {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  color: var(--item_left_text_color);
-  opacity: 0.5;
+  gap: 6px;
 }
-.footer-dot {
-  width: 6px; height: 6px; border-radius: 50%;
+
+.hud-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent_strong, #7dd3fc);
+  line-height: 1;
+}
+.hud-sep {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--card_stroke_color);
+  line-height: 1;
+}
+.hud-label-sub {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--item_left_text_color);
+  opacity: 0.55;
+  line-height: 1;
+}
+
+.hud-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hud-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
   background: var(--accent, #38bdf8);
   animation: dot-pulse 2.4s ease-in-out infinite;
   flex-shrink: 0;
 }
+.hud-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--main_text_color);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.hud-text-sub {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: var(--item_left_text_color);
+  opacity: 0.55;
+  line-height: 1;
+}
+
 @keyframes dot-pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+/* ── Hint ── */
+.gv-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--item_left_text_color);
+  opacity: 0.3;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  letter-spacing: 0.5px;
+}
 
 /* ── Transitions ── */
 .fade-leave-active { transition: opacity 0.5s; }
