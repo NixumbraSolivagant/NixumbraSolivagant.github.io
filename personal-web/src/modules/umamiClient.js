@@ -1,49 +1,47 @@
 /**
  * Umami visitor data fetcher.
  *
- * Since Umami is a self-hosted analytics platform, this module fetches
- * country stats via the Umami public share API — no login required.
+ * Supports both self-hosted and Umami Cloud.
  *
- * Setup: In your Umami dashboard, create a "Share" link for your website
- * (Website Settings → Share). Paste the share URL here.
+ * Setup:
+ *  - Self-hosted: set VITE_UMAMI_BASE to your server URL
+ *  - Umami Cloud: set VITE_UMAMI_BASE to https://api.umami.is/v1
  *
- * Example share URL:
- *   https://umami.example.com/share/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/your-website-slug
- *                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- *                                            replace SHARE_ID and SLUG below
+ * Find your website UUID from the Umami dashboard (Websites → click your site).
+ * Generate an API key in Settings → API Keys.
  */
 
-// ── Configuration ────────────────────────────────────────────────────────────
 const UMAMI_BASE = import.meta.env.VITE_UMAMI_BASE || ''
-const SHARE_ID = import.meta.env.VITE_UMAMI_SHARE_ID || ''
-const SLUG = import.meta.env.VITE_UMAMI_SLUG || ''
+const WEBSITE_ID = import.meta.env.VITE_UMAMI_WEBSITE_ID || ''
+const API_KEY = import.meta.env.VITE_UMAMI_API_KEY || ''
 
 const API_BASE = UMAMI_BASE
-  ? `${UMAMI_BASE}/api/share`
-  : '/api/share'
+const ENDPOINT = `${API_BASE}/websites/${WEBSITE_ID}/metrics`
 
 /**
- * Fetch country visitor stats from the Umami public share endpoint.
+ * Fetch country visitor stats from the Umami metrics API.
  *
- * @param {string} [websiteSlug] - optional override
+ * @param {number} [limit=10] - max number of countries to return
  * @returns {Promise<Array<{x: string, y: number}>>} country code → visitor count
  */
-export async function fetchCountryStats(websiteSlug = SLUG) {
-  if (!SHARE_ID) {
-    console.warn('[Umami] VITE_UMAMI_SHARE_ID not set — using mock data')
+export async function fetchCountryStats(limit = 10) {
+  if (!API_KEY || !WEBSITE_ID) {
+    console.warn('[Umami] VITE_UMAMI_API_KEY or VITE_UMAMI_WEBSITE_ID not set — using mock data')
     return getMockData()
   }
 
-  const url = `${API_BASE}/${SHARE_ID}${websiteSlug ? `/${websiteSlug}` : ''}/metrics`
+  const params = new URLSearchParams({
+    startAt: '0',
+    endAt: Date.now().toString(),
+    type: 'country',
+    limit: limit.toString(),
+  })
 
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      type: 'countries',
-      startAt: 0,
-      endAt: Date.now(),
-    }),
-    method: 'POST',
+  const res = await fetch(`${ENDPOINT}?${params}`, {
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json',
+    },
   })
 
   if (!res.ok) {
@@ -51,22 +49,19 @@ export async function fetchCountryStats(websiteSlug = SLUG) {
     return getMockData()
   }
 
-  const json = await res.json()
-  return json.data || []
+  const data = await res.json()
+  return data.slice(0, limit)
 }
 
 /**
- * Fetch top countries with visitor counts.
- * Convenience wrapper that returns sorted results.
+ * Fetch top countries with visitor counts, sorted descending.
  *
  * @param {number} [limit=10]
  * @returns {Promise<Array<{x: string, y: number}>>}
  */
 export async function fetchTopCountries(limit = 10) {
-  const stats = await fetchCountryStats()
-  return stats
-    .sort((a, b) => b.y - a.y)
-    .slice(0, limit)
+  const stats = await fetchCountryStats(limit)
+  return stats.sort((a, b) => b.y - a.y)
 }
 
 /**

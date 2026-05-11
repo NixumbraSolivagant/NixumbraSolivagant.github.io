@@ -47,6 +47,11 @@
           <ul id="line">
             <li>
               <div class="focus"></div>
+              <div>{{ t('home.timelineEvent2') }}</div>
+              <div>2026.5.11</div>
+            </li>
+            <li>
+              <div class="focus"></div>
               <div>{{ t('home.timelineEvent') }}</div>
               <div>2026.1.24</div>
             </li>
