@@ -153,19 +153,18 @@
             <button class="lang-switch" :title="locale === 'zh' ? t('common.switchToEn') : t('common.switchToZh')" @click="toggleLocale">
               {{ locale === 'zh' ? 'EN' : '中文' }}
             </button>
-            <a class="switch" href="javascript:void(0)">
-              <div class="onoffswitch">
-                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked />
-                <label class="onoffswitch-label" for="myonoffswitch">
-                  <span class="onoffswitch-inner"></span>
-                  <span class="onoffswitch-switch"></span>
-                </label>
-              </div>
-            </a>
+            <button class="theme-switch" :title="isDarkTheme ? t('common.switchToLight') : t('common.switchToDark')" @click="toggleTheme" :aria-label="isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'">
+              <svg v-if="isDarkTheme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+              <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+              </svg>
+            </button>
           </div>
 
           <div class="tanChiShe">
-            <img id="tanChiShe" src="/static/svg/snake-Light.svg" alt="" />
+            <img id="tanChiShe" :src="isDarkTheme ? '/static/svg/snake-Dark.svg' : '/static/svg/snake-Light.svg'" alt="" />
           </div>
         </header>
 
@@ -306,6 +305,7 @@ import { useThreeBody } from '../composables/useThreeBody.js'
 import GlobeViewer from '../components/GlobeViewer.vue'
 import { i18n } from '../i18n/index.js'
 import { SITE_AUTHOR } from '../config/author.js'
+import { isDarkTheme, toggleTheme } from '../composables/useTheme.js'
 
 const { t } = useI18n()
 
@@ -405,5 +405,26 @@ onBeforeUnmount(() => {
   opacity: 1;
   background: var(--accent);
   border-color: transparent;
+}
+
+.theme-switch {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--item_hover_color);
+  color: var(--main_text_color);
+  border: 1px solid var(--card_stroke_color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.theme-switch:hover {
+  background: var(--accent);
+  border-color: transparent;
+  transform: translateY(-1px);
 }
 </style>

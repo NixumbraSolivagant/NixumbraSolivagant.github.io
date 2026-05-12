@@ -8,9 +8,13 @@
             <div class="zhihu-title">{{ t('blog.heroTitle') }}</div>
             <p class="zhihu-subtitle">{{ t('blog.heroSubtitle') }}</p>
             <div class="zhihu-tabs">
-              <button class="tab active">{{ t('blog.tabRecommend') }}</button>
-              <button class="tab">{{ t('blog.tabLatest') }}</button>
-              <button class="tab">{{ t('blog.tabEssay') }}</button>
+              <button
+                v-for="tab in tabs"
+                :key="tab.key"
+                class="tab"
+                :class="{ active: activeTab === tab.key }"
+                @click="activeTab = tab.key"
+              >{{ tab.label }}</button>
             </div>
           </div>
           <div class="zhihu-hero-card">
@@ -112,7 +116,11 @@
             <div class="side-card">
               <div class="side-title">{{ t('blog.sidebarUpdate') }}</div>
               <p class="side-text">{{ t('blog.sidebarUpdateDesc') }}</p>
-              <button class="side-btn">{{ t('blog.sidebarFollow') }}</button>
+              <button
+                class="side-btn"
+                :class="{ subscribed: isFollowing }"
+                @click="isFollowing = !isFollowing"
+              >{{ isFollowing ? t('blog.sidebarFollowing') : t('blog.sidebarFollow') }}</button>
             </div>
             <div v-if="isDetailView" class="side-card post-toc">
               <div class="toc-title">{{ t('blog.tocTitle') }}</div>
@@ -141,6 +149,14 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { SITE_AUTHOR } from '@/config/author.js'
 
 const { t } = useI18n()
+
+const activeTab = ref('recommend')
+const isFollowing = ref(false)
+const tabs = computed(() => [
+  { key: 'recommend', label: t('blog.tabRecommend') },
+  { key: 'latest',   label: t('blog.tabLatest') },
+  { key: 'essay',    label: t('blog.tabEssay') },
+])
 
 // auto import all markdown files
 const markdownModules = import.meta.glob('../markdowns/*.md', { eager: true, query: '?raw', import: 'default' })
@@ -719,6 +735,14 @@ watch(
   padding: 10px 12px;
   border-radius: 10px;
   font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.side-btn.subscribed {
+  background: var(--item_hover_color);
+  color: var(--item_left_text_color);
+  border: 1px solid var(--card_stroke_color);
 }
 
 @media (max-width: 1024px) {
