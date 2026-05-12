@@ -132,7 +132,7 @@ const animations = computed(() =>
 
 // ── Canvas refs ─────────────────────────────────────────────────────────────
 const canvasRefs = reactive({})
-const setCanvasRef = (id, el) => { if (el) canvasRefs[id] = el }
+const setCanvasRef = (id, el) => { if (el) { if (!canvasRefs[id]) canvasRefs[id] = el } }
 const modalCanvasRef = ref(null)
 
 // ── Cleanup registry ─────────────────────────────────────────────────────────

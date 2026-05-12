@@ -6,7 +6,7 @@ const defaultConfig = {
   maxVelocity: 500,
 }
 
-// 三角旋转（拉格朗日L4/L5点）
+// 三角旋转（拉格朗日 L4/L5 点）
 function getLagrangeTriangle(cx, cy, r, G) {
   const v = Math.sqrt(G / r) * 0.8
   return [
@@ -227,7 +227,7 @@ export function useThreeBody(config = {}) {
 
   function updateTrails() {
     if (!cfg.enableTrails) return
-      for (let i = 0; i < bodies.length; i++) {
+    for (let i = 0; i < bodies.length; i++) {
       trails[i].push({ x: bodies[i].x, y: bodies[i].y })
       if (trails[i].length > cfg.trailLength) {
         trails[i].shift()

@@ -10,7 +10,7 @@ export function makeBalls(canvas) {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
 
   const scene = new THREE.Scene()
@@ -43,15 +43,20 @@ export function makeBalls(canvas) {
   const step = () => {
     id = requestAnimationFrame(step)
     const b = 3.2
-    spheres.forEach(s => {
+    for (const s of spheres) {
       s.position.x += s.userData.vx; s.position.y += s.userData.vy; s.position.z += s.userData.vz
       if (Math.abs(s.position.x) > b) s.userData.vx *= -1
       if (Math.abs(s.position.y) > b) s.userData.vy *= -1
       if (Math.abs(s.position.z) > b) s.userData.vz *= -1
-    })
+    }
     group.rotation.y += 0.003
     renderer.render(scene, camera)
   }
   step()
-  return () => { cancelAnimationFrame(id); ro.disconnect(); renderer.dispose() }
+  return () => {
+    cancelAnimationFrame(id)
+    ro.disconnect()
+    spheres.forEach(s => { s.geometry.dispose(); s.material.dispose() })
+    renderer.dispose()
+  }
 }

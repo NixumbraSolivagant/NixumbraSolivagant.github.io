@@ -405,7 +405,6 @@ export class EarthRenderer {
     this._destroyed = true
     cancelAnimationFrame(this._raf)
 
-    // Dispose all Three.js objects
     if (this._markers) {
       this._markers.forEach(m => {
         m._ring?.geometry.dispose()
@@ -422,14 +421,31 @@ export class EarthRenderer {
         if (Array.isArray(obj.material)) {
           obj.material.forEach(mat => {
             if (mat.map) mat.map.dispose()
+            if (mat.uniforms) {
+              Object.values(mat.uniforms).forEach(u => {
+                if (u.value?.dispose) u.value.dispose()
+              })
+            }
             mat.dispose()
           })
         } else {
           if (obj.material.map) obj.material.map.dispose()
+          if (obj.material.uniforms) {
+            Object.values(obj.material.uniforms).forEach(u => {
+              if (u.value?.dispose) u.value.dispose()
+            })
+          }
           obj.material.dispose()
         }
       }
     })
+
+    // Also dispose textures that were stored directly on this
+    if (this.earthMat?.uniforms) {
+      Object.values(this.earthMat.uniforms).forEach(u => {
+        if (u.value?.dispose) u.value.dispose()
+      })
+    }
 
     this.controls?.dispose()
     this.composer?.dispose()

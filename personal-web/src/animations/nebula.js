@@ -10,7 +10,7 @@ export function makeNebula(canvas) {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
 
   const scene = new THREE.Scene()
@@ -53,6 +53,8 @@ export function makeNebula(canvas) {
   return () => {
     cancelAnimationFrame(id)
     ro.disconnect()
+    geo.dispose()
+    mat.dispose()
     renderer.dispose()
   }
 }

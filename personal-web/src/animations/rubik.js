@@ -8,7 +8,7 @@ export function makeRubik(canvas) {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
 
   const scene = new THREE.Scene()
@@ -69,5 +69,17 @@ export function makeRubik(canvas) {
     renderer.render(scene, camera)
   }
   step()
-  return () => { cancelAnimationFrame(id); ro.disconnect(); renderer.dispose() }
+  return () => {
+    cancelAnimationFrame(id)
+    ro.disconnect()
+    cubelets.forEach(c => {
+      c.mesh.geometry.dispose()
+      if (Array.isArray(c.mesh.material)) {
+        c.mesh.material.forEach(m => m.dispose())
+      } else {
+        c.mesh.material.dispose()
+      }
+    })
+    renderer.dispose()
+  }
 }

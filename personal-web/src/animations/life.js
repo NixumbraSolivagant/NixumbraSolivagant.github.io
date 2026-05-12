@@ -26,23 +26,29 @@ export function makeLife(canvas) {
     ctx.fillRect(0, 0, w, h)
 
     if (tick++ % 5 === 0) {
-      const c = cols(), r = rows()
-      for (let y = 0; y < r; y++) for (let x = 0; x < c; x++) {
-        let live = 0
-        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-          if (!dx && !dy) continue
-          live += grid[(y + dy + r) % r][(x + dx + c) % c]
+      const r = rows(), c = cols()
+      for (let y = 0; y < r; y++) {
+        for (let x = 0; x < c; x++) {
+          let live = 0
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue
+              live += grid[(y + dy + r) % r][(x + dx + c) % c]
+            }
+          }
+          next[y][x] = (grid[y][x] && (live === 2 || live === 3)) || (!grid[y][x] && live === 3) ? 1 : 0
         }
-        next[y][x] = (grid[y][x] && (live === 2 || live === 3)) || (!grid[y][x] && live === 3) ? 1 : 0
       }
       ;[grid, next] = [next, grid]
     }
 
-    const c = cols(), r = rows()
-    for (let y = 0; y < r; y++) for (let x = 0; x < c; x++) {
-      if (!grid[y][x]) continue
-      ctx.fillStyle = `hsl(${(x + y) * 2 % 360}, 80%, 60%)`
-      ctx.fillRect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2)
+    const r = rows(), c = cols()
+    for (let y = 0; y < r; y++) {
+      for (let x = 0; x < c; x++) {
+        if (!grid[y][x]) continue
+        ctx.fillStyle = `hsl(${(x + y) * 2 % 360}, 80%, 60%)`
+        ctx.fillRect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2)
+      }
     }
   }
   step()

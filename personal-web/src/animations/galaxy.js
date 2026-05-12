@@ -8,7 +8,7 @@ export function makeGalaxy(canvas) {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
 
   const scene = new THREE.Scene()
@@ -55,5 +55,11 @@ export function makeGalaxy(canvas) {
     renderer.render(scene, camera)
   }
   step()
-  return () => { cancelAnimationFrame(id); ro.disconnect(); renderer.dispose() }
+  return () => {
+    cancelAnimationFrame(id)
+    ro.disconnect()
+    geo.dispose()
+    mat.dispose()
+    renderer.dispose()
+  }
 }

@@ -61,15 +61,15 @@ export function makeFirework(canvas) {
       p.vy += 0.05; p.vx *= 0.98
       p.alpha -= p.decay
       if (p.alpha <= 0) { particles.splice(i, 1); continue }
-      ctx.save()
       ctx.globalAlpha = p.alpha
-      ctx.fillStyle = `hsl(${p.hue}, 90%, 65%)`
       ctx.shadowColor = `hsl(${p.hue}, 90%, 65%)`
       ctx.shadowBlur = 8
+      ctx.fillStyle = `hsl(${p.hue}, 90%, 65%)`
       ctx.beginPath()
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
       ctx.fill()
-      ctx.restore()
+      ctx.globalAlpha = 1
+      ctx.shadowBlur = 0
     }
   }
   step(0)

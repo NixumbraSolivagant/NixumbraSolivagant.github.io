@@ -8,7 +8,7 @@ export function makeTunnel(canvas) {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
 
   const scene = new THREE.Scene()
@@ -16,6 +16,7 @@ export function makeTunnel(canvas) {
   camera.position.z = 3
 
   const rings = []
+  const ringObjects = [] // { geo, mat } for disposal
   const count = 40
   for (let i = 0; i < count; i++) {
     const r = 0.3 + i * 0.12
@@ -33,6 +34,7 @@ export function makeTunnel(canvas) {
       opacity: 0.6 - i * 0.012,
     })
     rings.push(new THREE.Line(geo, mat))
+    ringObjects.push({ geo, mat })
     scene.add(rings[rings.length - 1])
   }
 
@@ -62,5 +64,10 @@ export function makeTunnel(canvas) {
     renderer.render(scene, camera)
   }
   step()
-  return () => { cancelAnimationFrame(id); ro.disconnect(); renderer.dispose() }
+  return () => {
+    cancelAnimationFrame(id)
+    ro.disconnect()
+    ringObjects.forEach(({ geo, mat }) => { geo.dispose(); mat.dispose() })
+    renderer.dispose()
+  }
 }
