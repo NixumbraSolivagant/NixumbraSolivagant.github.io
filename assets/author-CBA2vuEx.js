@@ -1,0 +1,1 @@
+const c=(t,o)=>{const a=t.__vccOpts||t;for(const[n,i]of o)a[n]=i;return a},g={name:"胡明璋",nameEn:"Mingzhang HU",email:"Hmzemc333@outlook.com",github:"NixumbraSolivagant",githubUrl:"https://github.com/NixumbraSolivagant",location:"江西 · 南昌",locationEn:"Jiangxi · Nanchang"};export{g as S,c as _};
