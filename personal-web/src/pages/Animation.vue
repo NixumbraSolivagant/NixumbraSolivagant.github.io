@@ -158,9 +158,10 @@ const makers = {
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
 let THREEloaded = false
+let THREE = null
 
 const initAnimations = () => {
-  if (!THREEloaded) return
+  if (!THREE) return
   animations.value.forEach(anim => {
     const canvas = canvasRefs[anim.id]
     if (!canvas) return
@@ -186,8 +187,9 @@ const initAnimations = () => {
 }
 
 onMounted(async () => {
-  await import('three')
+  THREE = await import('three')
   THREEloaded = true
+  window._THREE = THREE
   // Refs aren't populated until after first render, so defer
   await nextTick()
   initAnimations()

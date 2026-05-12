@@ -96,7 +96,7 @@
                   <span>{{ t('blog.statsCode') }}</span>
                 </div>
               </div>
-              <a class="profile-link" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
+              <a class="profile-link" :href="SITE_AUTHOR.githubUrl" target="_blank" rel="noreferrer">
                 {{ t('blog.visitGithub') }}
               </a>
             </div>
@@ -138,6 +138,7 @@ import { useI18n } from 'vue-i18n'
 import NavBar from '@/components/NavBar.vue'
 import { useRouter, useRoute } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
+import { SITE_AUTHOR } from '@/config/author.js'
 
 const { t } = useI18n()
 

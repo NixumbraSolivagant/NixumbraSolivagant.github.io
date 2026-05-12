@@ -2,6 +2,18 @@
   <div class="gv-wrap">
     <div class="gv-viewport" ref="viewportEl">
 
+      <!-- ── Error state ── -->
+      <Transition name="fade">
+        <div v-if="hasError" class="gv-error">
+          <span class="gv-error-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </span>
+          <span>{{ t('common.globeError') }}</span>
+        </div>
+      </Transition>
+
       <!-- ── HUD: above the globe ── -->
       <div class="gv-hud">
         <div class="hud-inner">
@@ -18,7 +30,7 @@
 
       <!-- ── Loading ── -->
       <Transition name="fade">
-        <div v-if="!earthReady" class="gv-loading">
+        <div v-if="!earthReady && !hasError" class="gv-loading">
           <div class="gv-ring" />
         </div>
       </Transition>
@@ -38,6 +50,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { EarthRenderer } from '@/composables/useEarthRenderer.js'
 import { fetchTopCountries } from '@/modules/umamiClient.js'
 import { statsToMarkers } from '@/modules/geoUtils.js'
@@ -46,9 +59,12 @@ const props = defineProps({
   refreshInterval: { type: Number, default: 60_000 },
 })
 
+const { t } = useI18n()
+
 const canvasEl      = ref(null)
 const viewportEl    = ref(null)
 const earthReady    = ref(false)
+const hasError      = ref(false)
 const hasInteracted = ref(false)
 const total         = ref(0)
 const countryCount  = ref(0)
@@ -86,16 +102,30 @@ async function loadData() {
 
 onMounted(async () => {
   await nextTick()
-  renderer = new EarthRenderer(canvasEl.value)
 
-  canvasEl.value?.addEventListener('mousedown',  onInteract)
-  canvasEl.value?.addEventListener('touchstart', onInteract, { passive: true })
+  // Guard against zero-size container (e.g. element hidden via CSS)
+  const w = canvasEl.value?.clientWidth ?? 0
+  const h = canvasEl.value?.clientHeight ?? 0
+  if (w === 0 || h === 0) {
+    hasError.value = true
+    return
+  }
 
-  earthReady.value = true
-  await loadData()
+  try {
+    renderer = new EarthRenderer(canvasEl.value)
 
-  if (props.refreshInterval > 0) {
-    pollTimer = setInterval(loadData, props.refreshInterval)
+    canvasEl.value?.addEventListener('mousedown',  onInteract)
+    canvasEl.value?.addEventListener('touchstart', onInteract, { passive: true })
+
+    earthReady.value = true
+    await loadData()
+
+    if (props.refreshInterval > 0) {
+      pollTimer = setInterval(loadData, props.refreshInterval)
+    }
+  } catch (e) {
+    console.error('[GlobeViewer] init failed:', e)
+    hasError.value = true
   }
 })
 

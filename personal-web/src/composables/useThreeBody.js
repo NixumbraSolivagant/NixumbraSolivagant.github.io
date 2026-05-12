@@ -57,6 +57,7 @@ export function useThreeBody(config = {}) {
   let frameId = null
   let resizeHandler = null
   let isVisible = true
+  let canvasObserver = null
 
   let bodies = []
   let trails = [[], [], []]
@@ -395,10 +396,10 @@ export function useThreeBody(config = {}) {
     const observer = new IntersectionObserver((entries) => {
       isVisible = entries[0].isIntersecting
     }, { threshold: 0.05 })
+    canvasObserver = observer
     observer.observe(canvas)
 
     animate()
-    return observer  // caller must call observer.disconnect() on cleanup
   }
 
   const stop = () => {
@@ -409,6 +410,10 @@ export function useThreeBody(config = {}) {
     if (resizeHandler) {
       window.removeEventListener('resize', resizeHandler)
       resizeHandler = null
+    }
+    if (canvasObserver) {
+      canvasObserver.disconnect()
+      canvasObserver = null
     }
     bodies = []
     trails = [[], [], []]

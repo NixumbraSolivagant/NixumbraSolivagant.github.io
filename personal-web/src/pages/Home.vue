@@ -72,13 +72,13 @@
             />
           </div>
           <div class="welcome">
-            {{ t('home.greetingBase') }} <span class="gradientText">胡明璋</span>
+            {{ t('home.greetingBase') }} <span class="gradientText">{{ SITE_AUTHOR.name }}</span>
           </div>
           <div class="description">👦 <span class="purpleText">{{ t('home.roleLabel') }}</span> {{ t('home.roleStudent') }}</div>
           <div class="description">{{ t('home.roleDesc') }}</div>
 
           <div class="iconContainer">
-            <a class="iconItem" href="https://github.com/NixumbraSolivagant" target="_blank" rel="noreferrer">
+            <a class="iconItem" :href="SITE_AUTHOR.githubUrl" target="_blank" rel="noreferrer">
               <svg
                 t="1704870335945"
                 class="icon"
@@ -94,7 +94,7 @@
               </svg>
               <div class="iconTip">{{ t('home.iconTipGithub') }}</div>
             </a>
-            <a class="iconItem" href="mailto:Hmzemc333@outlook.com">
+            <a class="iconItem" :href="`mailto:${SITE_AUTHOR.email}`">
               <svg
                 t="1704870588438"
                 class="icon"
@@ -305,6 +305,7 @@ import { useI18n } from 'vue-i18n'
 import { useThreeBody } from '../composables/useThreeBody.js'
 import GlobeViewer from '../components/GlobeViewer.vue'
 import { i18n } from '../i18n/index.js'
+import { SITE_AUTHOR } from '../config/author.js'
 
 const { t } = useI18n()
 
@@ -357,7 +358,6 @@ const fetchQuote = async () => {
 }
 
 const { start: startThreeBody, stop: stopThreeBody } = useThreeBody()
-let threeBodyObserver = null
 
 onMounted(() => {
   if (!document.querySelector('script[data-nix-script]')) {
@@ -368,7 +368,7 @@ onMounted(() => {
   }
   const canvas = document.getElementById('three-body-canvas')
   if (canvas instanceof HTMLCanvasElement) {
-    threeBodyObserver = startThreeBody(canvas)
+    startThreeBody(canvas)
   }
   fetchQuote()
   quoteTimer = window.setInterval(() => {
@@ -377,10 +377,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (threeBodyObserver) {
-    threeBodyObserver.disconnect()
-    threeBodyObserver = null
-  }
   stopThreeBody()
   if (quoteTimer) clearInterval(quoteTimer)
 })

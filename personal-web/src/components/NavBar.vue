@@ -23,7 +23,7 @@
 
         <a
           class="nav-cta"
-          href="https://github.com/NixumbraSolivagant"
+          :href="SITE_AUTHOR.githubUrl"
           target="_blank"
           rel="noreferrer"
         >
@@ -38,6 +38,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { i18n } from '@/i18n/index.js'
+import { SITE_AUTHOR } from '@/config/author.js'
 
 const { t } = useI18n()
 

@@ -147,19 +147,30 @@ const startBgRotation = () => {
 }
 
 onMounted(async () => {
-  const mediaModules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
-  backgroundMedia.value = Object.values(mediaModules)
-    .filter(Boolean)
-    .map((mod) => {
-      const src = typeof mod === 'string' ? mod : mod.default
-      const lower = (src || '').toLowerCase()
-      const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
-      return { type: isVideo ? 'video' : 'image', src }
-    })
-    .sort((a, b) => a.src.localeCompare(b.src))
+    // Load the media manifest generated at build time.
+    // Falls back to an empty array in dev (manifest is only written to dist/).
+    const manifestUrl = '/media-manifest.json'
+    try {
+      const resp = await fetch(manifestUrl)
+      if (resp.ok) {
+        backgroundMedia.value = await resp.json()
+      }
+    } catch {
+      // No manifest yet — dev server fallback: glob /static/media via raw import
+      const modules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
+      backgroundMedia.value = Object.values(modules)
+        .filter(Boolean)
+        .map(mod => {
+          const src = typeof mod === 'string' ? mod : mod.default
+          const lower = (src || '').toLowerCase()
+          const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
+          return { type: isVideo ? 'video' : 'image', src }
+        })
+        .sort((a, b) => a.src.localeCompare(b.src))
+    }
 
-  preloadImages(backgroundMedia.value)
-  startBgRotation()
+    preloadImages(backgroundMedia.value)
+    startBgRotation()
 })
 
 onBeforeUnmount(() => {

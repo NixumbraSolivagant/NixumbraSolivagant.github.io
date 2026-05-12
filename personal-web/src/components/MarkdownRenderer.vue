@@ -305,13 +305,20 @@ function injectCopyButtons() {
   font-size: 0.95rem;
 }
 
-.md-renderer :deep(pre::-webkit-scrollbar),
-.md-renderer :deep(.code-block-wrapper ::-webkit-scrollbar) {
+.md-renderer :deep(pre)::-webkit-scrollbar {
   height: 8px;
 }
 
-.md-renderer :deep(pre::-webkit-scrollbar-thumb),
-.md-renderer :deep(.code-block-wrapper ::-webkit-scrollbar-thumb) {
+.md-renderer :deep(pre)::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+}
+
+.md-renderer :deep(.code-block-wrapper)::-webkit-scrollbar {
+  height: 8px;
+}
+
+.md-renderer :deep(.code-block-wrapper)::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.4);
   border-radius: 999px;
 }
