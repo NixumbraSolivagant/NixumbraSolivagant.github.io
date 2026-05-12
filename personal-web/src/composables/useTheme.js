@@ -9,7 +9,7 @@ import { ref } from 'vue'
 export const isDarkTheme = ref(localStorage.getItem('theme') === 'Dark')
 
 const DARK_VARS = {
-  '--main_bg_color': 'url(/static/img/backgrounds/bg-1.png)',
+  '--main_bg_color': 'url(/static/media/bg-1.png)',
   '--main_text_color': '#f8fafc',
   '--item_left_title_color': '#f8fafc',
   '--item_left_text_color': '#e2e8f0',
@@ -26,7 +26,7 @@ const DARK_VARS = {
 }
 
 const LIGHT_VARS = {
-  '--main_bg_color': 'url(/static/img/backgrounds/bg-1.png)',
+  '--main_bg_color': 'url(/static/media/bg-1.png)',
   '--main_text_color': '#111827',
   '--item_left_title_color': '#111827',
   '--item_left_text_color': '#4b5563',
