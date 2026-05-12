@@ -1,4 +1,4 @@
-import{u as I}from"./index-B5_R7d2f.js";import{N as O}from"./NavBar-bZAKjkow.js";import{r as z,c as P,k as j,o as K,B as E,d as p,e as m,g as S,f as n,C as e,D as t,F as q,J as V,E as Q,u as X,K as J,b as Y,w as Z,L as nn}from"./vendor-vue-zDyEjqOb.js";import{M as en,a as tn,b as F,H as M,k as G}from"./vendor-md-9MIaiziu.js";import{_ as H,S as an}from"./author-CBA2vuEx.js";const on=`# JavaScript 异步编程：从回调到 async/await
+import{u as I}from"./index-BwXy_pxr.js";import{N as O}from"./NavBar-DqVjAKH-.js";import{r as z,c as P,k as j,o as K,B as E,d as p,e as m,g as S,f as n,C as e,D as t,F as q,J as V,E as Q,u as X,K as J,b as Y,w as Z,L as nn}from"./vendor-vue-zDyEjqOb.js";import{M as en,a as tn,b as F,H as M,k as G}from"./vendor-md-9MIaiziu.js";import{_ as H,S as an}from"./author-CBA2vuEx.js";const on=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
