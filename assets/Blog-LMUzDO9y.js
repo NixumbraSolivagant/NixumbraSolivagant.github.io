@@ -1,4 +1,4 @@
-import{u as I}from"./index-BwXy_pxr.js";import{N as O}from"./NavBar-DqVjAKH-.js";import{r as z,c as P,k as j,o as K,B as E,d as p,e as m,g as S,f as n,C as e,D as t,F as q,J as V,E as Q,u as X,K as J,b as Y,w as Z,L as nn}from"./vendor-vue-zDyEjqOb.js";import{M as en,a as tn,b as F,H as M,k as G}from"./vendor-md-9MIaiziu.js";import{_ as H,S as an}from"./author-CBA2vuEx.js";const on=`# JavaScript 异步编程：从回调到 async/await
+import{u as V}from"./index-Xb0Z5IxT.js";import{N as H}from"./NavBar-CabWKFno.js";import{r as A,c as M,k as Q,o as K,B as U,d as m,e as p,g as X,f as n,C as e,D as t,F as P,J as E,E as q,u as W,K as J,b as Y,w as Z,L as nn}from"./vendor-vue-zDyEjqOb.js";import{M as en,a as tn,b as F,H as S,k as j}from"./vendor-md-9MIaiziu.js";import{_ as I,S as an}from"./author-CBA2vuEx.js";const on=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -1448,7 +1448,873 @@ model.eval()
 ---
 
 *本文涵盖了 CNN 的核心概念、经典架构和实战技巧。如有疏漏或疑问，欢迎探讨交流。*
-`,ln=`# 博客搭建记录
+`,ln=`# XGBoost：梯度提升的工程极致
+
+> *"XGBoost 代表了一种将算法与系统设计深度融合的思路——不是在实验室里追求理论上的最优，而是在真实场景中追求工程上的极致。"*
+> — 陈亮，XGBoost 作者之一
+
+## 什么是 XGBoost？
+
+**XGBoost**（eXtreme Gradient Boosting）是_gradient boosting_算法的高性能开源实现，由陈亮（Tianqi Chen）于 2014 年创建。它在 Kaggle 等数据科学竞赛中横扫千军，几乎成为了梯度提升决策树的代名词。
+
+XGBoost 的核心思想可以概括为：**通过集成多棵弱学习器（决策树），逐步减少预测误差，每一棵树都专注于修正前面所有树的残差**。与传统方法相比，它在算法层面和工程层面都做到了极致的优化。
+
+### XGBoost 与其他梯度提升方法的对比
+
+| 特性 | 传统 GBDT | XGBoost | LightGBM | CatBoost |
+|------|-----------|---------|----------|----------|
+| **提出年份** | 2001 | 2014 | 2017 | 2017 |
+| **建树算法** | 贪心枚举 | 贪心枚举 + 近似 | GOSS/EFB | Ordered Boosting |
+| **分裂点搜索** | 精确贪心 | 精确 + 近似 | 直方图 | 精确 + 直方图 |
+| **缺失值处理** | 不支持 | 内置支持 | 内置支持 | 内置支持 |
+| **类别特征** | 需编码 | 需编码 | 优化编码 | 原生支持 |
+| **并行化** | 特征级 | 特征级 + 块级 | 特征级 | 特征级 |
+| **正则化** | 简单 | L1/L2 + 复杂度控制 | L1/L2 | Ordered TS |
+| **原生语言** | - | C++/Python/R | C++/Python/R | C++/Python/R |
+
+## 梯度提升决策树原理
+
+### 加法模型与前向分步算法
+
+GBDT 属于加法模型（Additive Model），最终预测是 $K$ 棵树的加权求和：
+
+$$\\hat{y}_i = \\sum_{k=1}^{K} f_k(x_i), \\quad f_k \\in \\mathcal{F}$$
+
+其中 $\\mathcal{F}$ 是所有决策树的空间。每棵树 $f_k(x)$ 输入样本 $x$，输出一个实数值（回归）或类别概率（分类）。
+
+前向分步算法逐棵学习这些树。假设已经学习了前 $t-1$ 棵树，第 $t$ 棵树的优化目标是：
+
+$$\\mathcal{L}^{(t)} = \\sum_{i=1}^{n} l(y_i, \\hat{y}_i^{(t-1)} + f_t(x_i)) + \\Omega(f_t)$$
+
+其中 $l$ 是损失函数，$\\Omega$ 是正则化项。
+
+### 泰勒展开与二阶近似
+
+XGBoost 的关键创新在于：对损失函数做**二阶泰勒展开**，直接用梯度信息指导树的构建。
+
+将损失函数在 $\\hat{y}_i^{(t-1)}$ 处展开：
+
+$$\\mathcal{L}^{(t)} \\approx \\sum_{i=1}^{n} \\left[ l(y_i, \\hat{y}_i^{(t-1)}) + g_i f_t(x_i) + \\frac{1}{2} h_i f_t^2(x_i) \\right] + \\Omega(f_t)$$
+
+其中：
+
+$$g_i = \\frac{\\partial l(y_i, \\hat{y}^{(t-1)})}{\\partial \\hat{y}^{(t-1)}} \\quad \\text{（一阶导数/梯度）}$$
+
+$$h_i = \\frac{\\partial^2 l(y_i, \\hat{y}^{(t-1)})}{\\partial (\\hat{y}^{(t-1)})^2} \\quad \\text{（二阶导数/海森矩阵）}$$
+
+去掉常数项 $l(y_i, \\hat{y}_i^{(t-1)})$，优化目标变为：
+
+$$\\tilde{\\mathcal{L}}^{(t)} = \\sum_{i=1}^{n} \\left[ g_i f_t(x_i) + \\frac{1}{2} h_i f_t^2(x_i) \\right] + \\Omega(f_t)$$
+
+**为什么用二阶展开？**
+- 一阶信息只告诉你"往哪个方向走"，二阶信息还告诉你"走多快"——收敛更快更稳定
+- 相比一阶近似，二阶展开对损失的近似精度更高
+- 当 $l$ 是逻辑损失时，二阶近似等价于牛顿法，理论上收敛更快
+
+### 决策树的正则化
+
+XGBoost 对每棵树定义了显式的正则化项：
+
+$$\\Omega(f) = \\gamma T + \\frac{1}{2}\\lambda \\sum_{j=1}^{T} w_j^2$$
+
+其中：
+- $T$ 是树的叶节点数（控制树的复杂度）
+- $w_j$ 是第 $j$ 个叶节点的输出权重
+- $\\gamma$ 是叶节点数的惩罚系数
+- $\\lambda$ 是 L2 正则化系数
+
+### 分裂增益的精确计算
+
+给定一个分裂点 $P$，将样本划分为左子集 $I_L$ 和右子集 $I_R$，则分裂增益为：
+
+$$\\text{Gain} = \\frac{1}{2} \\left[ \\frac{G_L^2}{H_L + \\lambda} + \\frac{G_R^2}{H_R + \\lambda} - \\frac{(G_L + G_R)^2}{H_L + H_R + \\lambda} \\right] - \\gamma$$
+
+其中 $G = \\sum_{i \\in I} g_i$，$H = \\sum_{i \\in I} h_i$。
+
+**分裂增益的直观理解**：
+- 分子 $G^2$ 衡量样本梯度的"方向一致性"——梯度越同向，$G^2$ 越大
+- 分母 $H + \\lambda$ 中的 $H$ 衡量梯度的"幅度总和"
+- $\\lambda$ 防止过拟合：平滑叶节点权重
+- $\\gamma$ 直接惩罚叶节点数量
+
+### 缺失值处理
+
+XGBoost 内置了缺失值处理机制。对于每个特征：
+
+1. 在训练时，将缺失样本分别放入左子树和右子树，计算不包含缺失样本时的增益
+2. 选择使增益最大（或损失最小）的方向作为默认分裂方向
+3. 预测时，缺失样本自动沿默认方向走
+
+\`\`\`python
+# XGBoost 自动处理缺失值
+import xgboost as xgb
+
+model = xgb.XGBClassifier(
+    missing=-999,  # 指定缺失值的标记（XGBoost 默认用 NaN 或 -1/-999）
+    enable_categorical=True
+)
+
+# 训练数据中可以包含 NaN，XGBoost 会自动处理
+model.fit(X_train, y_train)
+\`\`\`
+
+## 目标函数与损失函数
+
+XGBoost 支持多种损失函数，适用于不同任务：
+
+### 回归任务
+
+**均方误差（MSE / L2 Loss）**：
+
+$$l(y_i, \\hat{y}_i) = (y_i - \\hat{y}_i)^2$$
+
+梯度：$g_i = -2(y_i - \\hat{y}_i)$，海森矩阵：$h_i = 2$
+
+**绝对误差（MAE / L1 Loss）**：
+
+$$l(y_i, \\hat{y}_i) = |y_i - \\hat{y}_i|$$
+
+梯度：$g_i = \\text{sign}(\\hat{y}_i - y_i)$，海森矩阵：$h_i = 1$（次梯度）
+
+**Huber 损失**（MSE 和 MAE 的折中）：
+
+$$l(y_i, \\hat{y}_i) = \\begin{cases} \\frac{1}{2}(y_i - \\hat{y}_i)^2 & \\text{if } |y_i - \\hat{y}_i| \\leq \\delta \\\\ \\delta |y_i - \\hat{y}_i| - \\frac{1}{2}\\delta^2 & \\text{otherwise} \\end{cases}$$
+
+### 分类任务
+
+**逻辑损失（Logistic Loss）**：
+
+$$l(y_i, \\hat{y}_i) = -y_i \\log(\\hat{p}_i) - (1-y_i)\\log(1-\\hat{p}_i)$$
+
+其中 $\\hat{p}_i = \\frac{1}{1 + e^{-\\hat{y}_i}}$，$\\hat{y}_i$ 是原始输出（未被 sigmoid 归一化）
+
+梯度：$g_i = \\hat{p}_i - y_i$，海森矩阵：$h_i = \\hat{p}_i(1-\\hat{p}_i)$
+
+**Softmax 损失（多分类）**：
+
+$$l(y_i, \\hat{y}_i) = -\\log\\left( \\frac{e^{\\hat{y}_{i,y_i}}}{\\sum_{c} e^{\\hat{y}_{i,c}}} \\right)$$
+
+## 树的分裂策略
+
+### 精确贪心算法
+
+最朴素的建树方法：枚举所有可能的分裂点，计算每个分裂的增益，选择最优。
+
+\`\`\`python
+# XGBoost 精确贪心算法
+import xgboost as xgb
+
+params = {
+    'tree_method': 'hist',  # 精确贪心用 'exact'
+    'max_depth': 6,
+    'learning_rate': 0.1,
+    'objective': 'binary:logistic',
+}
+
+# 精确贪心（适用于小数据集）
+model = xgb.XGBClassifier(
+    tree_method='exact',  # 精确枚举所有分裂点
+    max_depth=6,
+    min_child_weight=1,
+)
+\`\`\`
+
+但精确贪心的复杂度是 $O(n \\cdot d \\cdot K)$，其中 $n$ 是样本数，$d$ 是特征数，$K$ 是树数。当 $n$ 很大时，计算代价极高。
+
+### 近似算法（Approximate Algorithm）
+
+XGBoost 提出了基于**特征值分位数**的近似算法：
+
+1. 对每个特征，根据其分位数（如百分位数）选出候选分裂点
+2. 只在这些候选分裂点上计算增益
+3. 将连续特征离散化为直方图桶
+
+\`\`\`python
+# 近似算法（推荐用于大数据集）
+model = xgb.XGBClassifier(
+    tree_method='hist',      # 基于直方图的近似
+    max_bin=256,              # 直方图的桶数
+)
+\`\`\`
+
+**近似算法的优势**：
+- 大幅减少候选分裂点数量
+- 可以处理超大规模数据
+- 支持并行化
+
+### 权重分位数 sketch（Weighted Quantile Sketch）
+
+在近似算法中，候选分裂点的选择不是均匀的，而是根据**二阶导数 $h_i$ 作为权重**来选择：
+
+$$|h_i| \\sum_{j} w_j = 1$$
+
+即选择满足以下条件的分裂点：
+
+$$\\left| \\frac{1}{\\sum_{(x, h) \\in S_k} h} \\sum_{(x, h) \\in S_k} h - \\frac{1}{n} \\right| < \\epsilon$$
+
+其中 $\\epsilon$ 是近似误差参数。
+
+### 列采样与特征并行
+
+XGBoost 支持**列采样**（Column Subsampling），类似随机森林：
+
+\`\`\`python
+model = xgb.XGBClassifier(
+    colsample_bytree=0.8,  # 每棵树随机选择 80% 的特征
+    colsample_bylevel=0.8, # 每层随机选择 80% 的特征
+)
+\`\`\`
+
+### 学习率（Shrinkage）与行采样
+
+\`\`\`python
+model = xgb.XGBClassifier(
+    learning_rate=0.1,        # 收缩系数（也称 eta）
+    subsample=0.8,            # 每棵树随机选择 80% 的样本
+    colsample_bytree=0.8,     # 每棵树随机选择 80% 的特征
+    min_child_weight=3,       # 叶节点的最小样本权重和
+)
+\`\`\`
+
+## 防止过拟合
+
+XGBoost 提供了多种正则化手段：
+
+### 显式正则化
+
+\`\`\`python
+params = {
+    'lambda': 1.0,  # L2 正则化
+    'alpha': 0.0,  # L1 正则化
+    'gamma': 0.0,  # 最小分裂增益阈值
+}
+\`\`\`
+
+### 树结构正则化
+
+\`\`\`python
+model = xgb.XGBClassifier(
+    max_depth=6,           # 树的最大深度
+    min_child_weight=1,   # 叶节点的最小权重和
+    max_delta_step=0,     # 限制叶节点输出的最大步长
+)
+\`\`\`
+
+### Early Stopping
+
+\`\`\`python
+# 监控验证集表现，自动停止
+model = xgb.XGBClassifier(
+    n_estimators=1000,
+    early_stopping_rounds=50,
+    eval_metric='auc',
+)
+
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_val, y_val)],
+    verbose=50,
+)
+\`\`\`
+
+输出示例：
+
+\`\`\`
+[0] validation_0-auc:0.82314
+[10] validation_0-auc:0.89123
+[20] validation_0-auc:0.90345
+[30] validation_0-auc:0.90712
+[40] validation_0-auc:0.90567  # 开始下降
+...
+Early stopping at iteration 41
+Best iteration: 31
+\`\`\`
+
+## 特征重要性
+
+XGBoost 提供了多种衡量特征重要性的指标：
+
+### 常用指标
+
+\`\`\`python
+# 训练模型后获取特征重要性
+importance = model.feature_importances_
+
+# 使用 Shap 值（最权威）
+import shap
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
+
+# 可视化
+shap.summary_plot(shap_values, X_test, feature_names=feature_names)
+\`\`\`
+
+### 重要性的计算方式
+
+| 指标 | 计算方式 | 适用场景 |
+|------|---------|---------|
+| **weight** | 特征被用作分裂点的次数 | 粗略评估 |
+| **gain** | 所有分裂的平均增益 | 默认选项 |
+| **cover** | 分裂涉及的样本覆盖量 | 类别不平衡 |
+| **total_gain** | 所有分裂的增益之和 | 综合评估 |
+| **total_cover** | 所有分裂的覆盖量之和 | 综合评估 |
+
+\`\`\`python
+# 查看不同指标的重要性
+importance_df = xgb.plot_importance(
+    model,
+    importance_type='gain',  # weight / gain / cover / total_gain / total_cover
+    max_num_features=20,
+    show_values=False,
+)
+\`\`\`
+
+## 实战：完整分类流程
+
+\`\`\`python
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+
+# ===================== 数据准备 =====================
+# 使用 sklearn 的信用卡欺诈数据集作为演示
+from sklearn.datasets import fetch_openml
+credit = fetch_openml(name='credit-g', as_frame=True)
+X, y = credit.data, credit.target
+
+# 编码目标变量
+le = LabelEncoder()
+y = le.fit_transform(y)
+
+# 分离数值和类别特征
+numeric_features = X.select_dtypes(include=['number']).columns.tolist()
+categorical_features = X.select_dtypes(include=['category', 'object']).columns.tolist()
+
+# ===================== 特征工程 =====================
+# XGBoost 可以直接处理类别特征
+X_cat = X[categorical_features].astype('category')
+
+# 合并特征
+X_processed = pd.concat([
+    X[numeric_features],
+    X_cat
+], axis=1)
+
+# 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(
+    X_processed, y,
+    test_size=0.2,
+    stratify=y,
+    random_state=42
+)
+
+# ===================== 模型训练 =====================
+# 方法一：Scikit-Learn 接口（推荐）
+model = xgb.XGBClassifier(
+    n_estimators=500,
+    max_depth=6,
+    learning_rate=0.05,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    min_child_weight=3,
+    reg_alpha=0.1,
+    reg_lambda=1.0,
+    gamma=0.1,
+    objective='binary:logistic',
+    eval_metric='auc',
+    early_stopping_rounds=50,
+    enable_categorical=True,
+    tree_method='hist',
+    device='cuda',  # GPU 加速
+    random_state=42,
+)
+
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    verbose=50,
+)
+
+# ===================== 模型评估 =====================
+y_pred = model.predict(X_test)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+print(f"AUC-ROC: {roc_auc_score(y_test, y_pred_proba):.4f}")
+print("\\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# ===================== 交叉验证 =====================
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+cv_scores = cross_val_score(model, X_processed, y, cv=cv, scoring='roc_auc')
+print(f"CV AUC: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+\`\`\`
+
+## 高级调参技巧
+
+### 参数分组
+
+XGBoost 的参数可以分为几组来调节：
+
+**第一组：收敛速度**
+\`\`\`python
+params = {
+    'n_estimators': 1000,  # 迭代次数（配合 early_stopping）
+    'learning_rate': 0.05,  # 步长 shrink
+    'early_stopping_rounds': 50,
+}
+\`\`\`
+
+**第二组：树结构**
+\`\`\`python
+params = {
+    'max_depth': 6,           # 最大深度（4-10）
+    'min_child_weight': 1,    # 最小叶节点权重（数据量小时用 1，数据量大时用 5-10）
+    'gamma': 0.1,             # 最小分裂增益
+}
+\`\`\`
+
+**第三组：随机化（正则化）**
+\`\`\`python
+params = {
+    'subsample': 0.8,          # 行采样（0.6-1.0）
+    'colsample_bytree': 0.8,   # 列采样（0.6-1.0）
+    'colsample_bylevel': 1.0,  # 每层列采样
+}
+\`\`\`
+
+**第四组：正则化参数**
+\`\`\`python
+params = {
+    'reg_alpha': 0.1,  # L1 正则化
+    'reg_lambda': 1.0, # L2 正则化
+}
+\`\`\`
+
+### 贝叶斯调参
+
+\`\`\`python
+from sklearn.model_selection import BayesianOptimization
+import xgboost as xgb
+
+def xgb_cv(n_estimators, max_depth, learning_rate, subsample, colsample_bytree, min_child_weight):
+    model = xgb.XGBClassifier(
+        n_estimators=int(n_estimators),
+        max_depth=int(max_depth),
+        learning_rate=learning_rate,
+        subsample=subsample,
+        colsample_bytree=colsample_bytree,
+        min_child_weight=int(min_child_weight),
+        enable_categorical=True,
+        tree_method='hist',
+        random_state=42,
+        verbosity=0,
+    )
+    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='roc_auc')
+    return scores.mean()
+
+pbounds = {
+    'n_estimators': (100, 1000),
+    'max_depth': (3, 10),
+    'learning_rate': (0.01, 0.3),
+    'subsample': (0.6, 1.0),
+    'colsample_bytree': (0.6, 1.0),
+    'min_child_weight': (1, 10),
+}
+
+optimizer = BayesianOptimization(
+    f=xgb_cv,
+    pbounds=pbounds,
+    random_state=42,
+    verbose=2
+)
+optimizer.maximize(init_points=5, n_iter=25)
+
+print(f"Best AUC: {optimizer.max['target']:.4f}")
+print(f"Best params: {optimizer.max['params']}")
+\`\`\`
+
+### 学习曲线分析
+
+\`\`\`python
+# 分析不同学习率的效果
+results_list = []
+for lr in [0.01, 0.05, 0.1, 0.3]:
+    model = xgb.XGBClassifier(
+        n_estimators=500,
+        learning_rate=lr,
+        max_depth=6,
+        eval_metric='auc',
+        early_stopping_rounds=50,
+        enable_categorical=True,
+        tree_method='hist',
+        random_state=42,
+    )
+    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
+    results_list.append({
+        'learning_rate': lr,
+        'best_iteration': model.best_iteration,
+        'best_score': model.best_score,
+    })
+
+results_df = pd.DataFrame(results_list)
+print(results_df)
+\`\`\`
+
+## 类别特征与原生支持
+
+从 XGBoost 1.5 开始，支持**原生类别特征**处理，无需手动 one-hot 编码：
+
+\`\`\`python
+import pandas as pd
+import xgboost as xgb
+
+# 准备类别特征数据
+df = pd.DataFrame({
+    'feature1': pd.Categorical(['A', 'B', 'A', 'C', 'B']),
+    'feature2': pd.Categorical([1, 2, 3, 1, 2]),
+    'numeric1': [0.1, 0.5, 0.3, 0.8, 0.2],
+})
+
+# 指定特征类型
+df['feature1'] = df['feature1'].astype('category')
+df['feature2'] = df['feature2'].astype('category')
+
+# 训练时启用类别支持
+model = xgb.XGBClassifier(
+    enable_categorical=True,
+    tree_method='hist',
+)
+model.fit(df, y)
+\`\`\`
+
+## XGBoost 回归与自定义目标
+
+### 回归任务
+
+\`\`\`python
+# 方法一：使用 XGBRegressor
+model = xgb.XGBRegressor(
+    n_estimators=500,
+    max_depth=6,
+    learning_rate=0.05,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    reg_alpha=0.1,
+    reg_lambda=1.0,
+    enable_categorical=True,
+    tree_method='hist',
+)
+
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    early_stopping_rounds=50,
+)
+\`\`\`
+
+### 自定义损失函数
+
+\`\`\`python
+import xgboost as xgb
+import numpy as np
+
+# 定义自定义损失函数（需要提供梯度和海森矩阵）
+def custom_mse(y_true, y_pred):
+    grad = y_pred - y_true
+    hess = np.ones_like(grad)  # MSE 的海森矩阵为 1
+    return grad, hess
+
+# 定义自定义评估指标
+def custom_mae(y_true, y_pred):
+    mae = np.mean(np.abs(y_true - y_pred))
+    return 'custom_mae', mae
+
+model = xgb.XGBClassifier(
+    objective=custom_mse,
+    n_estimators=500,
+    enable_categorical=True,
+)
+
+model.fit(
+    X_train, y_train,
+    eval_metric=custom_mae,
+    verbose=50,
+)
+\`\`\`
+
+## XGBoost 的工程实现
+
+### 稀疏感知（Sparsity-aware）算法
+
+XGBoost 为稀疏数据（one-hot 编码、缺失值、用户未记录行为）专门优化：
+
+\`\`\`python
+# XGBoost 将稀疏矩阵压缩为 CSC/CSR 格式
+# 只需 O(nnz) 的内存，而非 O(n * d)
+from scipy.sparse import csr_matrix
+
+X_sparse = csr_matrix(X_processed.values)
+
+model = xgb.XGBClassifier(
+    tree_method='hist',  # 稀疏感知建树
+)
+model.fit(X_sparse, y)
+\`\`\`
+
+### 缓存感知访问（Cache-aware Access）
+
+- 梯度统计量 $(g_i, h_i)$ 按特征连续存储
+- 使用预取（prefetch）减少缓存未命中
+- 减少随机内存访问，提升 CPU 利用率
+
+### 块结构（Block Structure）
+
+- 按列存储训练数据，每列对应一个特征的所有值
+- 预排序后的数据以 CSC 格式存储
+- 并行计算所有特征的一阶梯度和二阶导数
+
+### GPU 加速
+
+\`\`\`python
+# 使用 GPU 训练
+model = xgb.XGBClassifier(
+    tree_method='hist',  # GPU hist 算法
+    device='cuda',
+    max_bin=256,
+)
+
+# GPU 直方图算法在数据量大时加速显著
+model.fit(X_train, y_train, verbose=50)
+\`\`\`
+
+### 分布式训练
+
+\`\`\`python
+# XGBoost 支持 Spark、Flink、Dask 等分布式框架
+# 以下为 PySpark 示例
+from xgboost.spark import SparkXGBClassifier
+
+spark_model = SparkXGBClassifier(
+    num_workers=4,
+    max_depth=6,
+    learning_rate=0.1,
+    n_estimators=500,
+    reg_lambda=1.0,
+)
+
+# 在 Spark DataFrame 上训练
+spark_model.fit(spark_df)
+\`\`\`
+
+## 模型保存与部署
+
+\`\`\`python
+import joblib
+
+# ===================== 模型保存 =====================
+# 方法一：joblib（通用）
+joblib.dump(model, 'xgb_model.joblib')
+
+# 方法二：XGBoost 原生 JSON 格式（推荐，保留元信息）
+model.save_model('xgb_model.json')
+
+# 方法三：UBJSON（更小更快）
+model.save_model('xgb_model.ubj')
+
+# ===================== 模型加载 =====================
+loaded_model = xgb.XGBClassifier()
+loaded_model.load_model('xgb_model.json')
+
+# ===================== 模型导出 =====================
+# 导出为 ONNX 格式（跨平台部署）
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
+onnx_model = convert_sklearn(model, initial_types=initial_type)
+
+with open('xgb_model.onnx', 'wb') as f:
+    f.write(onnx_model.SerializeToString())
+
+# ===================== 生产环境预测 =====================
+# 使用 njobs 并行预测
+import numpy as np
+
+def predict_proba_batch(model, X_batch, batch_size=10000):
+    """分批预测，避免内存溢出"""
+    n_samples = X_batch.shape[0]
+    predictions = []
+    for i in range(0, n_samples, batch_size):
+        batch = X_batch[i:i+batch_size]
+        pred = model.predict_proba(batch)
+        predictions.append(pred)
+    return np.vstack(predictions)
+\`\`\`
+
+## 与其他模型的关系
+
+### XGBoost vs LightGBM
+
+| 维度 | XGBoost | LightGBM |
+|------|---------|----------|
+| **建树方向** | 逐层生长（level-wise） | 逐叶生长（leaf-wise） |
+| **分裂点** | 基于特征的直方图 | 基于样本权重的直方图 |
+| **内存占用** | 较高（预排序矩阵） | 较低（只存储梯度） |
+| **稀疏数据** | 稀疏感知优化 | 稀疏优化 |
+| **类别特征** | 原生支持 | 原生支持 |
+| **训练速度** | 中等 | 更快（尤其大数据） |
+| **准确率** | 相当 | 相当 |
+| **大数据支持** | 好 | 更好（百万级+） |
+
+\`\`\`python
+# LightGBM 逐叶生长示例
+# LightGBM 每次选择增益最大的叶节点分裂
+# XGBoost 则每次分裂一层（所有叶节点）
+
+# XGBoost 的 level-wise 更保守，不易过拟合
+# LightGBM 的 leaf-wise 更快，但需要更小的 max_depth
+\`\`\`
+
+### XGBoost vs 随机森林
+
+| 维度 | XGBoost | 随机森林 |
+|------|---------|---------|
+| **集成方式** | 加法（前向逐步） | Bagging（并行） |
+| **弱学习器** | 决策树（带 boosting 权重） | 决策树（独立训练） |
+| **偏差-方差** | 低偏差 | 低方差 |
+| **对噪声的鲁棒性** | 较差 | 较强 |
+| **调参难度** | 较高 | 较低 |
+| **可解释性** | 较低 | 较高 |
+
+### XGBoost vs 神经网络
+
+| 维度 | XGBoost | 神经网络 |
+|------|---------|---------|
+| **数据需求** | 中等 | 大量 |
+| **特征工程** | 可自动处理 | 需要较多 |
+| **可解释性** | 高（特征重要性） | 低（黑盒） |
+| **训练时间** | 分钟-小时 | 小时-天 |
+| **表格数据** | **最优选择** | 良好 |
+| **非结构化数据** | 不适用 | 最优选择 |
+
+对于**结构化/表格数据**，XGBoost 和 LightGBM 仍然是 Kaggle 竞赛的主流选择，在大多数任务上不逊于甚至优于深度学习。
+
+## 常见问题与解决方案
+
+### 过拟合
+
+症状：训练集 AUC 接近 1，验证集 AUC 很低。
+
+解决方案：
+\`\`\`python
+# 1. 减少模型复杂度
+model = xgb.XGBClassifier(
+    max_depth=4,           # 从 6 降到 4
+    min_child_weight=5,     # 增加最小叶节点权重
+)
+
+# 2. 增强正则化
+model = xgb.XGBClassifier(
+    reg_alpha=0.5,   # 增加 L1 正则化
+    reg_lambda=2.0, # 增加 L2 正则化
+)
+
+# 3. 增加随机化
+model = xgb.XGBClassifier(
+    subsample=0.7,        # 减少行采样
+    colsample_bytree=0.7, # 减少列采样
+)
+
+# 4. 降低学习率，增加迭代次数
+model = xgb.XGBClassifier(
+    learning_rate=0.01,
+    n_estimators=2000,
+    early_stopping_rounds=100,
+)
+\`\`\`
+
+### 类别不平衡
+
+\`\`\`python
+# 方法一：scale_pos_weight
+# 对于二分类：负样本数 / 正样本数
+model = xgb.XGBClassifier(
+    scale_pos_weight=sum(y_train == 0) / sum(y_train == 1),
+)
+
+# 方法二：sample_weight
+sample_weights = np.where(y_train == 1, 10, 1)
+model.fit(X_train, y_train, sample_weight=sample_weights)
+
+# 方法三：AUC 作为评估指标
+model = xgb.XGBClassifier(
+    eval_metric='auc',
+)
+\`\`\`
+
+### 预测概率校准
+
+\`\`\`python
+from sklearn.calibration import CalibratedClassifierCV
+
+# Platt Scaling（逻辑斯蒂回归校准）
+calibrated_model = CalibratedClassifierCV(
+    model,
+    method='isotonic',  # isotonic 或 sigmoid
+    cv=5
+)
+calibrated_model.fit(X_train, y_train)
+
+y_pred_proba_calibrated = calibrated_model.predict_proba(X_test)
+\`\`\`
+
+### 特征质量差
+
+\`\`\`python
+# 1. 使用 eval_metric 为 logloss 而非 auc
+model = xgb.XGBClassifier(eval_metric='logloss')
+
+# 2. 检查特征分布
+import matplotlib.pyplot as plt
+
+for col in numeric_features:
+    plt.hist(X_train[col], bins=50)
+    plt.title(col)
+    plt.show()
+
+# 3. 移除低方差特征
+from sklearn.feature_selection import VarianceThreshold
+selector = VarianceThreshold(threshold=0.01)
+X_filtered = selector.fit_transform(X_train)
+\`\`\`
+
+## 结语
+
+XGBoost 的成功不是偶然的。它在算法、工程和工程-算法协同三个层面都做到了极致：
+
+- **算法层面**：二阶泰勒展开、显式正则化、缺失值处理、近似搜索
+- **工程层面**：稀疏感知、缓存优化、块结构、GPU 加速、分布式训练
+- **协同设计**：每个工程优化都有算法动机，每个算法决策都考虑了工程可行性
+
+更重要的是，XGBoost 证明了**好的工程实现和好的算法一样重要**。同样的梯度提升框架，一个经过精心工程优化的实现可以在真实数据上快几十倍、占用少几倍的内存。
+
+在深度学习大放异彩的今天，XGBoost 仍然牢牢占据着表格数据的统治地位。对于每一个数据科学实践者来说，深入理解 XGBoost 的原理与工程细节，仍然是基本功中的基本功。
+
+> **实用建议**：
+> 1. 小数据集（< 1 万样本）优先用精确贪心，大数据集用 hist
+> 2. 先用默认参数跑一个 baseline，再调参
+> 3. 类别特征直接用 \`enable_categorical\`，别手动编码
+> 4. 始终用 \`early_stopping_rounds\`，别手动定 \`n_estimators\`
+> 5. 调参时优先：learning_rate → max_depth → min_child_weight → subsample → reg_lambda
+
+---
+
+*本文参考了 XGBoost 原论文（KDD 2016）及陈亮的公开分享。*
+`,cn=`# 博客搭建记录
 
 ## 前言
 
@@ -1483,7 +2349,7 @@ model.eval()
 - [ ] 增加评论区
 
 如果你有任何建议或想法，欢迎通过邮箱联系我。
-`,cn=`### 一、理论所（杭高院依托理论所招生）
+`,_n=`### 一、理论所（杭高院依托理论所招生）
 
 #### （一）招生专业与初试科目
 
@@ -1579,4 +2445,4 @@ model.eval()
 2024 年：一志愿复试 32 人==（初试最高分 429 分、最低分 303 分）==，录取 23 人（初试最高分 429 分、最低分 324 分）
 2023 年：一志愿复试 26 人==（初试最高分 412 分、最低分 283 分）==，录取 20 人（初试最高分 412 分、最低分 311 分）
 2022 年：录取 19 人==（初试最高分 392 分、最低分 309 分==）
-`,dn=["innerHTML"],_n={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(U,{emit:a}){const L=U,{t:N}=I(),g=z(null),w=a;function $(l){return l.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,d=>d.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const v=new en({html:!0,linkify:!0,typographer:!0,highlight(l,d){const r=d&&M.getLanguage(d)?d:null,c=r?M.highlight(l,{language:r,ignoreIllegals:!0}).value:M.highlightAuto(l).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${r||"plaintext"}">${c}</code></pre></div>`}});v.use(tn),v.use(F,{slugify:$,level:[2,3,4],permalink:F.permalink.headerLink()});function b(l){if(!l)return"";const d=[];let r=l.replace(/```[\s\S]*?```/g,c=>(d.push(c),`__CODE_BLOCK_${d.length-1}__`));return r=r.replace(/\$\$([\s\S]+?)\$\$/g,(c,i)=>{try{return`<div class="katex-block">${G.renderToString(i.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${i}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(c,i)=>{try{return`<span class="katex-inline">${G.renderToString(i.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${i}$`}}),d.forEach((c,i)=>{r=r.replace(`__CODE_BLOCK_${i}__`,c)}),r}function x(l){if(!l)return l;const d=window.location.origin;return l.replace(/<img\s+([^>]*?)>/g,(r,c)=>c.includes("loading=")?r:`<img ${c} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(r,c)=>{const i=c.match(/href="([^"]*)"/);if(i){const C=i[1];if(C.startsWith("http://")||C.startsWith("https://"))try{if(new URL(C).origin!==d&&!c.includes("target="))return`<a ${c} target="_blank" rel="noopener noreferrer">`}catch{}}return r})}const k=P(()=>x(v.render(b(L.source||""))));j(k,async()=>{await E(),y(),w("rendered",g.value)}),K(async()=>{await E(),y(),w("rendered",g.value)});function y(){if(!g.value)return;g.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(d=>{d.classList.add("copy-injected");const r=d.querySelector("code"),c=(r==null?void 0:r.textContent)||"",i=document.createElement("button");i.className="copy-btn",i.type="button",i.setAttribute("aria-label",N("common.copyCode")),i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',i.addEventListener("click",()=>{c&&navigator.clipboard.writeText(c).then(()=>{i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',i.classList.add("copied"),setTimeout(()=>{i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',i.classList.remove("copied")},2e3)})}),d.appendChild(i)})}return(l,d)=>(p(),m("div",{ref_key:"containerRef",ref:g,class:"md-renderer",innerHTML:k.value},null,8,dn))}},pn=H(_n,[["__scopeId","data-v-b6bba450"]]),mn={class:"zhihu-page"},un={class:"zhihu-shell"},hn={class:"zhihu-body"},fn={class:"zhihu-hero"},gn={class:"zhihu-hero-content"},$n={class:"zhihu-title"},vn={class:"zhihu-subtitle"},bn={class:"zhihu-tabs"},xn={class:"tab active"},yn={class:"tab"},Cn={class:"tab"},wn={class:"zhihu-hero-card"},kn={class:"hero-label"},Ln={class:"hero-desc"},Nn={class:"hero-actions"},Rn={class:"hero-pill"},Tn={class:"hero-pill"},An={class:"hero-pill"},Dn={class:"zhihu-container"},Sn={class:"zhihu-main"},Mn={key:0,class:"feed"},zn={class:"feed-content"},Pn={class:"feed-title"},Un={class:"feed-excerpt"},Bn={class:"feed-footer"},En={class:"feed-meta"},qn={class:"meta-tag"},Vn={class:"meta-date"},Qn={class:"meta-read"},Fn={key:1,class:"post-view"},Gn={class:"post-header"},In={class:"post-title"},jn={class:"post-meta"},Hn={class:"post-tag"},Wn={key:2,class:"post-empty"},On={class:"zhihu-side"},Kn={class:"side-card profile"},Xn={class:"profile-header"},Jn={class:"profile-name"},Yn={class:"profile-desc"},Zn={class:"profile-stats"},ne=["href"],ee={class:"side-card"},te={class:"side-title"},ae={class:"tag-list"},oe={class:"tag"},se={class:"tag"},re={class:"tag"},ie={class:"tag"},le={class:"side-card"},ce={class:"side-title"},de={class:"side-text"},_e={class:"side-btn"},pe={key:0,class:"side-card post-toc"},me={class:"toc-title"},ue={class:"toc-list"},he=["onClick"],fe={key:0,class:"toc-empty"},ge={__name:"Blog",setup(U){const{t:a}=I(),L=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":on,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":sn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":rn,"../markdowns/first-blog.md":ln,"../markdowns/考研信息调研.md":cn});function N(o){return o?typeof o=="string"?o:o&&typeof o=="object"&&"default"in o?o.default:String(o):""}function g(o){return o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function w(o){var f;const s=o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),h=((f=s.match(/[\u4e00-\u9fa5]/g))==null?void 0:f.length)??0,u=s.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+h;return{wordCount:u,readMinutes:Math.max(1,Math.round(u/300)),excerpt:g(s)}}const $=new Map,v=o=>($.has(o)||$.set(o,w(o)),$.get(o)),b=Object.entries(L).map(([o,s])=>{const h=N(s),_=o.match(/\/([^/]+)\.md$/),u=_?_[1]:o;let f=u,R=null;const T=h.match(/^#\s+(.+)$/m);T&&(f=T[1].trim());const A=u.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);A&&(R=A[1],T||(f=A[2]));const W=R??u,D=v(h);return{path:o,slug:u,title:f,content:h,date:R,sortKey:W,excerpt:D.excerpt,readMinutes:D.readMinutes,wordCount:D.wordCount}}).sort((o,s)=>o.sortKey===s.sortKey?0:o.sortKey<s.sortKey?1:-1),x=X(),k=J(),y=P(()=>!!x.params.slug),l=P(()=>x.params.slug?i(x.params.slug):null),d=z(null),r=z([]);function c(){k.push({name:"BlogHome"})}function i(o){return b.find(s=>s.slug===o)}function C(o){const s=o??d.value;if(!s){r.value=[];return}const h=Array.from(s.querySelectorAll("h2, h3"));r.value=h.map(_=>{var f;const u=_.tagName.toLowerCase();return{id:_.id,text:((f=_.textContent)==null?void 0:f.trim())||"标题",level:u}})}function B(o){const s=document.getElementById(o);s&&s.scrollIntoView({behavior:"smooth",block:"start"})}return j(l,o=>{o||(r.value=[])},{immediate:!0}),(o,s)=>{const h=Y("router-link");return p(),m("section",mn,[S(O),n("div",un,[n("div",hn,[n("div",fn,[n("div",gn,[n("div",$n,e(t(a)("blog.heroTitle")),1),n("p",vn,e(t(a)("blog.heroSubtitle")),1),n("div",bn,[n("button",xn,e(t(a)("blog.tabRecommend")),1),n("button",yn,e(t(a)("blog.tabLatest")),1),n("button",Cn,e(t(a)("blog.tabEssay")),1)])]),n("div",wn,[n("div",kn,e(t(a)("blog.heroLabel")),1),n("div",Ln,e(t(a)("blog.heroDesc")),1),n("div",Nn,[n("span",Rn,e(t(a)("blog.heroTechMarkdown")),1),n("span",Tn,e(t(a)("blog.heroTechVue")),1),n("span",An,e(t(a)("blog.heroTechStudy")),1)])])]),n("div",Dn,[n("main",Sn,[y.value?l.value?(p(),m("div",Fn,[n("div",Gn,[n("button",{class:"back-btn",onClick:c},e(t(a)("blog.backToList")),1),n("h1",In,e(l.value.title),1),n("div",jn,[n("span",Hn,e(t(a)("blog.metaColumn")),1),s[3]||(s[3]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,e(l.value.date||t(a)("blog.postMetaDate")),1),s[4]||(s[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,e(t(a)("blog.postMetaReadTime",{n:l.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:d,class:"post-content"},[S(pn,{source:l.value.content,onRendered:C},null,8,["source"])],512)])):(p(),m("div",Wn,[n("h2",null,e(t(a)("blog.postNotFound")),1),n("p",null,e(t(a)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:c},e(t(a)("blog.backToBlog")),1)])):(p(),m("div",Mn,[(p(!0),m(q,null,V(t(b),_=>(p(),m("article",{key:_.slug,class:"feed-item"},[S(h,{to:{name:"BlogDetail",params:{slug:_.slug}},class:"feed-link"},{default:Z(()=>[n("div",zn,[n("h2",Pn,e(_.title),1),n("p",Un,e(_.excerpt),1)]),n("div",Bn,[n("div",En,[n("span",qn,e(t(a)("blog.metaColumn")),1),s[0]||(s[0]=n("span",{class:"meta-dot"},"·",-1)),n("span",Vn,e(_.date||t(a)("blog.metaNoDate")),1),s[1]||(s[1]=n("span",{class:"meta-dot"},"·",-1)),n("span",Qn,e(t(a)("blog.metaReadMinutes",{n:_.readMinutes})),1)]),s[2]||(s[2]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",On,[n("div",Kn,[n("div",Xn,[s[5]||(s[5]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",Jn,e(t(a)("blog.profileName")),1),n("div",Yn,e(t(a)("blog.profileDesc")),1)])]),n("div",Zn,[n("div",null,[n("strong",null,e(t(b).length),1),n("span",null,e(t(a)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,e(t(a)("blog.statsActive")),1),n("span",null,e(t(a)("blog.statsCode")),1)]),n("div",null,[n("strong",null,e(t(a)("blog.statsGithub")),1),n("span",null,e(t(a)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:t(an).githubUrl,target:"_blank",rel:"noreferrer"},e(t(a)("blog.visitGithub")),9,ne)]),n("div",ee,[n("div",te,e(t(a)("blog.sidebarTags")),1),n("div",ae,[n("span",oe,e(t(a)("blog.tagLearning")),1),n("span",se,e(t(a)("blog.tagAlgorithm")),1),n("span",re,e(t(a)("blog.tagFrontend")),1),n("span",ie,e(t(a)("blog.tagLife")),1)])]),n("div",le,[n("div",ce,e(t(a)("blog.sidebarUpdate")),1),n("p",de,e(t(a)("blog.sidebarUpdateDesc")),1),n("button",_e,e(t(a)("blog.sidebarFollow")),1)]),y.value?(p(),m("div",pe,[n("div",me,e(t(a)("blog.tocTitle")),1),n("ul",ue,[(p(!0),m(q,null,V(r.value,_=>(p(),m("li",{key:_.id,class:nn(["toc-item",_.level])},[n("button",{type:"button",class:"toc-link",onClick:u=>B(_.id)},e(_.text),9,he)],2))),128)),r.value.length?Q("",!0):(p(),m("li",fe,e(t(a)("blog.tocEmpty")),1))])])):Q("",!0)])])])])])}}},Ce=H(ge,[["__scopeId","data-v-b82abc87"]]);export{Ce as default};
+`,dn=["innerHTML"],mn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(D,{emit:a}){const L=D,{t:N}=V(),f=A(null),w=a;function $(l){return l.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,_=>_.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const b=new en({html:!0,linkify:!0,typographer:!0,highlight(l,_){const r=_&&S.getLanguage(_)?_:null,c=r?S.highlight(l,{language:r,ignoreIllegals:!0}).value:S.highlightAuto(l).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${r||"plaintext"}">${c}</code></pre></div>`}});b.use(tn),b.use(F,{slugify:$,level:[2,3,4],permalink:F.permalink.headerLink()});function y(l){if(!l)return"";const _=[];let r=l.replace(/```[\s\S]*?```/g,c=>(_.push(c),`__CODE_BLOCK_${_.length-1}__`));return r=r.replace(/\$\$([\s\S]+?)\$\$/g,(c,i)=>{try{return`<div class="katex-block">${j.renderToString(i.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${i}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(c,i)=>{try{return`<span class="katex-inline">${j.renderToString(i.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${i}$`}}),_.forEach((c,i)=>{r=r.replace(`__CODE_BLOCK_${i}__`,c)}),r}function x(l){if(!l)return l;const _=window.location.origin;return l.replace(/<img\s+([^>]*?)>/g,(r,c)=>c.includes("loading=")?r:`<img ${c} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(r,c)=>{const i=c.match(/href="([^"]*)"/);if(i){const C=i[1];if(C.startsWith("http://")||C.startsWith("https://"))try{if(new URL(C).origin!==_&&!c.includes("target="))return`<a ${c} target="_blank" rel="noopener noreferrer">`}catch{}}return r})}const k=M(()=>x(b.render(y(L.source||""))));Q(k,async()=>{await U(),v(),w("rendered",f.value)}),K(async()=>{await U(),v(),w("rendered",f.value)});function v(){if(!f.value)return;f.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(_=>{_.classList.add("copy-injected");const r=_.querySelector("code"),c=(r==null?void 0:r.textContent)||"",i=document.createElement("button");i.className="copy-btn",i.type="button",i.setAttribute("aria-label",N("common.copyCode")),i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',i.addEventListener("click",()=>{c&&navigator.clipboard.writeText(c).then(()=>{i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',i.classList.add("copied"),setTimeout(()=>{i.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',i.classList.remove("copied")},2e3)})}),_.appendChild(i)})}return(l,_)=>(m(),p("div",{ref_key:"containerRef",ref:f,class:"md-renderer",innerHTML:k.value},null,8,dn))}},pn=I(mn,[["__scopeId","data-v-b6bba450"]]),hn={class:"zhihu-page"},un={class:"zhihu-shell"},gn={class:"zhihu-body"},fn={class:"zhihu-hero"},$n={class:"zhihu-hero-content"},bn={class:"zhihu-title"},yn={class:"zhihu-subtitle"},xn={class:"zhihu-tabs"},vn={class:"tab active"},Cn={class:"tab"},wn={class:"tab"},kn={class:"zhihu-hero-card"},Ln={class:"hero-label"},Nn={class:"hero-desc"},Bn={class:"hero-actions"},Rn={class:"hero-pill"},Tn={class:"hero-pill"},Gn={class:"hero-pill"},Xn={class:"zhihu-container"},Sn={class:"zhihu-main"},An={key:0,class:"feed"},Mn={class:"feed-content"},Dn={class:"feed-title"},zn={class:"feed-excerpt"},Un={class:"feed-footer"},Pn={class:"feed-meta"},En={class:"meta-tag"},qn={class:"meta-date"},Fn={class:"meta-read"},jn={key:1,class:"post-view"},Vn={class:"post-header"},Qn={class:"post-title"},In={class:"post-meta"},On={class:"post-tag"},Hn={key:2,class:"post-empty"},Kn={class:"zhihu-side"},Wn={class:"side-card profile"},Jn={class:"profile-header"},Yn={class:"profile-name"},Zn={class:"profile-desc"},ne={class:"profile-stats"},ee=["href"],te={class:"side-card"},ae={class:"side-title"},oe={class:"tag-list"},se={class:"tag"},re={class:"tag"},ie={class:"tag"},le={class:"tag"},ce={class:"side-card"},_e={class:"side-title"},de={class:"side-text"},me={class:"side-btn"},pe={key:0,class:"side-card post-toc"},he={class:"toc-title"},ue={class:"toc-list"},ge=["onClick"],fe={key:0,class:"toc-empty"},$e={__name:"Blog",setup(D){const{t:a}=V(),L=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":on,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":sn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":rn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":ln,"../markdowns/first-blog.md":cn,"../markdowns/考研信息调研.md":_n});function N(o){return o?typeof o=="string"?o:o&&typeof o=="object"&&"default"in o?o.default:String(o):""}function f(o){return o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function w(o){var g;const s=o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),u=((g=s.match(/[\u4e00-\u9fa5]/g))==null?void 0:g.length)??0,h=s.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+u;return{wordCount:h,readMinutes:Math.max(1,Math.round(h/300)),excerpt:f(s)}}const $=new Map,b=o=>($.has(o)||$.set(o,w(o)),$.get(o)),y=Object.entries(L).map(([o,s])=>{const u=N(s),d=o.match(/\/([^/]+)\.md$/),h=d?d[1]:o;let g=h,B=null;const R=u.match(/^#\s+(.+)$/m);R&&(g=R[1].trim());const T=h.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);T&&(B=T[1],R||(g=T[2]));const O=B??h,G=b(u);return{path:o,slug:h,title:g,content:u,date:B,sortKey:O,excerpt:G.excerpt,readMinutes:G.readMinutes,wordCount:G.wordCount}}).sort((o,s)=>o.sortKey===s.sortKey?0:o.sortKey<s.sortKey?1:-1),x=W(),k=J(),v=M(()=>!!x.params.slug),l=M(()=>x.params.slug?i(x.params.slug):null),_=A(null),r=A([]);function c(){k.push({name:"BlogHome"})}function i(o){return y.find(s=>s.slug===o)}function C(o){const s=o??_.value;if(!s){r.value=[];return}const u=Array.from(s.querySelectorAll("h2, h3"));r.value=u.map(d=>{var g;const h=d.tagName.toLowerCase();return{id:d.id,text:((g=d.textContent)==null?void 0:g.trim())||"标题",level:h}})}function z(o){const s=document.getElementById(o);s&&s.scrollIntoView({behavior:"smooth",block:"start"})}return Q(l,o=>{o||(r.value=[])},{immediate:!0}),(o,s)=>{const u=Y("router-link");return m(),p("section",hn,[X(H),n("div",un,[n("div",gn,[n("div",fn,[n("div",$n,[n("div",bn,e(t(a)("blog.heroTitle")),1),n("p",yn,e(t(a)("blog.heroSubtitle")),1),n("div",xn,[n("button",vn,e(t(a)("blog.tabRecommend")),1),n("button",Cn,e(t(a)("blog.tabLatest")),1),n("button",wn,e(t(a)("blog.tabEssay")),1)])]),n("div",kn,[n("div",Ln,e(t(a)("blog.heroLabel")),1),n("div",Nn,e(t(a)("blog.heroDesc")),1),n("div",Bn,[n("span",Rn,e(t(a)("blog.heroTechMarkdown")),1),n("span",Tn,e(t(a)("blog.heroTechVue")),1),n("span",Gn,e(t(a)("blog.heroTechStudy")),1)])])]),n("div",Xn,[n("main",Sn,[v.value?l.value?(m(),p("div",jn,[n("div",Vn,[n("button",{class:"back-btn",onClick:c},e(t(a)("blog.backToList")),1),n("h1",Qn,e(l.value.title),1),n("div",In,[n("span",On,e(t(a)("blog.metaColumn")),1),s[3]||(s[3]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,e(l.value.date||t(a)("blog.postMetaDate")),1),s[4]||(s[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,e(t(a)("blog.postMetaReadTime",{n:l.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:_,class:"post-content"},[X(pn,{source:l.value.content,onRendered:C},null,8,["source"])],512)])):(m(),p("div",Hn,[n("h2",null,e(t(a)("blog.postNotFound")),1),n("p",null,e(t(a)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:c},e(t(a)("blog.backToBlog")),1)])):(m(),p("div",An,[(m(!0),p(P,null,E(t(y),d=>(m(),p("article",{key:d.slug,class:"feed-item"},[X(u,{to:{name:"BlogDetail",params:{slug:d.slug}},class:"feed-link"},{default:Z(()=>[n("div",Mn,[n("h2",Dn,e(d.title),1),n("p",zn,e(d.excerpt),1)]),n("div",Un,[n("div",Pn,[n("span",En,e(t(a)("blog.metaColumn")),1),s[0]||(s[0]=n("span",{class:"meta-dot"},"·",-1)),n("span",qn,e(d.date||t(a)("blog.metaNoDate")),1),s[1]||(s[1]=n("span",{class:"meta-dot"},"·",-1)),n("span",Fn,e(t(a)("blog.metaReadMinutes",{n:d.readMinutes})),1)]),s[2]||(s[2]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",Kn,[n("div",Wn,[n("div",Jn,[s[5]||(s[5]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",Yn,e(t(a)("blog.profileName")),1),n("div",Zn,e(t(a)("blog.profileDesc")),1)])]),n("div",ne,[n("div",null,[n("strong",null,e(t(y).length),1),n("span",null,e(t(a)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,e(t(a)("blog.statsActive")),1),n("span",null,e(t(a)("blog.statsCode")),1)]),n("div",null,[n("strong",null,e(t(a)("blog.statsGithub")),1),n("span",null,e(t(a)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:t(an).githubUrl,target:"_blank",rel:"noreferrer"},e(t(a)("blog.visitGithub")),9,ee)]),n("div",te,[n("div",ae,e(t(a)("blog.sidebarTags")),1),n("div",oe,[n("span",se,e(t(a)("blog.tagLearning")),1),n("span",re,e(t(a)("blog.tagAlgorithm")),1),n("span",ie,e(t(a)("blog.tagFrontend")),1),n("span",le,e(t(a)("blog.tagLife")),1)])]),n("div",ce,[n("div",_e,e(t(a)("blog.sidebarUpdate")),1),n("p",de,e(t(a)("blog.sidebarUpdateDesc")),1),n("button",me,e(t(a)("blog.sidebarFollow")),1)]),v.value?(m(),p("div",pe,[n("div",he,e(t(a)("blog.tocTitle")),1),n("ul",ue,[(m(!0),p(P,null,E(r.value,d=>(m(),p("li",{key:d.id,class:nn(["toc-item",d.level])},[n("button",{type:"button",class:"toc-link",onClick:h=>z(d.id)},e(d.text),9,ge)],2))),128)),r.value.length?q("",!0):(m(),p("li",fe,e(t(a)("blog.tocEmpty")),1))])])):q("",!0)])])])])])}}},we=I($e,[["__scopeId","data-v-b82abc87"]]);export{we as default};
