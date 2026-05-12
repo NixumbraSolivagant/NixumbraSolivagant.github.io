@@ -30,7 +30,7 @@ Only the last html{} block below is active. Switch themes by moving a block to t
 /* Theme 1: image blur background + dark translucent cards + white svg */
 html {
     --name: Theme1;
-    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
+    --main_bg_color: url(../media/bg-1.png);
     --main_text_color: #eeeeee;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
@@ -53,7 +53,7 @@ html {
 /* Theme 2: image blur background + white translucent cards + black svg */
 html {
     --name: Theme2;
-    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
+    --main_bg_color: url(../media/bg-1.png);
     --main_text_color: #000000;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
@@ -122,7 +122,7 @@ html {
 /* Theme 5: image blur background + dark translucent cards + white svg (back_filter is heavy) */
 html {
     --name: Theme5;
-    --main_bg_color: url(/static/img/backgrounds/bg-1.png);
+    --main_bg_color: url(../media/bg-1.png);
     --main_text_color: #eeeeee;
     --gradient: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
     --purple_text_color: #747bff;
