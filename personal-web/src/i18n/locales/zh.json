@@ -71,7 +71,6 @@
     "sidebarUpdate": "更新提醒",
     "sidebarUpdateDesc": "每周整理一次学习收获，欢迎交流。",
     "sidebarFollow": "关注专栏",
-    "sidebarFollowing": "已关注",
     "tocTitle": "目录",
     "tocEmpty": "暂无目录"
   },
@@ -153,8 +152,6 @@
     "copyCode": "复制代码",
     "copied": "已复制",
     "switchToEn": "切换到英文",
-    "switchToZh": "切换到中文",
-    "switchToDark": "切换到深色主题",
-    "switchToLight": "切换到浅色主题"
+    "switchToZh": "切换到中文"
   }
 }

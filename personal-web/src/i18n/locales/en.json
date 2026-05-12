@@ -71,7 +71,6 @@
     "sidebarUpdate": "Updates",
     "sidebarUpdateDesc": "Weekly learning summaries. Feel free to chat!",
     "sidebarFollow": "Follow",
-    "sidebarFollowing": "Following",
     "tocTitle": "Contents",
     "tocEmpty": "No contents yet"
   },
@@ -153,8 +152,6 @@
     "copyCode": "Copy code",
     "copied": "Copied",
     "switchToEn": "Switch to English",
-    "switchToZh": "Switch to Chinese",
-    "switchToDark": "Switch to dark theme",
-    "switchToLight": "Switch to light theme"
+    "switchToZh": "Switch to Chinese"
   }
 }
