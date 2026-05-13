@@ -33,6 +33,10 @@ jobs:
       - name: Build
         working-directory: ./personal-web
         run: npm run build
+        env:
+          VITE_UMAMI_BASE: ${{ vars.VITE_UMAMI_BASE }}
+          VITE_UMAMI_WEBSITE_ID: ${{ vars.VITE_UMAMI_WEBSITE_ID }}
+          VITE_UMAMI_API_KEY: ${{ secrets.VITE_UMAMI_API_KEY }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

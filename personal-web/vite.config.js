@@ -10,10 +10,14 @@ function mediaManifestPlugin() {
   const MANIFEST_FILE = 'media-manifest.json'
   const MEDIA_DIR = 'public/static/media'
 
+  // Use process.cwd() — always the project root where npm run/build is invoked
+  const projectRoot = process.cwd()
+  const distDir = join(projectRoot, 'dist')
+  const mediaDir = join(projectRoot, MEDIA_DIR)
+
   return {
     name: 'media-manifest',
-    async buildStart() {
-      const mediaDir = join(__dirname, '..', MEDIA_DIR)
+    async writeBundle() {
       let entries
       try {
         entries = await readdir(mediaDir)
@@ -31,9 +35,9 @@ function mediaManifestPlugin() {
         }))
         .sort((a, b) => a.src.localeCompare(b.src))
 
-      await mkdir(join(__dirname, '..', 'dist'), { recursive: true })
+      await mkdir(distDir, { recursive: true })
       await writeFile(
-        join(__dirname, '..', 'dist', MANIFEST_FILE),
+        join(distDir, MANIFEST_FILE),
         JSON.stringify(media, null, 2)
       )
     },
