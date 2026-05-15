@@ -74,6 +74,16 @@
             </div>
           </main>
           <aside class="zhihu-side">
+            <!-- ── 移动端 TOC 抽屉触发按钮 ── -->
+            <div v-if="isDetailView && tocItems.length" class="toc-drawer-toggle">
+              <button class="drawer-btn" @click="drawerOpen = true" :aria-label="t('blog.tocTitle')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/>
+                </svg>
+                {{ t('blog.tocTitle') }}
+              </button>
+            </div>
+
             <div class="side-card profile">
               <div class="profile-header">
                 <div class="profile-avatar"></div>
@@ -114,10 +124,18 @@
               <p class="side-text">{{ t('blog.sidebarUpdateDesc') }}</p>
               <button class="side-btn">{{ t('blog.sidebarFollow') }}</button>
             </div>
-            <div v-if="isDetailView" class="side-card post-toc">
-              <div class="toc-title">{{ t('blog.tocTitle') }}</div>
+            <!-- ── 目录：桌面端 sticky + 移动端 teleport ── -->
+            <div v-if="isDetailView" class="side-card post-toc" :class="{ 'toc-mobile': isMobileDrawer }">
+              <div class="toc-header">
+                <div class="toc-title">{{ t('blog.tocTitle') }}</div>
+                <button v-if="isMobileDrawer" class="toc-close" @click="drawerOpen = false" :aria-label="t('blog.modalClose')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
               <ul class="toc-list">
-                <li v-for="item in tocItems" :key="item.id" :class="['toc-item', item.level]">
+                <li v-for="item in tocItems" :key="item.id" :data-id="item.id" :class="['toc-item', item.level, { 'toc-active': activeId === item.id }]">
                   <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
                     {{ item.text }}
                   </button>
@@ -129,11 +147,44 @@
         </div>
       </div>
     </div>
+
+    <!-- 移动端目录抽屉（Teleport 到 body 层） -->
+    <Teleport to="body">
+      <Transition name="drawer">
+        <div v-if="isMobileDrawer && drawerOpen" class="toc-drawer-overlay" @click.self="drawerOpen = false">
+          <div class="toc-drawer-panel">
+            <div class="toc-drawer-header">
+              <span class="toc-drawer-title">{{ t('blog.tocTitle') }}</span>
+              <button class="toc-close" @click="drawerOpen = false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+            <nav class="toc-drawer-body">
+              <ul class="toc-drawer-list">
+                <li
+                  v-for="item in tocItems"
+                  :key="item.id"
+                  :data-id="item.id"
+                  :class="['toc-drawer-item', item.level, { 'toc-active': activeId === item.id }]"
+                >
+                  <button type="button" class="toc-drawer-link" @click="scrollToHeading(item.id)">
+                    {{ item.text }}
+                  </button>
+                </li>
+                <li v-if="!tocItems.length" class="toc-drawer-empty">{{ t('blog.tocEmpty') }}</li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import NavBar from '@/components/NavBar.vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -243,6 +294,19 @@ const currentPost = computed(() => {
 })
 const postContentRef = ref(null)
 const tocItems = ref([])
+const activeId = ref('')
+const drawerOpen = ref(false)
+const MOBILE_BREAKPOINT = 768
+const isMobileDrawer = ref(false)
+
+// 在组件创建时就检测一次，避免 SPA 路由切换后仍是初始值
+let rafId = null
+let scrollHandler = null
+let resizeObserver = null
+
+function checkMobile() {
+  isMobileDrawer.value = window.innerWidth < MOBILE_BREAKPOINT
+}
 
 function goBack() {
   router.push({ name: 'BlogHome' })
@@ -268,7 +332,57 @@ function buildToc(el) {
 function scrollToHeading(id) {
   const target = document.getElementById(id)
   if (!target) return
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  drawerOpen.value = false
+  const navHeight = 90
+  const top = target.getBoundingClientRect().top + window.scrollY - navHeight
+  window.scrollTo({ top, behavior: 'smooth' })
+}
+
+function setupScrollspy() {
+  destroyScrollspy()
+  if (!tocItems.value.length) return
+  const headingEls = tocItems.value
+    .map(item => document.getElementById(item.id))
+    .filter(Boolean)
+  if (!headingEls.length) return
+
+  function updateActive() {
+    const navHeight = 90
+    const scrollTop = window.scrollY
+    let current = null
+    for (const el of headingEls) {
+      const top = el.getBoundingClientRect().top + scrollTop - navHeight
+      if (top <= scrollTop + 5) {
+        current = el
+      }
+    }
+    if (current) activeId.value = current.id
+  }
+
+  function onScroll() {
+    if (rafId) return
+    rafId = requestAnimationFrame(() => {
+      updateActive()
+      rafId = null
+    })
+  }
+
+  scrollHandler = onScroll
+  window.addEventListener('scroll', scrollHandler, { passive: true })
+  updateActive()
+}
+
+function destroyScrollspy() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null }
+  if (scrollHandler) {
+    window.removeEventListener('scroll', scrollHandler)
+    scrollHandler = null
+  }
+}
+
+function setupResizeObserver() {
+  resizeObserver = new ResizeObserver(() => checkMobile())
+  resizeObserver.observe(document.documentElement)
 }
 
 watch(
@@ -276,10 +390,51 @@ watch(
   post => {
     if (!post) {
       tocItems.value = []
+      destroyScrollspy()
     }
   },
   { immediate: true }
 )
+
+// TOC 构建完成后（DOM 更新完毕）再启动 Scrollspy
+watch(tocItems, async () => {
+  if (!tocItems.value.length) {
+    destroyScrollspy()
+    return
+  }
+  await nextTick()
+  setupScrollspy()
+})
+
+// 活动条目变化时，自动滚动目录使其进入可视范围
+watch(activeId, async (id) => {
+  if (!id) return
+  await nextTick()
+  // 桌面端：.post-toc 内滚动
+  const tocEl = document.querySelector('.post-toc')
+  const tocItem = tocEl?.querySelector(`[data-id="${id}"]`)
+  if (tocItem) {
+    tocItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+  // 移动端：抽屉打开时滚动抽屉内部
+  if (drawerOpen.value) {
+    const drawerBody = document.querySelector('.toc-drawer-body')
+    const drawerItem = drawerBody?.querySelector(`[data-id="${id}"]`)
+    if (drawerItem) {
+      drawerItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }
+})
+
+onMounted(() => {
+  checkMobile()
+  setupResizeObserver()
+})
+
+onBeforeUnmount(() => {
+  destroyScrollspy()
+  resizeObserver?.disconnect()
+})
 </script>
 
 <style scoped>
@@ -518,6 +673,21 @@ watch(
 .post-toc {
   position: sticky;
   top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card_stroke_color) transparent;
+}
+
+.post-toc::-webkit-scrollbar {
+  width: 4px;
+}
+.post-toc::-webkit-scrollbar-thumb {
+  background: var(--card_stroke_color);
+  border-radius: 999px;
+}
+.post-toc::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .post-empty {
@@ -543,11 +713,17 @@ watch(
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .toc-item {
   display: flex;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.toc-item:hover {
+  background: var(--item_hover_color);
 }
 
 .toc-item.h3 {
@@ -561,28 +737,282 @@ watch(
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  font-size: 0.92rem;
-  line-height: 1.4;
-  padding: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  padding: 5px 8px;
+  width: 100%;
+  border-radius: 8px;
+  transition: color 0.15s ease;
 }
 
 .toc-link:hover {
+  color: var(--main_text_color);
+}
+
+.toc-active .toc-link {
   color: var(--accent_strong);
+  font-weight: 700;
+}
+
+.toc-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.toc-item {
+  position: relative;
 }
 
 .toc-empty {
   color: var(--item_left_text_color);
   font-size: 0.85rem;
   opacity: 0.6;
+  padding: 4px 8px;
 }
 
-.post-header {
+/* ── 目录头部（移动端有关闭按钮） ── */
+.toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.toc-header .toc-title {
+  margin-bottom: 0;
+}
+
+.toc-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--card_stroke_color);
+  border-radius: 8px;
+  background: var(--item_hover_color);
+  color: var(--item_left_text_color);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.toc-close:hover {
+  background: var(--accent);
+  color: var(--main_text_color);
+  border-color: transparent;
+}
+
+/* ── 移动端抽屉触发按钮（桌面端隐藏） ── */
+.toc-drawer-toggle {
+  display: none;
+}
+
+/* ── 移动端抽屉 Overlay ── */
+.toc-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+}
+
+.toc-drawer-panel {
+  width: 100%;
+  max-height: 70vh;
+  background: var(--item_bg_color);
+  border-radius: 20px 20px 0 0;
+  border: 1px solid var(--card_stroke_color);
+  border-bottom: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-bottom: 18px;
+  overflow: hidden;
+  box-shadow: 0 -16px 48px rgba(15, 23, 42, 0.3);
+}
+
+.toc-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 14px;
   border-bottom: 1px solid var(--card_stroke_color);
-  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.toc-drawer-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--main_text_color);
+}
+
+.toc-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card_stroke_color) transparent;
+}
+
+.toc-drawer-body::-webkit-scrollbar {
+  width: 4px;
+}
+.toc-drawer-body::-webkit-scrollbar-thumb {
+  background: var(--card_stroke_color);
+  border-radius: 999px;
+}
+
+.toc-drawer-list {
+  list-style: none;
+  padding: 0 12px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toc-drawer-item {
+  position: relative;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.toc-drawer-item:hover {
+  background: var(--item_hover_color);
+}
+
+.toc-drawer-item.h3 {
+  padding-left: 16px;
+}
+
+.toc-drawer-item.toc-active::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.toc-drawer-link {
+  border: none;
+  background: transparent;
+  color: var(--item_left_text_color);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 8px 12px;
+  width: 100%;
+  border-radius: 10px;
+  transition: color 0.15s ease;
+}
+
+.toc-drawer-link:hover {
+  color: var(--main_text_color);
+}
+
+.toc-drawer-item.toc-active .toc-drawer-link {
+  color: var(--accent_strong);
+  font-weight: 700;
+}
+
+.toc-drawer-empty {
+  color: var(--item_left_text_color);
+  font-size: 0.88rem;
+  opacity: 0.6;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* ── 抽屉滑入/滑出动画 ── */
+.drawer-enter-active .toc-drawer-panel {
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.drawer-leave-active .toc-drawer-panel {
+  transition: transform 0.25s ease-in;
+}
+.drawer-enter-from .toc-drawer-panel,
+.drawer-leave-to .toc-drawer-panel {
+  transform: translateY(100%);
+}
+
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: opacity 0.25s ease;
+}
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+}
+
+/* ── 响应式断点 ── */
+@media (max-width: 1024px) {
+  .zhihu-hero,
+  .zhihu-container {
+    grid-template-columns: 1fr;
+  }
+
+  .zhihu-hero-card {
+    order: -1;
+  }
+
+  /* 移动端显示抽屉按钮，隐藏内嵌目录 */
+  .toc-drawer-toggle {
+    display: block;
+  }
+
+  /* 桌面端在 1024px 及以上隐藏内嵌抽屉触发按钮 */
+  .toc-drawer-toggle {
+    display: none;
+  }
+
+  /* 桌面端（>1024px）目录保持 sticky */
+  .zhihu-side:not(.mobile-mode) .post-toc {
+    position: sticky;
+    top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .zhihu-shell {
+    padding: 0 0 40px;
+  }
+
+  .zhihu-body {
+    padding: 0 12px;
+  }
+
+  .zhihu-hero-content {
+    padding: 22px;
+  }
+
+  .feed-item,
+  .post-view {
+    padding: 22px;
+  }
+
+  /* 768px 以下：隐藏内嵌目录卡片，只保留抽屉触发按钮 */
+  .zhihu-side .post-toc {
+    display: none;
+  }
+
+  .toc-drawer-toggle {
+    display: flex;
+  }
 }
 
 .back-btn {
