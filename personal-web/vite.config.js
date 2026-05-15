@@ -45,6 +45,7 @@ function mediaManifestPlugin() {
 }
 
 export default defineConfig({
+  base: '/',
   plugins: [
     vue(),
     viteCompression({
