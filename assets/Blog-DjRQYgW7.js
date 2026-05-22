@@ -1,4 +1,4 @@
-import{r as w,c as I,k as M,o as Z,B as D,d as m,e as u,a as ln,g as A,f as n,C as t,D as a,F as q,J as j,G as cn,E as x,K as F,h as _n,w as W,T as dn,L as mn,u as pn,M as un,b as hn,H as gn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-COOurZL1.js";import{N as fn}from"./NavBar-BX-cYKp5.js";import{M as $n,a as bn,b as J,H as V,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as vn}from"./author-CBA2vuEx.js";const yn=`# JavaScript 异步编程：从回调到 async/await
+import{r as L,c as V,k as A,o as Z,B as D,d as m,e as h,a as ln,g as G,f as n,C as t,D as s,F as U,J as I,G as _n,E as v,K as j,h as dn,w as K,T as cn,L as mn,u as pn,M as hn,b as un,H as fn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-DLgmhVco.js";import{N as gn}from"./NavBar-B9svbtyx.js";import{M as bn,a as $n,b as J,H as O,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as xn}from"./author-CBA2vuEx.js";const yn=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -93,7 +93,7 @@ const b = await fetchB()
 - async/await：最现代的方式，代码可读性最佳
 
 实际项目中，**async/await + try/catch** 是推荐写法。
-`,xn=`# 强化学习：从马尔可夫决策过程到深度 Q 网络
+`,vn=`# 强化学习：从马尔可夫决策过程到深度 Q 网络
 
 > *"强化学习讨论的是：智能体（Agent）如何在不确定的环境中，通过试错学习，获得最大累积奖励。"*
 > — Sutton & Barto，《强化学习导论》
@@ -433,7 +433,7 @@ $$L^{\\text{CLIP}}(\\theta) = \\mathbb{E}_t \\left[ \\min\\left( r_t(\\theta) \\
 ---
 
 *本文参考了 Sutton & Barto 的《强化学习导论》（第二版）及 OpenAI Spinning Up 等资料。*
-`,wn=`# 卷积神经网络：原理、架构与实战
+`,Ln=`# 卷积神经网络：原理、架构与实战
 
 > *"深度学习最强大的地方在于，它能从原始数据中自动学习出有效的特征表示，而无需人工设计特征。"*
 > — Yann LeCun，卷积神经网络之父，2018 年图灵奖得主
@@ -1448,7 +1448,7 @@ model.eval()
 ---
 
 *本文涵盖了 CNN 的核心概念、经典架构和实战技巧。如有疏漏或疑问，欢迎探讨交流。*
-`,Cn=`# XGBoost：梯度提升的工程极致
+`,wn=`# XGBoost：梯度提升的工程极致
 
 > *"XGBoost 代表了一种将算法与系统设计深度融合的思路——不是在实验室里追求理论上的最优，而是在真实场景中追求工程上的极致。"*
 > — 陈亮，XGBoost 作者之一
@@ -2314,7 +2314,1316 @@ XGBoost 的成功不是偶然的。它在算法、工程和工程-算法协同�
 ---
 
 *本文参考了 XGBoost 原论文（KDD 2016）及陈亮的公开分享。*
-`,kn=`# 博客搭建记录
+`,Tn=`# 长短期记忆网络：LSTM 原理、架构与进阶
+
+> *"人类不会每秒都从头开始思考。当你阅读一篇文章时，你基于对前面词语的理解来理解每个新词，而不是全部忘掉重新开始。"*
+> — Sepp Hochreiter，LSTM 发明者（1997）
+
+## 引言：为什么需要 LSTM？
+
+在深度学习的应用中，我们面对的数据主要分为两类：**有空间结构的数据**（如图像）和**有时间顺序的数据**（如文本、语音、股票价格）。对于空间结构，卷积神经网络（CNN）已经展示了卓越的能力；但对于时序数据，我们需要能够**记住历史信息**的网络结构。
+
+传统的循环神经网络（Recurrent Neural Network，RNN）理论上具备处理序列数据的能力：它通过将上一时刻的隐藏状态传递到下一时刻，形成一条"记忆链"，从而捕获序列中的时序依赖关系。然而，RNN 在实际应用中面临着两个致命的训练困难：**梯度消失**（Gradient Vanishing）和**梯度爆炸**（Gradient Exploding）问题。
+
+让我们从数学角度理解这个问题。考虑一个简单的 RNN 单元，其隐藏状态的更新公式为：
+
+$$h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h)$$
+
+在反向传播过程中，梯度需要沿着时间步反向传递。对于第 $t$ 时刻的损失 $L_t$，第 $k$ 时刻参数 $W$ 的梯度为：
+
+$$\\frac{\\partial L_t}{\\partial W} = \\sum_{i=1}^{t} \\frac{\\partial L_t}{\\partial h_t} \\cdot \\frac{\\partial h_t}{\\partial h_i} \\cdot \\frac{\\partial h_i}{\\partial W}$$
+
+其中 $\\frac{\\partial h_t}{\\partial h_i}$ 涉及到雅可比矩阵的连乘。由于 $\\tanh$ 的导数最大值为 1，而权重矩阵 $W_{hh}$ 的特征值往往小于 1，经过多次连乘后，梯度会指数级衰减（梯度消失）；反之，如果特征值大于 1，梯度会指数级增长（梯度爆炸）。
+
+梯度消失意味着**早期的信息无法有效影响网络的后续输出**，即网络难以学习长距离依赖关系。对于处理"我住在纽约...我去过那里的中央公园"这样的长句，网络无法记住"纽约"这个关键信息。
+
+1997 年，Sepp Hochreiter 和 Jürgen Schmidhuber 在论文《Long Short-Term Memory》中提出了**长短期记忆网络**（Long Short-Term Memory，LSTM），从根本上解决了这一问题。LSTM 通过引入**门控机制**（Gating Mechanism）和**细胞状态**（Cell State）的设计，使得网络能够学习哪些信息应该被记住、哪些应该被遗忘，从而有效地捕获序列中的长距离依赖关系。
+
+## LSTM 的核心设计
+
+### 整体架构
+
+LSTM 的核心思想是在 RNN 的基础上增加一条**细胞状态**（Cell State）$C_t$，这条状态类似于一条"传送带"，信息可以沿着它平稳地流动，只有少量线性交互，从而避免了梯度的剧烈变化。
+
+在每个时间步，LSTM 通过三个精心设计的**门**来控制信息流：
+
+1. **遗忘门**（Forget Gate）：决定从细胞状态中丢弃什么信息
+2. **输入门**（Input Gate）：决定将什么新信息存储到细胞状态中
+3. **输出门**（Output Gate）：决定输出什么信息
+
+\`\`\`
+┌─────────────────────────────────────────────────────────────────┐
+│                         LSTM Cell                                │
+│                                                                 │
+│   h_{t-1} ───────────────────────────────────────────→         │
+│            │                                                     │
+│            │    ┌─────────┐                                     │
+│   x_t ─────┼───→│ Forget  │──────┐                              │
+│            │    │  Gate   │      │                              │
+│            │    └─────────┘      │                              │
+│            │                     │     ┌─────────┐              │
+│            │    ┌─────────┐      ├────→│  Cell   │──→ h_t     │
+│            └───→│  Input  │──────┤     │ State   │      ↑      │
+│                 │  Gate   │      │     └─────────┘      │      │
+│                 └─────────┘      │            ↑         │      │
+│                               ┌──┴────────────┤         │      │
+│                               │               │         │      │
+│                               ▼               │         │      │
+│                          ┌─────────┐           │         │      │
+│                          │ Output │           │         │      │
+│                          │  Gate  │           │         │      │
+│                          └─────────┘           │         │      │
+│                                               │         │      │
+└───────────────────────────────────────────────┴─────────┴───────┘
+\`\`\`
+
+### 遗忘门：决定丢弃什么
+
+遗忘门查看上一时刻的隐藏状态 $h_{t-1}$ 和当前输入 $x_t$，输出一个 0 到 1 之间的数值，用于决定细胞状态 $C_{t-1}$ 中每个元素应该保留多少。
+
+$$f_t = \\sigma(W_f \\cdot [h_{t-1}, x_t] + b_f)$$
+
+其中 $\\sigma$ 是 Sigmoid 激活函数，$[h_{t-1}, x_t]$ 表示向量拼接，$W_f$ 和 $b_f$ 是可学习的参数。
+
+如果 $f_t$ 接近 0，表示"完全遗忘"；如果 $f_t$ 接近 1，表示"完全保留"。
+
+### 输入门：决定添加什么
+
+输入门分两步工作：首先，Sigmoid 层（输入门）决定哪些位置需要更新；然后，Tanh 层创建一个新的候选值向量。
+
+$$i_t = \\sigma(W_i \\cdot [h_{t-1}, x_t] + b_i)$$
+
+$$\\tilde{C}_t = \\tanh(W_C \\cdot [h_{t-1}, x_t] + b_C)$$
+
+### 细胞状态更新：核心机制
+
+现在可以更新细胞状态了。从 $C_{t-1}$ 更新到 $C_t$：
+
+$$C_t = f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t$$
+
+其中 $\\odot$ 表示逐元素乘法（Hadamard 积）。
+
+这个公式的直觉理解是：
+- **$f_t \\odot C_{t-1}$**：遗忘门决定保留多少旧信息
+- **$i_t \\odot \\tilde{C}_t$**：输入门决定添加多少新信息
+
+这就是 LSTM 解决梯度消失问题的关键：**细胞状态的更新是"加法"操作而非"乘法"操作**。即使经过很长的序列，梯度也可以相对稳定地传播，而不会指数级衰减。
+
+### 输出门：决定输出什么
+
+最后，输出门决定输出什么内容：
+
+$$o_t = \\sigma(W_o \\cdot [h_{t-1}, x_t] + b_o)$$
+
+$$h_t = o_t \\odot \\tanh(C_t)$$
+
+注意，输出的隐藏状态 $h_t$ 是根据当前的细胞状态 $C_t$（经过 Tanh 压缩到 [-1, 1]）和输出门的加权组合。
+
+## LSTM 的数学推导
+
+### 前向传播
+
+综合以上，LSTM 的完整前向传播公式如下：
+
+$$
+\\begin{aligned}
+f_t &= \\sigma(W_f \\cdot [h_{t-1}, x_t] + b_f) \\quad \\text{（遗忘门）} \\\\
+i_t &= \\sigma(W_i \\cdot [h_{t-1}, x_t] + b_i) \\quad \\text{（输入门）} \\\\
+\\tilde{C}_t &= \\tanh(W_C \\cdot [h_{t-1}, x_t] + b_C) \\quad \\text{（候选细胞状态）} \\\\
+C_t &= f_t \\odot C_{t-1} + i_t \\odot \\tilde{C}_t \\quad \\text{（细胞状态更新）} \\\\
+o_t &= \\sigma(W_o \\cdot [h_{t-1}, x_t] + b_o) \\quad \\text{（输出门）} \\\\
+h_t &= o_t \\odot \\tanh(C_t) \\quad \\text{（隐藏状态输出）}
+\\end{aligned}
+$$
+
+如果使用批量训练，设批量大小为 $B$，序列长度为 $T$，输入维度为 $d_{in}$，隐藏状态维度为 $d_h$，则每个门的权重矩阵形状为：
+- $W_f, W_i, W_C, W_o \\in \\mathbb{R}^{d_h \\times (d_h + d_{in})}$
+- $b_f, b_i, b_C, b_o \\in \\mathbb{R}^{d_h}$
+
+总参数量：$4 \\times d_h \\times (d_h + d_{in}) + 4 \\times d_h$
+
+### 反向传播
+
+LSTM 的反向传播（BPTT，Backpropagation Through Time）比标准 RNN 复杂，因为涉及多个门控单元。但核心思想是类似的：梯度沿着时间步反向传播，同时通过每个 LSTM 单元的门控机制流动。
+
+关键的是，由于细胞状态的更新是**加法**操作：
+
+$$\\frac{\\partial C_t}{\\partial C_{t-1}} = f_t$$
+
+而 $f_t \\in (0, 1)$（Sigmoid 输出），这使得梯度不会像标准 RNN 那样指数级衰减。LSTM 通过**门控机制自适应地调节梯度流**，使得梯度可以在长序列中稳定传播。
+
+## PyTorch 实现
+
+### 基础 LSTM 实现
+
+\`\`\`python
+import torch
+import torch.nn as nn
+
+class LSTMCell(nn.Module):
+    """单层 LSTM 单元的 PyTorch 实现"""
+    
+    def __init__(self, input_size, hidden_size, bias=True):
+        super(LSTMCell, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        
+        # 将四个门的权重合并为一个矩阵以提高效率
+        # W: [input_size + hidden_size, 4 * hidden_size]
+        self.weight_ih = nn.Parameter(torch.randn(4 * hidden_size, input_size))
+        self.weight_hh = nn.Parameter(torch.randn(4 * hidden_size, hidden_size))
+        
+        if bias:
+            self.bias = nn.Parameter(torch.randn(4 * hidden_size))
+        else:
+            self.register_parameter('bias', None)
+        
+        self.reset_parameters()
+    
+    def reset_parameters(self):
+        nn.init.xavier_uniform_(self.weight_ih)
+        nn.init.xavier_uniform_(self.weight_hh)
+        if self.bias is not None:
+            nn.init.zeros_(self.bias)
+    
+    def forward(self, x, hidden=None):
+        """
+        Args:
+            x: 输入张量 [batch_size, input_size]
+            hidden: 隐状态元组 (h, c)，每个 [batch_size, hidden_size]
+        Returns:
+            h, c: 新的隐状态
+        """
+        if hidden is None:
+            h = torch.zeros(x.size(0), self.hidden_size, device=x.device)
+            c = torch.zeros(x.size(0), self.hidden_size, device=x.device)
+        else:
+            h, c = hidden
+        
+        # 计算四个门的值
+        gates = (torch.mm(x, self.weight_ih.t()) + 
+                 torch.mm(h, self.weight_hh.t()))
+        if self.bias is not None:
+            gates += self.bias
+        
+        # 分割为四个门
+        i, f, g, o = gates.chunk(4, dim=1)
+        
+        # 门控运算
+        i = torch.sigmoid(i)  # 输入门
+        f = torch.sigmoid(f)  # 遗忘门
+        g = torch.tanh(g)      # 候选细胞状态
+        o = torch.sigmoid(o)  # 输出门
+        
+        # 更新细胞状态和隐藏状态
+        c_next = f * c + i * g
+        h_next = o * torch.tanh(c_next)
+        
+        return h_next, c_next
+\`\`\`
+
+### 多层 LSTM
+
+\`\`\`python
+class MultiLayerLSTM(nn.Module):
+    """多层 LSTM 实现"""
+    
+    def __init__(self, input_size, hidden_size, num_layers=1, bias=True, dropout=0):
+        super(MultiLayerLSTM, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        layers = []
+        for layer_idx in range(num_layers):
+            # 第一层接收原始输入，后续层接收前一层输出
+            layer_input_size = input_size if layer_idx == 0 else hidden_size
+            layers.append(LSTMCell(layer_input_size, hidden_size, bias))
+        
+        self.layers = nn.ModuleList(layers)
+        self.dropout = dropout if num_layers > 1 else 0
+    
+    def forward(self, x, hidden=None):
+        """
+        Args:
+            x: 输入张量 [batch_size, seq_len, input_size]
+            hidden: 隐状态列表，每个元素为 (h, c)
+        Returns:
+            outputs: 所有时间步的输出 [batch_size, seq_len, hidden_size]
+            hidden: 最终隐状态
+        """
+        batch_size, seq_len, _ = x.size()
+        
+        # 初始化隐藏状态
+        if hidden is None:
+            hidden = self.init_hidden(batch_size, x.device)
+        
+        outputs = []
+        for t in range(seq_len):
+            x_t = x[:, t, :]  # [batch_size, input_size]
+            new_hidden = []
+            
+            for layer_idx, layer in enumerate(self.layers):
+                if t == 0:
+                    h, c = layer(x_t, hidden[layer_idx])
+                else:
+                    h, c = layer(x_t, hidden[layer_idx])
+                x_t = h  # 传递给下一层
+                new_hidden.append((h, c))
+            
+            outputs.append(x_t)
+            hidden = new_hidden
+        
+        outputs = torch.stack(outputs, dim=1)  # [batch_size, seq_len, hidden_size]
+        return outputs, hidden
+    
+    def init_hidden(self, batch_size, device):
+        return [(torch.zeros(batch_size, self.hidden_size, device=device),
+                 torch.zeros(batch_size, self.hidden_size, device=device))
+                for _ in range(self.num_layers)]
+\`\`\`
+
+### 使用 PyTorch 内置 LSTM
+
+\`\`\`python
+import torch.nn as nn
+
+class LSTMClassifier(nn.Module):
+    """使用 PyTorch 内置 nn.LSTM 的分类器"""
+    
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, num_layers, 
+                 num_classes, dropout=0.5):
+        super(LSTMClassifier, self).__init__()
+        
+        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
+        self.lstm = nn.LSTM(
+            input_size=embedding_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,  # 双向 LSTM
+            dropout=dropout if num_layers > 1 else 0
+        )
+        
+        # 全连接分类层
+        self.fc = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim * 2, hidden_dim),  # *2 因为双向
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, num_classes)
+        )
+        
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
+    
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len] - token IDs
+        Returns:
+            logits: [batch_size, num_classes]
+        """
+        # 词嵌入
+        embedded = self.embedding(x)  # [batch_size, seq_len, embedding_dim]
+        
+        # LSTM 前向传播
+        # lstm_out: [batch_size, seq_len, hidden_dim * 2] (bidirectional)
+        # hidden: (h_n, c_n) 每个形状 [num_layers * 2, batch_size, hidden_dim]
+        lstm_out, (h_n, c_n) = self.lstm(embedded)
+        
+        # 使用最后时刻的隐状态（双向）
+        # h_n[-2] 是最后一层前向的最终隐状态
+        # h_n[-1] 是最后一层后向的最终隐状态
+        hidden_forward = h_n[-2, :, :]  # [batch_size, hidden_dim]
+        hidden_backward = h_n[-1, :, :]  # [batch_size, hidden_dim]
+        final_hidden = torch.cat([hidden_forward, hidden_backward], dim=1)
+        
+        # 分类
+        logits = self.fc(final_hidden)
+        return logits
+\`\`\`
+
+## LSTM 的变体与演进
+
+### 门控循环单元（GRU）
+
+2014 年，Cho 等人提出了**门控循环单元**（Gated Recurrent Unit，GRU），它是 LSTM 的简化版本，只有两个门（重置门和更新门），参数更少，在某些任务上表现相当甚至更好。
+
+\`\`\`python
+class GRUCell(nn.Module):
+    """GRU 单元实现"""
+    
+    def __init__(self, input_size, hidden_size):
+        super(GRUCell, self).__init__()
+        self.hidden_size = hidden_size
+        
+        # 更新门
+        self.weight_z = nn.Parameter(torch.randn(hidden_size, input_size + hidden_size))
+        self.bias_z = nn.Parameter(torch.zeros(hidden_size))
+        
+        # 重置门
+        self.weight_r = nn.Parameter(torch.randn(hidden_size, input_size + hidden_size))
+        self.bias_r = nn.Parameter(torch.zeros(hidden_size))
+        
+        # 候选隐状态
+        self.weight_h = nn.Parameter(torch.randn(hidden_size, input_size + hidden_size))
+        self.bias_h = nn.Parameter(torch.zeros(hidden_size))
+    
+    def forward(self, x, h):
+        # 拼接输入和隐状态
+        xh = torch.cat([x, h], dim=1)
+        
+        # 计算更新门
+        z = torch.sigmoid(xh @ self.weight_z.t() + self.bias_z)
+        
+        # 计算重置门
+        r = torch.sigmoid(xh @ self.weight_r.t() + self.bias_r)
+        
+        # 计算候选隐状态
+        rh = torch.cat([x, r * h], dim=1)
+        h_tilde = torch.tanh(rh @ self.weight_h.t() + self.bias_h)
+        
+        # 更新隐状态
+        h_new = (1 - z) * h + z * h_tilde
+        
+        return h_new
+\`\`\`
+
+GRU 的核心更新公式：
+
+$$z_t = \\sigma(W_z \\cdot [h_{t-1}, x_t]) \\quad \\text{（更新门）}$$
+
+$$r_t = \\sigma(W_r \\cdot [h_{t-1}, x_t]) \\quad \\text{（重置门）}$$
+
+$$\\tilde{h}_t = \\tanh(W \\cdot [r_t \\odot h_{t-1}, x_t]) \\quad \\text{（候选隐状态）}$$
+
+$$h_t = (1 - z_t) \\odot h_{t-1} + z_t \\odot \\tilde{h}_t \\quad \\text{（隐状态更新）}$$
+
+### 双向 LSTM（BiLSTM）
+
+对于某些任务（如文本分类、命名实体识别），当前时刻的输出可能依赖于"未来"的信息。**双向 LSTM** 通过分别处理正向和反向的序列来捕获完整的上下文信息。
+
+\`\`\`python
+class BidirectionalLSTM(nn.Module):
+    """双向 LSTM"""
+    
+    def __init__(self, input_size, hidden_size, num_layers=1):
+        super().__init__()
+        self.forward_lstm = nn.LSTM(
+            input_size, hidden_size, num_layers, batch_first=True
+        )
+        self.backward_lstm = nn.LSTM(
+            input_size, hidden_size, num_layers, batch_first=True
+        )
+    
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len, input_size]
+        Returns:
+            output: [batch_size, seq_len, hidden_size * 2]
+        """
+        # 正向 LSTM
+        out_forward, _ = self.forward_lstm(x)
+        
+        # 反向 LSTM：翻转输入
+        x_reversed = torch.flip(x, dims=[1])
+        out_backward, _ = self.backward_lstm(x_reversed)
+        out_backward = torch.flip(out_backward, dims=[1])  # 翻转回来
+        
+        # 拼接
+        output = torch.cat([out_forward, out_backward], dim=2)
+        return output
+\`\`\`
+
+### 带注意力机制的 LSTM
+
+**注意力机制**（Attention Mechanism）允许模型在生成每个输出时"关注"输入序列的不同部分，这对机器翻译、文本摘要等任务特别有效。
+
+\`\`\`python
+class AttentionLSTM(nn.Module):
+    """带注意力机制的 LSTM"""
+    
+    def __init__(self, input_size, hidden_size, attention_size):
+        super().__init__()
+        self.hidden_size = hidden_size
+        
+        # LSTM
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        
+        # 注意力层
+        self.attention = Attention(hidden_size, attention_size)
+        
+        # 输出层
+        self.fc = nn.Linear(hidden_size, 1)
+    
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len, input_size]
+        Returns:
+            context: [batch_size, hidden_size] - 加权上下文向量
+            attention_weights: [batch_size, seq_len] - 注意力权重
+        """
+        # LSTM 编码
+        lstm_out, _ = self.lstm(x)  # [batch_size, seq_len, hidden_size]
+        
+        # 计算注意力权重
+        attention_weights = self.attention(lstm_out)  # [batch_size, seq_len]
+        attention_weights = torch.softmax(attention_weights, dim=1)
+        
+        # 加权求和得到上下文向量
+        context = torch.sum(attention_weights.unsqueeze(-1) * lstm_out, dim=1)
+        
+        return context, attention_weights
+
+
+class Attention(nn.Module):
+    """Luong 注意力"""
+    
+    def __init__(self, hidden_size, attention_size):
+        super().__init__()
+        self.attention = nn.Sequential(
+            nn.Linear(hidden_size, attention_size),
+            nn.Tanh(),
+            nn.Linear(attention_size, 1)
+        )
+    
+    def forward(self, encoder_outputs):
+        """
+        Args:
+            encoder_outputs: [batch_size, seq_len, hidden_size]
+        Returns:
+            attention_scores: [batch_size, seq_len]
+        """
+        # 计算每个时间步的注意力分数
+        scores = self.attention(encoder_outputs)  # [batch_size, seq_len, 1]
+        scores = scores.squeeze(-1)  # [batch_size, seq_len]
+        return scores
+\`\`\`
+
+### 堆叠 LSTM 与残差连接
+
+深层 LSTM 通常表现更好，但直接堆叠会导致训练困难。**残差连接**（Residual Connection）可以有效缓解这个问题。
+
+\`\`\`python
+class ResidualLSTM(nn.Module):
+    """带残差连接的 LSTM 层"""
+    
+    def __init__(self, hidden_size, num_layers=1, dropout=0.1):
+        super().__init__()
+        
+        self.lstm = nn.LSTM(
+            input_size=hidden_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True,
+            dropout=dropout if num_layers > 1 else 0
+        )
+        
+        # 可学习的残差投影（如果输入输出维度不同）
+        self.projection = nn.Linear(hidden_size, hidden_size) if True else None
+    
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len, hidden_size]
+        Returns:
+            out: [batch_size, seq_len, hidden_size]
+        """
+        residual = x
+        
+        out, hidden = self.lstm(x)
+        
+        # 残差连接
+        if self.projection is not None:
+            residual = self.projection(residual)
+        
+        out = out + residual  # 残差连接
+        return out, hidden
+
+
+class DeepResidualLSTM(nn.Module):
+    """深层残差 LSTM"""
+    
+    def __init__(self, input_size, hidden_size, num_layers, dropout=0.5):
+        super().__init__()
+        
+        self.input_proj = nn.Linear(input_size, hidden_size)
+        
+        self.layers = nn.ModuleList([
+            ResidualLSTM(hidden_size, dropout=dropout)
+            for _ in range(num_layers)
+        ])
+        
+        self.output_proj = nn.Linear(hidden_size, hidden_size)
+    
+    def forward(self, x):
+        x = self.input_proj(x)
+        
+        for layer in self.layers:
+            x, _ = layer(x)
+        
+        x = self.output_proj(x)
+        return x
+\`\`\`
+
+## 序列建模实战
+
+### 文本分类
+
+\`\`\`python
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from collections import Counter
+import re
+
+class TextClassificationDataset(Dataset):
+    """文本分类数据集"""
+    
+    def __init__(self, texts, labels, vocab=None, max_len=200, min_freq=2):
+        self.texts = texts
+        self.labels = labels
+        self.max_len = max_len
+        
+        if vocab is None:
+            self.vocab = self._build_vocab(min_freq)
+        else:
+            self.vocab = vocab
+        
+        self.vocab_size = len(self.vocab)
+        self.pad_idx = self.vocab['<PAD>']
+        self.unk_idx = self.vocab['<UNK>']
+    
+    def _build_vocab(self, min_freq):
+        """构建词汇表"""
+        counter = Counter()
+        for text in self.texts:
+            tokens = self._tokenize(text)
+            counter.update(tokens)
+        
+        vocab = {'<PAD>': 0, '<UNK>': 1}
+        for word, freq in counter.items():
+            if freq >= min_freq:
+                vocab[word] = len(vocab)
+        return vocab
+    
+    def _tokenize(self, text):
+        """简单分词"""
+        text = text.lower()
+        text = re.sub(r'[^a-z\\s]', '', text)
+        return text.split()
+    
+    def __len__(self):
+        return len(self.texts)
+    
+    def __getitem__(self, idx):
+        tokens = self._tokenize(self.texts[idx])
+        ids = [self.vocab.get(t, self.unk_idx) for t in tokens]
+        
+        # 截断或填充
+        if len(ids) > self.max_len:
+            ids = ids[:self.max_len]
+        else:
+            ids += [self.pad_idx] * (self.max_len - len(ids))
+        
+        return torch.tensor(ids), torch.tensor(self.labels[idx])
+
+
+def train_lstm_classifier():
+    """LSTM 文本分类器训练流程"""
+    
+    # 超参数
+    VOCAB_SIZE = 10000
+    EMBEDDING_DIM = 128
+    HIDDEN_DIM = 256
+    NUM_LAYERS = 2
+    NUM_CLASSES = 2
+    DROPOUT = 0.3
+    LEARNING_RATE = 1e-3
+    EPOCHS = 10
+    BATCH_SIZE = 64
+    
+    # 模型
+    model = LSTMClassifier(
+        vocab_size=VOCAB_SIZE,
+        embedding_dim=EMBEDDING_DIM,
+        hidden_dim=HIDDEN_DIM,
+        num_layers=NUM_LAYERS,
+        num_classes=NUM_CLASSES,
+        dropout=DROPOUT
+    )
+    
+    # 损失函数和优化器
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='max', factor=0.5, patience=2
+    )
+    
+    # 训练循环
+    for epoch in range(EPOCHS):
+        model.train()
+        total_loss = 0
+        correct = 0
+        total = 0
+        
+        for batch_x, batch_y in train_loader:
+            optimizer.zero_grad()
+            
+            outputs = model(batch_x)
+            loss = criterion(outputs, batch_y)
+            loss.backward()
+            
+            # 梯度裁剪，防止梯度爆炸
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+            
+            optimizer.step()
+            
+            total_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += batch_y.size(0)
+            correct += predicted.eq(batch_y).sum().item()
+        
+        train_acc = 100. * correct / total
+        print(f'Epoch {epoch+1}: Loss={total_loss:.4f}, Acc={train_acc:.2f}%')
+        
+        # 验证
+        model.eval()
+        val_correct = 0
+        val_total = 0
+        with torch.no_grad():
+            for batch_x, batch_y in val_loader:
+                outputs = model(batch_x)
+                _, predicted = outputs.max(1)
+                val_total += batch_y.size(0)
+                val_correct += predicted.eq(batch_y).sum().item()
+        
+        val_acc = 100. * val_correct / val_total
+        scheduler.step(val_acc)
+        print(f'Validation Acc: {val_acc:.2f}%')
+\`\`\`
+
+### 序列到序列（Seq2Seq）模型
+
+\`\`\`python
+class Seq2SeqLSTM(nn.Module):
+    """基于 LSTM 的序列到序列模型"""
+    
+    def __init__(self, src_vocab_size, tgt_vocab_size, embedding_dim, 
+                 hidden_dim, num_layers, dropout=0.2):
+        super().__init__()
+        
+        # 编码器
+        self.encoder_embedding = nn.Embedding(src_vocab_size, embedding_dim)
+        self.encoder_lstm = nn.LSTM(
+            embedding_dim, hidden_dim, num_layers,
+            batch_first=True, dropout=dropout if num_layers > 1 else 0
+        )
+        
+        # 解码器
+        self.decoder_embedding = nn.Embedding(tgt_vocab_size, embedding_dim)
+        self.decoder_lstm = nn.LSTM(
+            embedding_dim, hidden_dim, num_layers,
+            batch_first=True, dropout=dropout if num_layers > 1 else 0
+        )
+        
+        # 输出层
+        self.fc = nn.Linear(hidden_dim, tgt_vocab_size)
+        self.dropout = nn.Dropout(dropout)
+    
+    def forward(self, src, tgt, teacher_forcing_ratio=0.5):
+        """
+        Args:
+            src: [batch_size, src_seq_len] - 源序列
+            tgt: [batch_size, tgt_seq_len] - 目标序列
+            teacher_forcing_ratio: 使用教师强制的概率
+        Returns:
+            outputs: [batch_size, tgt_seq_len, tgt_vocab_size]
+        """
+        batch_size = src.size(0)
+        tgt_seq_len = tgt.size(1)
+        tgt_vocab_size = self.fc.out_features
+        
+        # 编码
+        encoder_embedded = self.dropout(self.encoder_embedding(src))
+        _, (h_n, c_n) = self.encoder_lstm(encoder_embedded)
+        
+        # 解码
+        decoder_embedded = self.dropout(self.decoder_embedding(tgt))
+        outputs = []
+        
+        # 使用编码器的最终隐状态初始化解码器
+        decoder_hidden = (h_n, c_n)
+        
+        # 第一个输入是 <SOS> token（假设为 0）
+        decoder_input = tgt[:, 0:1]
+        
+        for t in range(tgt_seq_len):
+            decoder_output, decoder_hidden = self.decoder_lstm(
+                decoder_embedded[:, t:t+1, :], decoder_hidden
+            )
+            
+            prediction = self.fc(decoder_output.squeeze(1))
+            outputs.append(prediction)
+            
+            # 教师强制
+            teacher_force = torch.rand(1).item() < teacher_forcing_ratio
+            decoder_input = tgt[:, t:t+1] if teacher_force else prediction.argmax(1).unsqueeze(1)
+        
+        outputs = torch.stack(outputs, dim=1)
+        return outputs
+\`\`\`
+
+### 时间序列预测
+
+\`\`\`python
+class TimeSeriesLSTM(nn.Module):
+    """时间序列预测 LSTM"""
+    
+    def __init__(self, input_size, hidden_dim, num_layers, output_size, dropout=0.1):
+        super().__init__()
+        
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            dropout=dropout if num_layers > 1 else 0
+        )
+        
+        self.fc = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim // 2, output_size)
+        )
+    
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len, input_size]
+        Returns:
+            out: [batch_size, output_size]
+        """
+        # LSTM
+        lstm_out, (h_n, _) = self.lstm(x)
+        
+        # 使用最后时刻的隐状态进行预测
+        final_hidden = h_n[-1]  # [batch_size, hidden_dim]
+        
+        # 全连接层
+        out = self.fc(final_hidden)
+        return out
+
+
+def create_sequences(data, seq_length, pred_length=1):
+    """创建时间序列训练样本"""
+    X, y = [], []
+    for i in range(len(data) - seq_length - pred_length + 1):
+        X.append(data[i:i+seq_length])
+        y.append(data[i+seq_length:i+seq_length+pred_length])
+    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+
+
+def train_time_series_model():
+    """时间序列预测训练"""
+    
+    # 生成示例数据（正弦波 + 噪声）
+    import numpy as np
+    t = np.linspace(0, 100, 1000)
+    data = np.sin(t * 0.1) + 0.1 * np.random.randn(1000)
+    
+    # 创建序列
+    X, y = create_sequences(data, seq_length=50, pred_length=1)
+    
+    # 划分训练集和测试集
+    train_size = int(0.8 * len(X))
+    X_train, y_train = X[:train_size], y[:train_size]
+    X_test, y_test = X[train_size:], y[train_size:]
+    
+    # 模型参数
+    INPUT_SIZE = 1
+    HIDDEN_DIM = 64
+    NUM_LAYERS = 2
+    OUTPUT_SIZE = 1
+    
+    model = TimeSeriesLSTM(INPUT_SIZE, HIDDEN_DIM, NUM_LAYERS, OUTPUT_SIZE)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    
+    # 训练
+    EPOCHS = 50
+    BATCH_SIZE = 32
+    
+    train_dataset = torch.utils.data.TensorDataset(X_train, y_train)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    
+    for epoch in range(EPOCHS):
+        model.train()
+        total_loss = 0
+        
+        for batch_x, batch_y in train_loader:
+            optimizer.zero_grad()
+            
+            output = model(batch_x)
+            loss = criterion(output, batch_y)
+            loss.backward()
+            
+            optimizer.step()
+            total_loss += loss.item()
+        
+        if (epoch + 1) % 10 == 0:
+            model.eval()
+            with torch.no_grad():
+                test_pred = model(X_test)
+                test_loss = criterion(test_pred, y_test)
+            print(f'Epoch {epoch+1}: Train Loss = {total_loss/len(train_loader):.6f}, '
+                  f'Test Loss = {test_loss:.6f}')
+\`\`\`
+
+## 高级技巧与最佳实践
+
+### 梯度裁剪
+
+LSTM 训练中梯度爆炸仍然可能发生，特别是在初期训练阶段。**梯度裁剪**是防止梯度爆炸的标准技术：
+
+\`\`\`python
+# 梯度裁剪
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+
+# 或者裁剪梯度的绝对值
+torch.nn.utils.clip_grad_value_(model.parameters(), clip_value=1.0)
+\`\`\`
+
+### 权重初始化
+
+良好的权重初始化对 LSTM 的训练稳定性至关重要：
+
+\`\`\`python
+def init_lstm_weights(model):
+    """LSTM 权重初始化"""
+    for name, param in model.named_parameters():
+        if 'weight_ih' in name:  # 输入到隐藏层
+            nn.init.xavier_uniform_(param)
+        elif 'weight_hh' in name:  # 隐藏到隐藏层
+            nn.init.orthogonal_(param)  # 正交初始化更适合 RNN
+        elif 'bias' in name:
+            nn.init.zeros_(param)
+            # 设置遗忘门的偏置为 1，有助于初始时刻保留信息
+            n = param.size(0)
+            param.data[n//4:n//2].fill_(1)
+\`\`\`
+
+### 变长序列处理
+
+\`\`\`python
+def collate_fn(batch):
+    """处理变长序列的 collate 函数"""
+    texts, labels = zip(*batch)
+    
+    # 获取每个序列的实际长度
+    lengths = torch.tensor([len(t) for t in texts])
+    
+    # 填充到相同长度
+    padded_texts = nn.utils.rnn.pad_sequence(texts, batch_first=True, padding_value=0)
+    
+    # 按长度降序排序
+    lengths, perm_idx = lengths.sort(dim=0, descending=True)
+    padded_texts = padded_texts[perm_idx]
+    labels = torch.stack(labels)[perm_idx]
+    
+    return padded_texts, labels, lengths
+
+
+# 使用 pack_padded_sequence 加速变长序列处理
+def forward_with_packing(self, x, lengths):
+    """使用 pack_padded_sequence 优化"""
+    # 按长度降序排序
+    lengths, sorted_idx = lengths.sort(dim=0, descending=True)
+    x = x[sorted_idx]
+    
+    # 打包序列
+    packed = nn.utils.rnn.pack_padded_sequence(
+        x, lengths.cpu(), batch_first=True
+    )
+    
+    # LSTM 处理
+    packed_out, hidden = self.lstm(packed)
+    
+    # 解包
+    out, _ = nn.utils.rnn.pad_packed_sequence(packed_out, batch_first=True)
+    
+    # 恢复原始顺序
+    _, unsort_idx = sorted_idx.sort()
+    out = out[unsort_idx]
+    hidden = (hidden[0][:, unsort_idx, :], hidden[1][:, unsort_idx, :])
+    
+    return out, hidden
+\`\`\`
+
+### 学习率调度
+
+\`\`\`python
+# 多种学习率调度策略
+
+# 1. 余弦退火
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
+
+# 2. 早停学习率衰减
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer, mode='min', factor=0.5, patience=5, min_lr=1e-6
+)
+
+# 3. 周期性学习率
+scheduler = torch.optim.lr_scheduler.CyclicLR(
+    optimizer, base_lr=1e-4, max_lr=1e-3, 
+    step_size_up=2000, mode='triangular'
+)
+\`\`\`
+
+### 正则化技术
+
+\`\`\`python
+class RegularizedLSTM(nn.Module):
+    """带多种正则化的 LSTM"""
+    
+    def __init__(self, input_size, hidden_size, num_layers, dropout=0.5):
+        super().__init__()
+        
+        self.lstm = nn.LSTM(
+            input_size, hidden_size, num_layers,
+            batch_first=True,
+            dropout=dropout if num_layers > 1 else 0
+        )
+        
+        # 输入 dropout
+        self.input_dropout = nn.Dropout(0.2)
+        
+        # 输出层带 Dropout
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(hidden_size, hidden_size // 2),
+            nn.Tanh(),
+            nn.Dropout(dropout / 2),
+            nn.Linear(hidden_size // 2, 1)
+        )
+    
+    def forward(self, x):
+        # 输入 Dropout
+        x = self.input_dropout(x)
+        
+        # LSTM
+        _, (h_n, _) = self.lstm(x)
+        
+        # 使用最后一层隐状态
+        final_hidden = h_n[-1]
+        
+        # 分类
+        return self.classifier(final_hidden)
+\`\`\`
+
+## 与 Transformer 的比较
+
+LSTM 在自然语言处理领域曾占据主导地位，直到 2017 年 Transformer 架构的提出。尽管 Transformer 在许多任务上取得了更好的效果，LSTM 仍有其独特的优势和适用场景。
+
+| 特性 | LSTM | Transformer |
+|------|------|-------------|
+| **计算复杂度** | $O(n \\cdot d^2)$ | $O(n^2 \\cdot d)$ |
+| **长序列处理** | 理论上可以，实际有上限 | 原生支持任意长度 |
+| **并行化能力** | 序列依赖，难以并行 | 高度可并行 |
+| **位置编码** | 隐式学习位置信息 | 需要显式位置编码 |
+| **内存效率** | 固定隐状态大小 | 注意力矩阵 $O(n^2)$ 空间 |
+| **训练稳定性** | 需要梯度裁剪等技巧 | 相对稳定 |
+| **小数据集表现** | 相对较好 | 容易过拟合 |
+
+LSTM 的优势场景：
+- **资源受限环境**：参数量较小，适合边缘设备部署
+- **流式数据处理**：可以边输入边输出，无需等待完整序列
+- **超长序列**：当序列长度超过注意力矩阵的处理能力时
+- **需要显式记忆机制**：如记忆增强网络、神经图灵机
+
+## 实际应用案例
+
+### 情感分析
+
+\`\`\`python
+class SentimentLSTM(nn.Module):
+    """电影评论情感分析"""
+    
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, num_layers, 
+                 num_classes=2, dropout=0.3):
+        super().__init__()
+        
+        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
+        
+        # 可初始化为预训练词向量
+        # self.embedding.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
+        
+        self.lstm = nn.LSTM(
+            embedding_dim, hidden_dim, num_layers,
+            batch_first=True, bidirectional=True, dropout=dropout
+        )
+        
+        # 使用注意力加权
+        self.attention = nn.Linear(hidden_dim * 2, 1)
+        
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim * 2, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(dropout / 2),
+            nn.Linear(hidden_dim, num_classes)
+        )
+    
+    def forward(self, x):
+        # 词嵌入
+        embedded = self.embedding(x)  # [B, L, E]
+        
+        # LSTM
+        lstm_out, _ = self.lstm(embedded)  # [B, L, H*2]
+        
+        # 注意力加权
+        attn_weights = torch.softmax(self.attention(lstm_out), dim=1)
+        context = torch.sum(attn_weights * lstm_out, dim=1)  # [B, H*2]
+        
+        # 分类
+        return self.classifier(context)
+\`\`\`
+
+### 命名实体识别（NER）
+
+\`\`\`python
+class NERLSTM(nn.Module):
+    """命名实体识别"""
+    
+    def __init__(self, vocab_size, tagset_size, embedding_dim=128, 
+                 hidden_dim=256, num_layers=2, dropout=0.3):
+        super().__init__()
+        
+        self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
+        self.lstm = nn.LSTM(
+            embedding_dim, hidden_dim, num_layers,
+            batch_first=True, bidirectional=True, dropout=dropout
+        )
+        
+        # CRF 层可以替代简单的全连接层
+        self.classifier = nn.Linear(hidden_dim * 2, tagset_size)
+        self.dropout = nn.Dropout(dropout)
+    
+    def forward(self, x, mask=None):
+        embedded = self.dropout(self.embedding(x))
+        lstm_out, _ = self.lstm(embedded)
+        logits = self.classifier(lstm_out)
+        
+        if mask is not None:
+            # 只在有标记的位置计算损失
+            logits = logits[mask]
+        
+        return logits
+\`\`\`
+
+### 语音识别（简化）
+
+\`\`\`python
+class SpeechRecognitionLSTM(nn.Module):
+    """简化的语音识别模型"""
+    
+    def __init__(self, n_mels, hidden_dim, num_layers, vocab_size, dropout=0.3):
+        super().__init__()
+        
+        # 梅尔频谱特征投影
+        self.input_proj = nn.Linear(n_mels, hidden_dim)
+        
+        # 双向 LSTM 编码器
+        self.encoder = nn.LSTM(
+            hidden_dim, hidden_dim, num_layers,
+            batch_first=True, bidirectional=True, dropout=dropout
+        )
+        
+        # 注意力解码器
+        self.attention = nn.MultiheadAttention(hidden_dim * 2, num_heads=4)
+        self.decoder = nn.LSTM(
+            hidden_dim * 2, hidden_dim, 1, batch_first=True
+        )
+        
+        # 输出层
+        self.output_proj = nn.Linear(hidden_dim, vocab_size)
+        self.dropout = nn.Dropout(dropout)
+    
+    def forward(self, mel_spectrograms):
+        """
+        Args:
+            mel_spectrograms: [batch_size, n_mels, time_steps]
+        Returns:
+            logits: [batch_size, time_steps, vocab_size]
+        """
+        # 调整维度并投影
+        x = mel_spectrograms.transpose(1, 2)  # [B, T, M]
+        x = self.input_proj(x)  # [B, T, H]
+        x = self.dropout(x)
+        
+        # 编码
+        encoder_out, _ = self.encoder(x)  # [B, T, H*2]
+        
+        # 解码（简化版）
+        decoder_out, _ = self.decoder(encoder_out)  # [B, T, H]
+        
+        # 输出
+        logits = self.output_proj(decoder_out)  # [B, T, V]
+        
+        return logits
+\`\`\`
+
+## 调试与可视化
+
+### 监控训练过程
+
+\`\`\`python
+class TrainingMonitor:
+    """训练监控器"""
+    
+    def __init__(self):
+        self.train_losses = []
+        self.val_losses = []
+        self.train_accs = []
+        self.val_accs = []
+        self.attention_weights = []  # 保存注意力权重
+    
+    def on_batch_end(self, loss, accuracy):
+        self.train_losses.append(loss)
+        self.train_accs.append(accuracy)
+    
+    def on_epoch_end(self, val_loss, val_accuracy, attention=None):
+        self.val_losses.append(val_loss)
+        self.val_accs.append(val_accuracy)
+        if attention is not None:
+            self.attention_weights.append(attention.cpu().detach().numpy())
+        
+        print(f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%')
+    
+    def plot_learning_curves(self):
+        """绘制学习曲线"""
+        import matplotlib.pyplot as plt
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+        
+        # 损失曲线
+        ax1.plot(self.train_losses, label='Train')
+        ax1.plot(self.val_losses, label='Validation')
+        ax1.set_xlabel('Iteration')
+        ax1.set_ylabel('Loss')
+        ax1.set_title('Learning Curves - Loss')
+        ax1.legend()
+        ax1.grid(True)
+        
+        # 准确率曲线
+        ax2.plot(self.train_accs, label='Train')
+        ax2.plot(self.val_accs, label='Validation')
+        ax2.set_xlabel('Iteration')
+        ax2.set_ylabel('Accuracy')
+        ax2.set_title('Learning Curves - Accuracy')
+        ax2.legend()
+        ax2.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig('training_curves.png')
+
+
+def visualize_attention(attention_weights, tokens, save_path='attention.png'):
+    """可视化注意力权重"""
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    
+    # attention_weights: [target_len, source_len]
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(attention_weights, 
+                xticklabels=tokens, 
+                yticklabels=tokens,
+                cmap='viridis')
+    plt.xlabel('Source')
+    plt.ylabel('Target')
+    plt.title('Attention Weights')
+    plt.tight_layout()
+    plt.savefig(save_path)
+\`\`\`
+
+### 检查模型行为
+
+\`\`\`python
+def inspect_lstm_activations(model, sample_input):
+    """检查 LSTM 各门的激活值"""
+    model.eval()
+    
+    hooks = []
+    activations = {}
+    
+    def get_hook(name):
+        def hook(module, input, output):
+            activations[name] = output.detach()
+        return hook
+    
+    # 注册钩子
+    for name, module in model.named_modules():
+        if 'lstm' in name.lower():
+            hooks.append(module.register_forward_hook(get_hook(name)))
+    
+    with torch.no_grad():
+        output = model(sample_input)
+    
+    # 移除钩子
+    for hook in hooks:
+        hook.remove()
+    
+    return activations
+
+
+def analyze_gate_behavior(model, dataloader):
+    """分析各门的行为模式"""
+    model.eval()
+    
+    all_forget_gates = []
+    all_input_gates = []
+    all_output_gates = []
+    
+    with torch.no_grad():
+        for batch_x, _ in dataloader:
+            # 获取 LSTM 的权重
+            weight_ih = model.lstm.weight_ih_l0
+            weight_hh = model.lstm.weight_hh_l0
+            
+            # 计算各门的激活（这里需要手动实现前向传播）
+            # ... (根据具体模型结构实现)
+            
+            pass
+    
+    return {
+        'forget_gate_mean': np.mean(all_forget_gates),
+        'input_gate_mean': np.mean(all_input_gates),
+        'output_gate_mean': np.mean(all_output_gates),
+    }
+\`\`\`
+
+## 结语：LSTM 的历史地位与启示
+
+自 1997 年被提出以来，LSTM 在深度学习领域留下了浓墨重彩的足迹。它不仅解决了困扰 RNN 的长期依赖问题，还启发了后续一系列门控循环网络的设计，包括 GRU、神经图灵机、记忆网络等。
+
+LSTM 的成功告诉我们几个重要的设计原则：
+
+1. **信息选择性**：不是所有历史信息都同等重要，模型应该学会选择性地保留和遗忘
+2. **加法优于乘法**：通过加法更新状态而非乘法，可以更好地缓解梯度消失问题
+3. **模块化设计**：门控机制将"记忆什么"和"输出什么"解耦，提高了模型的可解释性
+
+尽管 Transformer 在许多任务上取得了更好的效果，LSTM 并没有被完全取代。在资源受限的场景、流式数据处理、以及需要显式记忆机制的应用中，LSTM 仍然是值得考虑的选择。更重要的是，LSTM 的设计思想——通过门控实现信息流的精细控制——已经渗透到现代深度学习的各个角落。
+
+> **"技术进步不是简单的替代，而往往是积累与融合。"** LSTM 的门控思想启发了注意力机制的设计，而 Transformer 的自注意力又反过来增强了我们对序列建模的理解。在深度学习的道路上，每一步探索都值得尊重。
+
+---
+
+*本文系统介绍了 LSTM 的原理、实现、变体和实战应用。如有疏漏或疑问，欢迎探讨交流。*
+`,zn=`# 博客搭建记录
 
 ## 前言
 
@@ -2411,7 +3720,7 @@ router.replace({ ...route, params: { locale: lang } })
 
 *本篇文章最后更新于 2026 年 5 月。*
 
-`,Ln=`### 一、理论所（杭高院依托理论所招生）
+`,Cn=`### 一、理论所（杭高院依托理论所招生）
 
 #### （一）招生专业与初试科目
 
@@ -2507,4 +3816,4 @@ router.replace({ ...route, params: { locale: lang } })
 2024 年：一志愿复试 32 人==（初试最高分 429 分、最低分 303 分）==，录取 23 人（初试最高分 429 分、最低分 324 分）
 2023 年：一志愿复试 26 人==（初试最高分 412 分、最低分 283 分）==，录取 20 人（初试最高分 412 分、最低分 311 分）
 2022 年：录取 19 人==（初试最高分 392 分、最低分 309 分==）
-`,Bn=["innerHTML"],Nn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(Q,{emit:o}){const z=Q,{t:P}=nn(),$=w(null),T=o;function C(_){return _.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,d=>d.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const k=new $n({html:!0,linkify:!0,typographer:!0,highlight(_,d){const i=d&&V.getLanguage(d)?d:null,c=i?V.highlight(_,{language:i,ignoreIllegals:!0}).value:V.highlightAuto(_).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${i||"plaintext"}">${c}</code></pre></div>`}});k.use(bn),k.use(J,{slugify:C,level:[2,3,4],permalink:J.permalink.headerLink()});function L(_){if(!_)return"";const d=[];let i=_.replace(/```[\s\S]*?```/g,c=>(d.push(c),`__CODE_BLOCK_${d.length-1}__`));return i=i.replace(/\$\$([\s\S]+?)\$\$/g,(c,l)=>{try{return`<div class="katex-block">${Y.renderToString(l.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${l}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(c,l)=>{try{return`<span class="katex-inline">${Y.renderToString(l.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${l}$`}}),d.forEach((c,l)=>{i=i.replace(`__CODE_BLOCK_${l}__`,c)}),i}function B(_){if(!_)return _;const d=window.location.origin;return _.replace(/<img\s+([^>]*?)>/g,(i,c)=>c.includes("loading=")?i:`<img ${c} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(i,c)=>{const l=c.match(/href="([^"]*)"/);if(l){const f=l[1];if(f.startsWith("http://")||f.startsWith("https://"))try{if(new URL(f).origin!==d&&!c.includes("target="))return`<a ${c} target="_blank" rel="noopener noreferrer">`}catch{}}return i})}const G=I(()=>B(k.render(L(z.source||""))));M(G,async()=>{await D(),v(),T("rendered",$.value)}),Z(async()=>{await D(),v(),T("rendered",$.value)});function v(){if(!$.value)return;$.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(d=>{d.classList.add("copy-injected");const i=d.querySelector("code"),c=(i==null?void 0:i.textContent)||"",l=document.createElement("button");l.className="copy-btn",l.type="button",l.setAttribute("aria-label",P("common.copyCode")),l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.addEventListener("click",()=>{c&&navigator.clipboard.writeText(c).then(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',l.classList.add("copied"),setTimeout(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.classList.remove("copied")},2e3)})}),d.appendChild(l)})}return(_,d)=>(m(),u("div",{ref_key:"containerRef",ref:$,class:"md-renderer",innerHTML:G.value},null,8,Bn))}},Rn=en(Nn,[["__scopeId","data-v-b6bba450"]]),Tn={class:"zhihu-page"},Gn={class:"zhihu-shell"},Xn={class:"zhihu-body"},Sn={class:"zhihu-hero"},An={class:"zhihu-hero-content"},Mn={class:"zhihu-title"},Dn={class:"zhihu-subtitle"},zn={class:"zhihu-tabs"},Pn={class:"tab active"},Un={class:"tab"},En={class:"tab"},qn={class:"zhihu-hero-card"},jn={class:"hero-label"},Fn={class:"hero-desc"},Vn={class:"hero-actions"},In={class:"hero-pill"},Qn={class:"hero-pill"},On={class:"hero-pill"},Hn={class:"zhihu-container"},Kn={class:"zhihu-main"},Wn={key:0,class:"feed"},Jn={class:"feed-content"},Yn={class:"feed-title"},Zn={class:"feed-excerpt"},ne={class:"feed-footer"},ee={class:"feed-meta"},te={class:"meta-tag"},ae={class:"meta-date"},oe={class:"meta-read"},se={key:1,class:"post-view"},re={class:"post-header"},ie={class:"post-title"},le={class:"post-meta"},ce={class:"post-tag"},_e={key:2,class:"post-empty"},de={class:"zhihu-side"},me={key:0,class:"toc-drawer-toggle"},pe=["aria-label"],ue={class:"side-card profile"},he={class:"profile-header"},ge={class:"profile-name"},fe={class:"profile-desc"},$e={class:"profile-stats"},be=["href"],ve={class:"side-card"},ye={class:"side-title"},xe={class:"tag-list"},we={class:"tag"},Ce={class:"tag"},ke={class:"tag"},Le={class:"tag"},Be={class:"side-card"},Ne={class:"side-title"},Re={class:"side-text"},Te={class:"side-btn"},Ge={class:"toc-header"},Xe={class:"toc-title"},Se=["aria-label"],Ae={class:"toc-list"},Me=["data-id"],De=["onClick"],ze={key:0,class:"toc-empty"},Pe={class:"toc-drawer-panel"},Ue={class:"toc-drawer-header"},Ee={class:"toc-drawer-title"},qe={class:"toc-drawer-body"},je={class:"toc-drawer-list"},Fe=["data-id"],Ve=["onClick"],Ie={key:0,class:"toc-drawer-empty"},Qe=768,Oe={__name:"Blog",setup(Q){const{t:o}=nn(),z=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":yn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":xn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":wn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":Cn,"../markdowns/first-blog.md":kn,"../markdowns/考研信息调研.md":Ln});function P(r){return r?typeof r=="string"?r:r&&typeof r=="object"&&"default"in r?r.default:String(r):""}function $(r){return r.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function T(r){var g;const e=r.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),h=((g=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:g.length)??0,p=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+h;return{wordCount:p,readMinutes:Math.max(1,Math.round(p/300)),excerpt:$(e)}}const C=new Map,k=r=>(C.has(r)||C.set(r,T(r)),C.get(r)),L=Object.entries(z).map(([r,e])=>{const h=P(e),s=r.match(/\/([^/]+)\.md$/),p=s?s[1]:r;let g=p,y=null;const S=h.match(/^#\s+(.+)$/m);S&&(g=S[1].trim());const U=p.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);U&&(y=U[1],S||(g=U[2]));const rn=y??p,E=k(h);return{path:r,slug:p,title:g,content:h,date:y,sortKey:rn,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((r,e)=>r.sortKey===e.sortKey?0:r.sortKey<e.sortKey?1:-1),B=pn(),G=un(),v=I(()=>!!B.params.slug),_=I(()=>B.params.slug?tn(B.params.slug):null),d=w(null),i=w([]),c=w(""),l=w(!1),f=w(!1);let b=null,N=null,R=null;function O(){f.value=window.innerWidth<Qe}function H(){G.push({name:"BlogHome"})}function tn(r){return L.find(e=>e.slug===r)}function an(r){const e=r??d.value;if(!e){i.value=[];return}const h=Array.from(e.querySelectorAll("h2, h3"));i.value=h.map(s=>{var g;const p=s.tagName.toLowerCase();return{id:s.id,text:((g=s.textContent)==null?void 0:g.trim())||"标题",level:p}})}function K(r){const e=document.getElementById(r);if(!e)return;l.value=!1;const s=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:s,behavior:"smooth"})}function on(){if(X(),!i.value.length)return;const r=i.value.map(s=>document.getElementById(s.id)).filter(Boolean);if(!r.length)return;function e(){const p=window.scrollY;let g=null;for(const y of r)y.getBoundingClientRect().top+p-90<=p+5&&(g=y);g&&(c.value=g.id)}function h(){b||(b=requestAnimationFrame(()=>{e(),b=null}))}N=h,window.addEventListener("scroll",N,{passive:!0}),e()}function X(){b&&(cancelAnimationFrame(b),b=null),N&&(window.removeEventListener("scroll",N),N=null)}function sn(){R=new ResizeObserver(()=>O()),R.observe(document.documentElement)}return M(_,r=>{r||(i.value=[],X())},{immediate:!0}),M(i,async()=>{if(!i.value.length){X();return}await D(),on()}),M(c,async r=>{if(!r)return;await D();const e=document.querySelector(".post-toc"),h=e==null?void 0:e.querySelector(`[data-id="${r}"]`);if(h&&h.scrollIntoView({behavior:"smooth",block:"nearest"}),l.value){const s=document.querySelector(".toc-drawer-body"),p=s==null?void 0:s.querySelector(`[data-id="${r}"]`);p&&p.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),ln(()=>{X(),R==null||R.disconnect()}),(r,e)=>{const h=hn("router-link");return m(),u("section",Tn,[A(fn),n("div",Gn,[n("div",Xn,[n("div",Sn,[n("div",An,[n("div",Mn,t(a(o)("blog.heroTitle")),1),n("p",Dn,t(a(o)("blog.heroSubtitle")),1),n("div",zn,[n("button",Pn,t(a(o)("blog.tabRecommend")),1),n("button",Un,t(a(o)("blog.tabLatest")),1),n("button",En,t(a(o)("blog.tabEssay")),1)])]),n("div",qn,[n("div",jn,t(a(o)("blog.heroLabel")),1),n("div",Fn,t(a(o)("blog.heroDesc")),1),n("div",Vn,[n("span",In,t(a(o)("blog.heroTechMarkdown")),1),n("span",Qn,t(a(o)("blog.heroTechVue")),1),n("span",On,t(a(o)("blog.heroTechStudy")),1)])])]),n("div",Hn,[n("main",Kn,[v.value?_.value?(m(),u("div",se,[n("div",re,[n("button",{class:"back-btn",onClick:H},t(a(o)("blog.backToList")),1),n("h1",ie,t(_.value.title),1),n("div",le,[n("span",ce,t(a(o)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(_.value.date||a(o)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(o)("blog.postMetaReadTime",{n:_.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:d,class:"post-content"},[A(Rn,{source:_.value.content,onRendered:an},null,8,["source"])],512)])):(m(),u("div",_e,[n("h2",null,t(a(o)("blog.postNotFound")),1),n("p",null,t(a(o)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:H},t(a(o)("blog.backToBlog")),1)])):(m(),u("div",Wn,[(m(!0),u(q,null,j(a(L),s=>(m(),u("article",{key:s.slug,class:"feed-item"},[A(h,{to:{name:"BlogDetail",params:{slug:s.slug}},class:"feed-link"},{default:W(()=>[n("div",Jn,[n("h2",Yn,t(s.title),1),n("p",Zn,t(s.excerpt),1)]),n("div",ne,[n("div",ee,[n("span",te,t(a(o)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",ae,t(s.date||a(o)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(a(o)("blog.metaReadMinutes",{n:s.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",de,[v.value&&i.value.length?(m(),u("div",me,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=s=>l.value=!0),"aria-label":a(o)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),cn(" "+t(a(o)("blog.tocTitle")),1)],8,pe)])):x("",!0),n("div",ue,[n("div",he,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ge,t(a(o)("blog.profileName")),1),n("div",fe,t(a(o)("blog.profileDesc")),1)])]),n("div",$e,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(o)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(o)("blog.statsActive")),1),n("span",null,t(a(o)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(o)("blog.statsGithub")),1),n("span",null,t(a(o)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(vn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(o)("blog.visitGithub")),9,be)]),n("div",ve,[n("div",ye,t(a(o)("blog.sidebarTags")),1),n("div",xe,[n("span",we,t(a(o)("blog.tagLearning")),1),n("span",Ce,t(a(o)("blog.tagAlgorithm")),1),n("span",ke,t(a(o)("blog.tagFrontend")),1),n("span",Le,t(a(o)("blog.tagLife")),1)])]),n("div",Be,[n("div",Ne,t(a(o)("blog.sidebarUpdate")),1),n("p",Re,t(a(o)("blog.sidebarUpdateDesc")),1),n("button",Te,t(a(o)("blog.sidebarFollow")),1)]),v.value?(m(),u("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":f.value}])},[n("div",Ge,[n("div",Xe,t(a(o)("blog.tocTitle")),1),f.value?(m(),u("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=s=>l.value=!1),"aria-label":a(o)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Se)):x("",!0)]),n("ul",Ae,[(m(!0),u(q,null,j(i.value,s=>(m(),u("li",{key:s.id,"data-id":s.id,class:F(["toc-item",s.level,{"toc-active":c.value===s.id}])},[n("button",{type:"button",class:"toc-link",onClick:p=>K(s.id)},t(s.text),9,De)],10,Me))),128)),i.value.length?x("",!0):(m(),u("li",ze,t(a(o)("blog.tocEmpty")),1))])],2)):x("",!0)])])])]),(m(),_n(mn,{to:"body"},[A(dn,{name:"drawer"},{default:W(()=>[f.value&&l.value?(m(),u("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=gn(s=>l.value=!1,["self"]))},[n("div",Pe,[n("div",Ue,[n("span",Ee,t(a(o)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=s=>l.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",qe,[n("ul",je,[(m(!0),u(q,null,j(i.value,s=>(m(),u("li",{key:s.id,"data-id":s.id,class:F(["toc-drawer-item",s.level,{"toc-active":c.value===s.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:p=>K(s.id)},t(s.text),9,Ve)],10,Fe))),128)),i.value.length?x("",!0):(m(),u("li",Ie,t(a(o)("blog.tocEmpty")),1))])])])])):x("",!0)]),_:1})]))])}}},Ze=en(Oe,[["__scopeId","data-v-f1b0f654"]]);export{Ze as default};
+`,Sn=["innerHTML"],kn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(H,{emit:a}){const X=H,{t:q}=nn(),b=L(null),M=a;function w(d){return d.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,c=>c.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new bn({html:!0,linkify:!0,typographer:!0,highlight(d,c){const r=c&&O.getLanguage(c)?c:null,_=r?O.highlight(d,{language:r,ignoreIllegals:!0}).value:O.highlightAuto(d).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${r||"plaintext"}">${_}</code></pre></div>`}});T.use($n),T.use(J,{slugify:w,level:[2,3,4],permalink:J.permalink.headerLink()});function z(d){if(!d)return"";const c=[];let r=d.replace(/```[\s\S]*?```/g,_=>(c.push(_),`__CODE_BLOCK_${c.length-1}__`));return r=r.replace(/\$\$([\s\S]+?)\$\$/g,(_,l)=>{try{return`<div class="katex-block">${Y.renderToString(l.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${l}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(_,l)=>{try{return`<span class="katex-inline">${Y.renderToString(l.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${l}$`}}),c.forEach((_,l)=>{r=r.replace(`__CODE_BLOCK_${l}__`,_)}),r}function C(d){if(!d)return d;const c=window.location.origin;return d.replace(/<img\s+([^>]*?)>/g,(r,_)=>_.includes("loading=")?r:`<img ${_} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(r,_)=>{const l=_.match(/href="([^"]*)"/);if(l){const g=l[1];if(g.startsWith("http://")||g.startsWith("https://"))try{if(new URL(g).origin!==c&&!_.includes("target="))return`<a ${_} target="_blank" rel="noopener noreferrer">`}catch{}}return r})}const N=V(()=>C(T.render(z(X.source||""))));A(N,async()=>{await D(),x(),M("rendered",b.value)}),Z(async()=>{await D(),x(),M("rendered",b.value)});function x(){if(!b.value)return;b.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(c=>{c.classList.add("copy-injected");const r=c.querySelector("code"),_=(r==null?void 0:r.textContent)||"",l=document.createElement("button");l.className="copy-btn",l.type="button",l.setAttribute("aria-label",q("common.copyCode")),l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.addEventListener("click",()=>{_&&navigator.clipboard.writeText(_).then(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',l.classList.add("copied"),setTimeout(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.classList.remove("copied")},2e3)})}),c.appendChild(l)})}return(d,c)=>(m(),h("div",{ref_key:"containerRef",ref:b,class:"md-renderer",innerHTML:N.value},null,8,Sn))}},Mn=en(kn,[["__scopeId","data-v-b6bba450"]]),Nn={class:"zhihu-page"},Rn={class:"zhihu-shell"},Bn={class:"zhihu-body"},Gn={class:"zhihu-hero"},An={class:"zhihu-hero-content"},Dn={class:"zhihu-title"},Xn={class:"zhihu-subtitle"},qn={class:"zhihu-tabs"},En={class:"tab active"},Pn={class:"tab"},Un={class:"tab"},In={class:"zhihu-hero-card"},jn={class:"hero-label"},On={class:"hero-desc"},Vn={class:"hero-actions"},Hn={class:"hero-pill"},Fn={class:"hero-pill"},Wn={class:"hero-pill"},Qn={class:"zhihu-container"},Kn={class:"zhihu-main"},Jn={key:0,class:"feed"},Yn={class:"feed-content"},Zn={class:"feed-title"},ne={class:"feed-excerpt"},ee={class:"feed-footer"},te={class:"feed-meta"},se={class:"meta-tag"},ae={class:"meta-date"},ie={class:"meta-read"},oe={key:1,class:"post-view"},re={class:"post-header"},le={class:"post-title"},_e={class:"post-meta"},de={class:"post-tag"},ce={key:2,class:"post-empty"},me={class:"zhihu-side"},pe={key:0,class:"toc-drawer-toggle"},he=["aria-label"],ue={class:"side-card profile"},fe={class:"profile-header"},ge={class:"profile-name"},be={class:"profile-desc"},$e={class:"profile-stats"},xe=["href"],ye={class:"side-card"},ve={class:"side-title"},Le={class:"tag-list"},we={class:"tag"},Te={class:"tag"},ze={class:"tag"},Ce={class:"tag"},Se={class:"side-card"},ke={class:"side-title"},Me={class:"side-text"},Ne={class:"side-btn"},Re={class:"toc-header"},Be={class:"toc-title"},Ge=["aria-label"],Ae={class:"toc-list"},De=["data-id"],Xe=["onClick"],qe={key:0,class:"toc-empty"},Ee={class:"toc-drawer-panel"},Pe={class:"toc-drawer-header"},Ue={class:"toc-drawer-title"},Ie={class:"toc-drawer-body"},je={class:"toc-drawer-list"},Oe=["data-id"],Ve=["onClick"],He={key:0,class:"toc-drawer-empty"},Fe=768,We={__name:"Blog",setup(H){const{t:a}=nn(),X=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":yn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Ln,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":wn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/first-blog.md":zn,"../markdowns/考研信息调研.md":Cn});function q(o){return o?typeof o=="string"?o:o&&typeof o=="object"&&"default"in o?o.default:String(o):""}function b(o){return o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function M(o){var f;const e=o.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),u=((f=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:f.length)??0,p=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+u;return{wordCount:p,readMinutes:Math.max(1,Math.round(p/300)),excerpt:b(e)}}const w=new Map,T=o=>(w.has(o)||w.set(o,M(o)),w.get(o)),z=Object.entries(X).map(([o,e])=>{const u=q(e),i=o.match(/\/([^/]+)\.md$/),p=i?i[1]:o;let f=p,y=null;const B=u.match(/^#\s+(.+)$/m);B&&(f=B[1].trim());const E=p.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);E&&(y=E[1],B||(f=E[2]));const rn=y??p,P=T(u);return{path:o,slug:p,title:f,content:u,date:y,sortKey:rn,excerpt:P.excerpt,readMinutes:P.readMinutes,wordCount:P.wordCount}}).sort((o,e)=>o.sortKey===e.sortKey?0:o.sortKey<e.sortKey?1:-1),C=pn(),N=hn(),x=V(()=>!!C.params.slug),d=V(()=>C.params.slug?tn(C.params.slug):null),c=L(null),r=L([]),_=L(""),l=L(!1),g=L(!1);let $=null,S=null,k=null;function F(){g.value=window.innerWidth<Fe}function W(){N.push({name:"BlogHome"})}function tn(o){return z.find(e=>e.slug===o)}function sn(o){const e=o??c.value;if(!e){r.value=[];return}const u=Array.from(e.querySelectorAll("h2, h3"));r.value=u.map(i=>{var f;const p=i.tagName.toLowerCase();return{id:i.id,text:((f=i.textContent)==null?void 0:f.trim())||"标题",level:p}})}function Q(o){const e=document.getElementById(o);if(!e)return;l.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function an(){if(R(),!r.value.length)return;const o=r.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!o.length)return;function e(){const p=window.scrollY;let f=null;for(const y of o)y.getBoundingClientRect().top+p-90<=p+5&&(f=y);f&&(_.value=f.id)}function u(){$||($=requestAnimationFrame(()=>{e(),$=null}))}S=u,window.addEventListener("scroll",S,{passive:!0}),e()}function R(){$&&(cancelAnimationFrame($),$=null),S&&(window.removeEventListener("scroll",S),S=null)}function on(){k=new ResizeObserver(()=>F()),k.observe(document.documentElement)}return A(d,o=>{o||(r.value=[],R())},{immediate:!0}),A(r,async()=>{if(!r.value.length){R();return}await D(),an()}),A(_,async o=>{if(!o)return;await D();const e=document.querySelector(".post-toc"),u=e==null?void 0:e.querySelector(`[data-id="${o}"]`);if(u&&u.scrollIntoView({behavior:"smooth",block:"nearest"}),l.value){const i=document.querySelector(".toc-drawer-body"),p=i==null?void 0:i.querySelector(`[data-id="${o}"]`);p&&p.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{F(),on()}),ln(()=>{R(),k==null||k.disconnect()}),(o,e)=>{const u=un("router-link");return m(),h("section",Nn,[G(gn),n("div",Rn,[n("div",Bn,[n("div",Gn,[n("div",An,[n("div",Dn,t(s(a)("blog.heroTitle")),1),n("p",Xn,t(s(a)("blog.heroSubtitle")),1),n("div",qn,[n("button",En,t(s(a)("blog.tabRecommend")),1),n("button",Pn,t(s(a)("blog.tabLatest")),1),n("button",Un,t(s(a)("blog.tabEssay")),1)])]),n("div",In,[n("div",jn,t(s(a)("blog.heroLabel")),1),n("div",On,t(s(a)("blog.heroDesc")),1),n("div",Vn,[n("span",Hn,t(s(a)("blog.heroTechMarkdown")),1),n("span",Fn,t(s(a)("blog.heroTechVue")),1),n("span",Wn,t(s(a)("blog.heroTechStudy")),1)])])]),n("div",Qn,[n("main",Kn,[x.value?d.value?(m(),h("div",oe,[n("div",re,[n("button",{class:"back-btn",onClick:W},t(s(a)("blog.backToList")),1),n("h1",le,t(d.value.title),1),n("div",_e,[n("span",de,t(s(a)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(d.value.date||s(a)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(s(a)("blog.postMetaReadTime",{n:d.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:c,class:"post-content"},[G(Mn,{source:d.value.content,onRendered:sn},null,8,["source"])],512)])):(m(),h("div",ce,[n("h2",null,t(s(a)("blog.postNotFound")),1),n("p",null,t(s(a)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:W},t(s(a)("blog.backToBlog")),1)])):(m(),h("div",Jn,[(m(!0),h(U,null,I(s(z),i=>(m(),h("article",{key:i.slug,class:"feed-item"},[G(u,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",Yn,[n("h2",Zn,t(i.title),1),n("p",ne,t(i.excerpt),1)]),n("div",ee,[n("div",te,[n("span",se,t(s(a)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",ae,t(i.date||s(a)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",ie,t(s(a)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",me,[x.value&&r.value.length?(m(),h("div",pe,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>l.value=!0),"aria-label":s(a)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),_n(" "+t(s(a)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",ue,[n("div",fe,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ge,t(s(a)("blog.profileName")),1),n("div",be,t(s(a)("blog.profileDesc")),1)])]),n("div",$e,[n("div",null,[n("strong",null,t(s(z).length),1),n("span",null,t(s(a)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(s(a)("blog.statsActive")),1),n("span",null,t(s(a)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(s(a)("blog.statsGithub")),1),n("span",null,t(s(a)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:s(xn).githubUrl,target:"_blank",rel:"noreferrer"},t(s(a)("blog.visitGithub")),9,xe)]),n("div",ye,[n("div",ve,t(s(a)("blog.sidebarTags")),1),n("div",Le,[n("span",we,t(s(a)("blog.tagLearning")),1),n("span",Te,t(s(a)("blog.tagAlgorithm")),1),n("span",ze,t(s(a)("blog.tagFrontend")),1),n("span",Ce,t(s(a)("blog.tagLife")),1)])]),n("div",Se,[n("div",ke,t(s(a)("blog.sidebarUpdate")),1),n("p",Me,t(s(a)("blog.sidebarUpdateDesc")),1),n("button",Ne,t(s(a)("blog.sidebarFollow")),1)]),x.value?(m(),h("div",{key:1,class:j(["side-card post-toc",{"toc-mobile":g.value}])},[n("div",Re,[n("div",Be,t(s(a)("blog.tocTitle")),1),g.value?(m(),h("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>l.value=!1),"aria-label":s(a)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Ge)):v("",!0)]),n("ul",Ae,[(m(!0),h(U,null,I(r.value,i=>(m(),h("li",{key:i.id,"data-id":i.id,class:j(["toc-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:p=>Q(i.id)},t(i.text),9,Xe)],10,De))),128)),r.value.length?v("",!0):(m(),h("li",qe,t(s(a)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(m(),dn(mn,{to:"body"},[G(cn,{name:"drawer"},{default:K(()=>[g.value&&l.value?(m(),h("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=fn(i=>l.value=!1,["self"]))},[n("div",Ee,[n("div",Pe,[n("span",Ue,t(s(a)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>l.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",Ie,[n("ul",je,[(m(!0),h(U,null,I(r.value,i=>(m(),h("li",{key:i.id,"data-id":i.id,class:j(["toc-drawer-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:p=>Q(i.id)},t(i.text),9,Ve)],10,Oe))),128)),r.value.length?v("",!0):(m(),h("li",He,t(s(a)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},nt=en(We,[["__scopeId","data-v-f1b0f654"]]);export{nt as default};
