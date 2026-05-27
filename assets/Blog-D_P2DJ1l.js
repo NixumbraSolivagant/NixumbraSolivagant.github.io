@@ -1,4 +1,4 @@
-import{r as C,c as j,k as q,o as Z,B as D,d as c,e as p,a as ln,g as N,f as n,C as t,D as a,F as U,J as I,G as dn,E as v,K as Q,h as _n,w as K,T as $n,L as cn,u as xn,M as pn,b as hn,H as fn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-CTimOnje.js";import{N as mn}from"./NavBar-g6QCzmb1.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
+import{r as C,c as Q,k as q,o as Z,B as P,d as c,e as x,a as ln,g as N,f as n,C as t,D as a,F as U,J as I,G as _n,E as v,K as F,h as dn,w as K,T as $n,L as cn,u as pn,M as xn,b as mn,H as hn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-CpP3gxdr.js";import{N as fn}from"./NavBar-DIifWQ27.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -2314,7 +2314,7 @@ XGBoost 的成功不是偶然的。它在算法、工程和工程-算法协同�
 ---
 
 *本文参考了 XGBoost 原论文（KDD 2016）及陈亮的公开分享。*
-`,Ln=`# 长短期记忆网络：LSTM 原理、架构与进阶
+`,Tn=`# 长短期记忆网络：LSTM 原理、架构与进阶
 
 > *"人类不会每秒都从头开始思考。当你阅读一篇文章时，你基于对前面词语的理解来理解每个新词，而不是全部忘掉重新开始。"*
 > — Sepp Hochreiter，LSTM 发明者（1997）
@@ -3623,7 +3623,7 @@ LSTM 的成功告诉我们几个重要的设计原则：
 ---
 
 *本文系统介绍了 LSTM 的原理、实现、变体和实战应用。如有疏漏或疑问，欢迎探讨交流。*
-`,wn=`# 常微分方程：类型总结与求解方法
+`,Ln=`# 常微分方程：类型总结与求解方法
 
 > *"常微分方程是描述自然现象变化规律的最直接工具之一，它将现实问题中的变化率关系转化为精确的数学语言。"*
 
@@ -5318,7 +5318,534 @@ $H'' - e^{-x}H = 0$，$H(0) = 0$，$H'(0) = h(0) = 0$。
 ---
 
 *本文系统总结了考研数学二中常微分方程的所有类型与求解方法，祝各位考生备考顺利。*
-`,Tn=`# 博客搭建记录
+`,wn=`# 随机森林：集成学习的决策树军团
+
+> *"如果你觉得随机森林只是一个简单的'投票'算法，那你可能低估了这支军队的协作智慧。"*
+> — Leo Breiman，随机森林创始人
+
+## 引言：为什么要"随机"？
+
+在机器学习的世界里，有一个看似矛盾的现象：**多个弱学习器的集成，往往比单个强学习器更稳定、更准确**。这就像是问一个人类专家，还是问一群普通人——在很多场景下，"群体智慧"反而更可靠。
+
+**随机森林**（Random Forest）正是这种思想的典型代表。它由 Leo Breiman 于 2001 年提出，核心思想是构建大量相互独立的决策树，每棵树"民主投票"得出最终预测。这个看似简单的机制，却带来了意想不到的效果：
+
+1. **方差降低**：单棵树可能严重过拟合，但多棵树的平均能有效平滑预测
+2. **泛化能力强**：每棵树只看到部分数据和特征，降低了错误的相关性
+3. **工程友好**：天然支持并行、易于调参、对缺失值鲁棒
+
+### 随机森林 vs 单一决策树
+
+| 特性 | 单一决策树 | 随机森林 |
+|------|-----------|----------|
+| **方差** | 高（对数据敏感） | 低（多树平均） |
+| **过拟合风险** | 高 | 低 |
+| **可解释性** | 高（树结构清晰） | 中等（特征重要性可评估） |
+| **训练速度** | 快 | 慢（但可并行） |
+| **内存占用** | 低 | 高 |
+| **缺失值处理** | 需预处理 | 原生支持 |
+
+## 随机森林的两重"随机性"
+
+随机森林的"随机"体现在两个层面，这是其成功的关键。
+
+### 第一重随机：Bagging（Bootstrap Aggregating）
+
+对于每棵树的训练，我们采用**有放回抽样**（Bootstrap Sampling）从原始数据集中提取样本：
+
+\`\`\`
+原始数据集 D = {x₁, x₂, x₃, ..., xₙ}
+
+Bootstrap 抽样 k 次后：
+  树 1 的训练集 D₁（可能包含重复样本，约 63.2% 原始样本）
+  树 2 的训练集 D₂（可能包含重复样本，约 63.2% 原始样本）
+  ...
+  树 m 的训练集 Dₘ（可能包含重复样本，约 63.2% 原始样本）
+
+注意：约有 36.8% 的样本从未被选中，称为 OOB（Out-of-Bag）样本
+\`\`\`
+
+**为什么 Bagging 有效？**
+
+考虑 $n$ 个独立同分布的随机变量 $X_i$，方差为 $\\sigma^2$：
+- 单个变量的方差：$\\text{Var}(X_i) = \\sigma^2$
+- 均值的方差：$\\text{Var}\\left(\\frac{1}{n}\\sum_{i=1}^{n} X_i\\right) = \\frac{\\sigma^2}{n}$
+
+虽然实际数据并非完全独立，但 Bagging 仍然能显著降低方差。
+
+### 第二重随机：随机特征选择
+
+在每棵决策树的每个分裂节点，不是搜索所有特征，而是**随机选择一个特征子集**进行分裂：
+
+\`\`\`
+假设数据集有 p 个特征：
+
+分裂节点时：
+  - 传统 CART：搜索所有 p 个特征
+  - 随机森林：随机选择 √p 个特征（分类）或 p/3 个特征（回归）
+
+这确保了树与树之间的多样性
+\`\`\`
+
+\`\`\`
+┌─────────────────────────────────────────────────────────────────────┐
+│                         随机森林架构                                  │
+│                                                                     │
+│                         ┌─────────────┐                            │
+│                    ┌───→│  Tree 1    │──→ 预测₁                    │
+│                    │    └─────────────┘                            │
+│                    │                                              │
+│    输入 x ───────┼───→│  Tree 2    │──→ 预测₂                    │
+│                    │    └─────────────┘     │                       │
+│                    │                        ▼                       │
+│                    ├───→│  Tree 3    │──→ 预测₃  → 最终预测 = 投票    │
+│                    │    └─────────────┘     │                       │
+│                    │                        │                       │
+│                    ├───→│   ...     │──→ ...                       │
+│                    │    └─────────────┘     │                       │
+│                    │                        │                       │
+│                    └───→│  Tree T    │──→ 预测ₜ                    │
+│                         └─────────────┘                            │
+│                                                                     │
+│  随机性来源：                                                        │
+│    1. Bootstrap 抽样：每棵树看到不同的训练样本                        │
+│    2. 特征子集：每个节点只考虑随机选择的特征                          │
+└─────────────────────────────────────────────────────────────────────┘
+\`\`\`
+
+## 决策树：随机森林的基石
+
+### CART 算法回顾
+
+**分类与回归树**（Classification and Regression Tree，CART）是随机森林中每棵树的基础。CART 采用**二叉树结构**，每次分裂基于单一特征的阈值：
+
+**分类任务**：使用基尼不纯度（Gini Impurity）
+
+$$\\text{Gini}(S) = 1 - \\sum_{c=1}^{C} p_c^2$$
+
+其中 $p_c$ 是类别 $c$ 在集合 $S$ 中的比例。
+
+分裂后的增益：
+
+$$\\Delta \\text{Gini} = \\text{Gini}(S) - \\frac{|S_L|}{|S|}\\text{Gini}(S_L) - \\frac{|S_R|}{|S|}\\text{Gini}(S_R)$$
+
+**回归任务**：使用均方误差（MSE）
+
+$$\\text{MSE}(S) = \\frac{1}{|S|}\\sum_{i \\in S}(y_i - \\bar{y}_S)^2$$
+
+其中 $\\bar{y}_S = \\frac{1}{|S|}\\sum_{i \\in S} y_i$ 是该节点的目标均值。
+
+### 决策树的剪枝
+
+为了防止过拟合，决策树需要进行**剪枝**（Pruning）：
+
+**预剪枝**：设置树的深度、叶节点最小样本数等超参数，提前停止分裂。
+
+**后剪枝**：先让树完全生长，然后自底向上合并带来最小误差增加的叶节点。
+
+随机森林通过**集成多棵完全生长的树**来隐式实现剪枝效果——即使单棵树可能过拟合，多棵树的投票会平滑这种过拟合。
+
+## 集成学习理论：为什么随机森林有效？
+
+### 偏差-方差分解
+
+机器学习的预测误差可以分解为：
+
+$$\\text{Err}(x) = \\text{Bias}^2 + \\text{Variance} + \\text{Irreducible Error}$$
+
+- **偏差**（Bias）：模型预测值与真实值的系统性偏离
+- **方差**（Variance）：模型对训练数据的敏感程度
+- **不可约误差**：数据本身的噪声
+
+随机森林的核心优势在于：**以轻微增加偏差为代价，大幅降低方差**。
+
+\`\`\`
+     预测误差
+         │
+    高   │      ┌─────────┐
+         │      │  高方差  │
+    误   │      │  低偏差  │
+    差   │      │  (树)    │
+         │      └────┬────┘
+         │           │
+         │           ▼  随机森林：降低方差
+         │      ┌─────────┐
+    中   │      │  中方差  │
+         │      │  中偏差  │
+         │      └─────────┘
+         │
+         │                          ┌─────────┐
+         │                          │  低方差  │
+         │                          │  高偏差  │
+    低   │                          │  (简单模型)│
+         │                          └─────────┘
+         └────────────────────────────────────────────→ 模型复杂度
+                                             低 ────────→ 高
+\`\`\`
+
+### 边际效应与间隔假设
+
+Breiman 提出了**间隔假设**（Margin Hypothesis）来解释随机森林的有效性：
+
+对于样本 $(x, y)$，边际定义为：
+
+$$\\text{margin}(x, y) = P_\\theta(h_\\theta(x) = y) - \\max_{j \\neq y} P_\\theta(h_\\theta(x) = j)$$
+
+即正确类别的投票比例与最大错误类别的投票比例之差。
+
+**间隔越大，分类置信度越高**。随机森林通过增加树的数量，使得边际分布向正方向移动，从而提高泛化能力。
+
+## 随机森林的工程实现
+
+### Scikit-learn 实现
+
+\`\`\`python
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
+# 分类任务
+clf = RandomForestClassifier(
+    n_estimators=100,        # 树的数量
+    max_depth=None,          # 最大深度（None 表示完全生长）
+    min_samples_split=2,     # 内部节点再分裂所需最小样本数
+    min_samples_leaf=1,      # 叶节点最小样本数
+    max_features='sqrt',     # 分裂时考虑的特征数（sqrt, log2, None）
+    bootstrap=True,          # 是否使用 Bootstrap 抽样
+    oob_score=True,          # 是否使用袋外样本评估
+    random_state=42,         # 随机种子
+    n_jobs=-1                # 并行任务数（-1 使用所有 CPU）
+)
+
+# 训练
+clf.fit(X_train, y_train)
+
+# 袋外得分（无需额外验证集）
+print(f"OOB Score: {clf.oob_score_:.4f}")
+
+# 交叉验证
+cv_scores = cross_val_score(clf, X, y, cv=5)
+print(f"CV Accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+
+# 特征重要性
+importances = clf.feature_importances_
+indices = np.argsort(importances)[::-1]
+print("Feature Ranking:")
+for i in range(min(10, len(indices))):
+    print(f"  {i+1}. Feature {indices[i]}: {importances[indices[i]]:.4f}")
+\`\`\`
+
+### 回归任务
+
+\`\`\`python
+# 回归任务
+reg = RandomForestRegressor(
+    n_estimators=200,
+    max_depth=15,
+    min_samples_leaf=5,
+    max_features=0.5,        # 回归默认是 1.0
+    oob_score=True,
+    random_state=42
+)
+
+reg.fit(X_train, y_train)
+
+# 预测
+y_pred = reg.predict(X_test)
+
+# 评估指标
+from sklearn.metrics import mean_squared_error, r2_score
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"MSE: {mse:.4f}, R²: {r2:.4f}")
+\`\`\`
+
+### 超参数调优实战
+
+\`\`\`python
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint, uniform
+
+param_dist = {
+    'n_estimators': randint(100, 500),
+    'max_depth': [None, 10, 20, 30, 40, 50],
+    'min_samples_split': randint(2, 20),
+    'min_samples_leaf': randint(1, 20),
+    'max_features': ['sqrt', 'log2', None, 0.5, 0.7]
+}
+
+random_search = RandomizedSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_distributions=param_dist,
+    n_iter=50,
+    cv=5,
+    scoring='accuracy',
+    random_state=42,
+    n_jobs=-1
+)
+
+random_search.fit(X_train, y_train)
+print(f"Best Parameters: {random_search.best_params_}")
+print(f"Best CV Score: {random_search.best_score_:.4f}")
+
+best_model = random_search.best_estimator_
+\`\`\`
+
+## 特征重要性分析
+
+随机森林提供了**内在的特征重要性度量**，这是其受欢迎的原因之一。
+
+### 基尼重要性
+
+每棵树中，每个特征对分裂增益的加权贡献：
+
+$$\\text{Importance}(X_j) = \\sum_{t \\in T} \\text{GiniGain}(t, X_j) \\cdot \\frac{n_t}{N}$$
+
+其中 $t$ 是使用特征 $X_j$ 的节点，$n_t$ 是该节点的样本数，$N$ 是总样本数。
+
+### 置换重要性（Permutation Importance）
+
+更可靠但计算成本更高的方法：
+
+\`\`\`python
+from sklearn.inspection import permutation_importance
+
+# 基于置换的重要性
+perm_importance = permutation_importance(
+    model, X_test, y_test,
+    n_repeats=30,
+    random_state=42,
+    n_jobs=-1
+)
+
+# 可视化
+import matplotlib.pyplot as plt
+
+sorted_idx = perm_importance.importances_mean.argsort()[-15:]
+plt.barh(range(len(sorted_idx)), perm_importance.importances_mean[sorted_idx])
+plt.xlabel('Permutation Importance')
+plt.title('Top 15 Feature Importances')
+plt.tight_layout()
+plt.show()
+\`\`\`
+
+### SHAP 值：可解释机器学习
+
+\`\`\`python
+import shap
+
+# 创建 SHAP 解释器
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
+
+# 对于二分类，取正类的 SHAP 值
+shap.summary_plot(shap_values[1], X_test, feature_names=feature_names)
+\`\`\`
+
+## 随机森林的变体与扩展
+
+### Extra Trees（极端随机树）
+
+**Extra Trees**（Extremely Randomized Trees）与随机森林的关键区别：
+
+1. **不进行 Bootstrap 抽样**：每棵树使用全部样本
+2. **随机分裂阈值**：在选中的特征上，不是找最优分裂点，而是随机选择阈值
+
+\`\`\`python
+from sklearn.ensemble import ExtraTreesClassifier
+
+extra_trees = ExtraTreesClassifier(
+    n_estimators=100,
+    max_features='sqrt',
+    bootstrap=False,  # 关键区别：使用全部样本
+    random_state=42
+)
+\`\`\`
+
+**何时使用 Extra Trees？**
+- 数据噪声较大时（随机阈值提供更好的正则化）
+- 追求更快的训练速度时
+- 当特征数量远大于样本数量时
+
+### 平衡随机森林（Balanced Random Forest）
+
+处理类别不平衡问题：
+
+\`\`\`python
+from imblearn.ensemble import BalancedRandomForestClassifier
+
+balanced_rf = BalancedRandomForestClassifier(
+    n_estimators=100,
+    sampling_strategy='auto',  # 自动平衡少数类
+    replacement=True,
+    random_state=42
+)
+\`\`\`
+
+### 高森林嵌入（Random Forest Embedding）
+
+将随机森林的叶节点作为新特征：
+
+\`\`\`python
+from sklearn.ensemble import RandomTreesEmbedding
+
+# 转换数据到高维稀疏空间
+embedder = RandomTreesEmbedding(
+    n_estimators=100,
+    max_depth=5,
+    sparse_output=False
+)
+
+X_embedded = embedder.fit_transform(X)
+# 每个叶节点成为一个二值特征
+\`\`\`
+
+## 随机森林的局限性与注意事项
+
+### 主要局限性
+
+1. **方差随树数量线性增长**：每增加一棵树，内存和时间成本线性增加
+2. **对高维稀疏数据表现一般**：如文本分类任务，深度学习更占优
+3. **预测是离散的**：每棵树的叶节点是离散的，预测不是真正的概率（虽然可以校准）
+4. **无法捕捉特征交互的最优方向**：树的分裂是轴平行的
+
+\`\`\`
+局限性示意：
+
+                    随机森林                    神经网络
+                       │                          │
+    高维稀疏 ──────────┼──────────→  神经网络更好
+         ↑            │                          │
+         │      随机森林更好                       │
+         │            │                          │
+低维稠密 ──────────────┼─────────────────────────→│
+         ↑            │                          ↑
+         │            │                    可解释性要求高
+\`\`\`
+
+### 常见陷阱与解决方案
+
+| 陷阱 | 问题 | 解决方案 |
+|------|------|----------|
+| **n_estimators 太小** | 预测不稳定 | 通常 100-500 棵树足够 |
+| **max_depth 过大** | 内存占用高 | 通过验证集选择或使用 None |
+| **max_features='sqrt'** | 高维数据时特征太少 | 考虑 0.3-0.7 或 log2 |
+| **忽视 oob_score** | 没有可靠的验证指标 | 开启 oob_score=True |
+| **过拟合噪声特征** | 测试集性能差 | 增大 min_samples_leaf |
+
+### 时间复杂度分析
+
+训练 $T$ 棵树的复杂度：
+
+$$O(T \\cdot n \\cdot m \\cdot \\log n)$$
+
+其中 $n$ 是样本数，$m$ 是特征数，$\\log n$ 是树的深度。
+
+预测复杂度：
+
+$$O(T \\cdot \\log n)$$
+
+这比单棵深度树稍慢，但在可接受范围内。
+
+## 实战：鸢尾花分类
+
+\`\`\`python
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 加载数据
+iris = load_iris()
+X, y = iris.data, iris.target
+feature_names = iris.feature_names
+class_names = iris.target_names
+
+# 划分数据集
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 网格搜索最优参数
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [3, 5, 7, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+grid_search = GridSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+grid_search.fit(X_train, y_train)
+
+print(f"Best Parameters: {grid_search.best_params_}")
+print(f"Best CV Accuracy: {grid_search.best_score_:.4f}")
+
+# 评估最优模型
+best_model = grid_search.best_estimator_
+y_pred = best_model.predict(X_test)
+
+print("\\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=class_names))
+
+# 混淆矩阵
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=class_names, yticklabels=class_names)
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix - Random Forest')
+plt.tight_layout()
+plt.show()
+
+# 特征重要性可视化
+importances = best_model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+plt.figure(figsize=(10, 6))
+plt.title('Feature Importances - Random Forest')
+plt.bar(range(len(importances)), importances[indices], align='center')
+plt.xticks(range(len(importances)), [feature_names[i] for i in indices], rotation=45)
+plt.tight_layout()
+plt.show()
+\`\`\`
+
+## 随机森林 vs 其他模型
+
+| 场景 | 推荐模型 | 原因 |
+|------|----------|------|
+| **表格数据的分类/回归** | 随机森林 / XGBoost | 表格数据是树的强项 |
+| **需要特征重要性** | 随机森林 | 内置且可靠 |
+| **类别不平衡** | Balanced RF / XGBoost | 随机森林需要特殊处理 |
+| **追求极致精度** | XGBoost / LightGBM | 梯度提升通常优于 Bagging |
+| **需要快速原型** | 随机森林 | 调参友好，性能尚可 |
+| **高维稀疏数据（如文本）** | 线性模型 / 深度学习 | 树不适合高维稀疏 |
+
+## 总结
+
+随机森林是机器学习中**优雅而强大**的算法。它的成功源于几个核心洞察：
+
+1. **双重随机性**：Bootstrap 抽样和特征子集确保了树的多样性
+2. **群体智慧**：多棵弱树的投票胜于单棵强树
+3. **方差降低**：通过平均化实现稳定预测
+4. **工程友好**：易于实现、并行化、内置特征重要性
+
+尽管近年来梯度提升方法（如 XGBoost、LightGBM）在大规模竞赛中风头更劲，但随机森林凭借其**简单性、鲁棒性和可解释性**，依然是许多实际应用的首选——尤其是当你需要快速构建一个可靠基准模型时。
+
+*"Less is more"——有时候，少一些精巧的设计，反而能带来更强的泛化能力。*
+
+## 参考资源
+
+- Breiman, L. (2001). "Random Forests." *Machine Learning*, 45(1), 5-32.
+- Scikit-learn 官方文档：https://scikit-learn.org/stable/modules/ensemble.html#forest
+- *The Elements of Statistical Learning* — Trevor Hastie, Robert Tibshirani, Jerome Friedman
+`,An=`# 博客搭建记录
 
 ## 前言
 
@@ -5415,7 +5942,7 @@ router.replace({ ...route, params: { locale: lang } })
 
 *本篇文章最后更新于 2026 年 5 月。*
 
-`,An=`### 一、理论所（杭高院依托理论所招生）
+`,Sn=`### 一、理论所（杭高院依托理论所招生）
 
 #### （一）招生专业与初试科目
 
@@ -5511,4 +6038,4 @@ router.replace({ ...route, params: { locale: lang } })
 2024 年：一志愿复试 32 人==（初试最高分 429 分、最低分 303 分）==，录取 23 人（初试最高分 429 分、最低分 324 分）
 2023 年：一志愿复试 26 人==（初试最高分 412 分、最低分 283 分）==，录取 20 人（初试最高分 412 分、最低分 311 分）
 2022 年：录取 19 人==（初试最高分 392 分、最低分 309 分==）
-`,kn=["innerHTML"],Sn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(O,{emit:r}){const P=O,{t:G}=nn(),u=C(null),S=r;function z(_){return _.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,$=>$.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const L=new un({html:!0,linkify:!0,typographer:!0,highlight(_,$){const o=$&&H.getLanguage($)?$:null,d=o?H.highlight(_,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(_).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${d}</code></pre></div>`}});L.use(yn),L.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function w(_){if(!_)return"";const $=[];let o=_.replace(/```[\s\S]*?```/g,d=>($.push(d),`__CODE_BLOCK_${$.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(d,l)=>{try{return`<div class="katex-block">${Y.renderToString(l.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${l}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(d,l)=>{try{return`<span class="katex-inline">${Y.renderToString(l.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${l}$`}}),$.forEach((d,l)=>{o=o.replace(`__CODE_BLOCK_${l}__`,d)}),o}function T(_){if(!_)return _;const $=window.location.origin;return _.replace(/<img\s+([^>]*?)>/g,(o,d)=>d.includes("loading=")?o:`<img ${d} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,d)=>{const l=d.match(/href="([^"]*)"/);if(l){const m=l[1];if(m.startsWith("http://")||m.startsWith("https://"))try{if(new URL(m).origin!==$&&!d.includes("target="))return`<a ${d} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const M=j(()=>T(L.render(w(P.source||""))));q(M,async()=>{await D(),g(),S("rendered",u.value)}),Z(async()=>{await D(),g(),S("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach($=>{$.classList.add("copy-injected");const o=$.querySelector("code"),d=(o==null?void 0:o.textContent)||"",l=document.createElement("button");l.className="copy-btn",l.type="button",l.setAttribute("aria-label",G("common.copyCode")),l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.addEventListener("click",()=>{d&&navigator.clipboard.writeText(d).then(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',l.classList.add("copied"),setTimeout(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.classList.remove("copied")},2e3)})}),$.appendChild(l)})}return(_,$)=>(c(),p("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:M.value},null,8,kn))}},Mn=en(Sn,[["__scopeId","data-v-b6bba450"]]),Bn={class:"zhihu-page"},Rn={class:"zhihu-shell"},Nn={class:"zhihu-body"},qn={class:"zhihu-hero"},Dn={class:"zhihu-hero-content"},Pn={class:"zhihu-title"},Gn={class:"zhihu-subtitle"},Xn={class:"zhihu-tabs"},En={class:"tab active"},Un={class:"tab"},In={class:"tab"},Qn={class:"zhihu-hero-card"},Hn={class:"hero-label"},jn={class:"hero-desc"},On={class:"hero-actions"},Fn={class:"hero-pill"},Vn={class:"hero-pill"},Wn={class:"hero-pill"},Kn={class:"zhihu-container"},Jn={class:"zhihu-main"},Yn={key:0,class:"feed"},Zn={class:"feed-content"},ne={class:"feed-title"},ee={class:"feed-excerpt"},te={class:"feed-footer"},ae={class:"feed-meta"},re={class:"meta-tag"},ie={class:"meta-date"},se={class:"meta-read"},oe={key:1,class:"post-view"},le={class:"post-header"},de={class:"post-title"},_e={class:"post-meta"},$e={class:"post-tag"},ce={key:2,class:"post-empty"},xe={class:"zhihu-side"},pe={key:0,class:"toc-drawer-toggle"},he=["aria-label"],fe={class:"side-card profile"},me={class:"profile-header"},ue={class:"profile-name"},ye={class:"profile-desc"},ge={class:"profile-stats"},be=["href"],ve={class:"side-card"},Ce={class:"side-title"},ze={class:"tag-list"},Le={class:"tag"},we={class:"tag"},Te={class:"tag"},Ae={class:"tag"},ke={class:"side-card"},Se={class:"side-title"},Me={class:"side-text"},Be={class:"side-btn"},Re={class:"toc-header"},Ne={class:"toc-title"},qe=["aria-label"],De={class:"toc-list"},Pe=["data-id"],Ge=["onClick"],Xe={key:0,class:"toc-empty"},Ee={class:"toc-drawer-panel"},Ue={class:"toc-drawer-header"},Ie={class:"toc-drawer-title"},Qe={class:"toc-drawer-body"},He={class:"toc-drawer-list"},je=["data-id"],Oe=["onClick"],Fe={key:0,class:"toc-drawer-empty"},Ve=768,We={__name:"Blog",setup(O){const{t:r}=nn(),P=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Ln,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":wn,"../markdowns/first-blog.md":Tn,"../markdowns/考研信息调研.md":An});function G(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function S(s){var f;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),h=((f=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:f.length)??0,x=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+h;return{wordCount:x,readMinutes:Math.max(1,Math.round(x/300)),excerpt:u(e)}}const z=new Map,L=s=>(z.has(s)||z.set(s,S(s)),z.get(s)),w=Object.entries(P).map(([s,e])=>{const h=G(e),i=s.match(/\/([^/]+)\.md$/),x=i?i[1]:s;let f=x,b=null;const R=h.match(/^#\s+(.+)$/m);R&&(f=R[1].trim());const X=x.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],R||(f=X[2]));const on=b??x,E=L(h);return{path:s,slug:x,title:f,content:h,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),T=xn(),M=pn(),g=j(()=>!!T.params.slug),_=j(()=>T.params.slug?tn(T.params.slug):null),$=C(null),o=C([]),d=C(""),l=C(!1),m=C(!1);let y=null,A=null,k=null;function F(){m.value=window.innerWidth<Ve}function V(){M.push({name:"BlogHome"})}function tn(s){return w.find(e=>e.slug===s)}function an(s){const e=s??$.value;if(!e){o.value=[];return}const h=Array.from(e.querySelectorAll("h2, h3"));o.value=h.map(i=>{var f;const x=i.tagName.toLowerCase();return{id:i.id,text:((f=i.textContent)==null?void 0:f.trim())||"标题",level:x}})}function W(s){const e=document.getElementById(s);if(!e)return;l.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(B(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const x=window.scrollY;let f=null;for(const b of s)b.getBoundingClientRect().top+x-90<=x+5&&(f=b);f&&(d.value=f.id)}function h(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}A=h,window.addEventListener("scroll",A,{passive:!0}),e()}function B(){y&&(cancelAnimationFrame(y),y=null),A&&(window.removeEventListener("scroll",A),A=null)}function sn(){k=new ResizeObserver(()=>F()),k.observe(document.documentElement)}return q(_,s=>{s||(o.value=[],B())},{immediate:!0}),q(o,async()=>{if(!o.value.length){B();return}await D(),rn()}),q(d,async s=>{if(!s)return;await D();const e=document.querySelector(".post-toc"),h=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(h&&h.scrollIntoView({behavior:"smooth",block:"nearest"}),l.value){const i=document.querySelector(".toc-drawer-body"),x=i==null?void 0:i.querySelector(`[data-id="${s}"]`);x&&x.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{F(),sn()}),ln(()=>{B(),k==null||k.disconnect()}),(s,e)=>{const h=hn("router-link");return c(),p("section",Bn,[N(mn),n("div",Rn,[n("div",Nn,[n("div",qn,[n("div",Dn,[n("div",Pn,t(a(r)("blog.heroTitle")),1),n("p",Gn,t(a(r)("blog.heroSubtitle")),1),n("div",Xn,[n("button",En,t(a(r)("blog.tabRecommend")),1),n("button",Un,t(a(r)("blog.tabLatest")),1),n("button",In,t(a(r)("blog.tabEssay")),1)])]),n("div",Qn,[n("div",Hn,t(a(r)("blog.heroLabel")),1),n("div",jn,t(a(r)("blog.heroDesc")),1),n("div",On,[n("span",Fn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Vn,t(a(r)("blog.heroTechVue")),1),n("span",Wn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Kn,[n("main",Jn,[g.value?_.value?(c(),p("div",oe,[n("div",le,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",de,t(_.value.title),1),n("div",_e,[n("span",$e,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(_.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:_.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:$,class:"post-content"},[N(Mn,{source:_.value.content,onRendered:an},null,8,["source"])],512)])):(c(),p("div",ce,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(c(),p("div",Yn,[(c(!0),p(U,null,I(a(w),i=>(c(),p("article",{key:i.slug,class:"feed-item"},[N(h,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",Zn,[n("h2",ne,t(i.title),1),n("p",ee,t(i.excerpt),1)]),n("div",te,[n("div",ae,[n("span",re,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",ie,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",se,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",xe,[g.value&&o.value.length?(c(),p("div",pe,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>l.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),dn(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",fe,[n("div",me,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ue,t(a(r)("blog.profileName")),1),n("div",ye,t(a(r)("blog.profileDesc")),1)])]),n("div",ge,[n("div",null,[n("strong",null,t(a(w).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,be)]),n("div",ve,[n("div",Ce,t(a(r)("blog.sidebarTags")),1),n("div",ze,[n("span",Le,t(a(r)("blog.tagLearning")),1),n("span",we,t(a(r)("blog.tagAlgorithm")),1),n("span",Te,t(a(r)("blog.tagFrontend")),1),n("span",Ae,t(a(r)("blog.tagLife")),1)])]),n("div",ke,[n("div",Se,t(a(r)("blog.sidebarUpdate")),1),n("p",Me,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Be,t(a(r)("blog.sidebarFollow")),1)]),g.value?(c(),p("div",{key:1,class:Q(["side-card post-toc",{"toc-mobile":m.value}])},[n("div",Re,[n("div",Ne,t(a(r)("blog.tocTitle")),1),m.value?(c(),p("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>l.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,qe)):v("",!0)]),n("ul",De,[(c(!0),p(U,null,I(o.value,i=>(c(),p("li",{key:i.id,"data-id":i.id,class:Q(["toc-item",i.level,{"toc-active":d.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:x=>W(i.id)},t(i.text),9,Ge)],10,Pe))),128)),o.value.length?v("",!0):(c(),p("li",Xe,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(c(),_n(cn,{to:"body"},[N($n,{name:"drawer"},{default:K(()=>[m.value&&l.value?(c(),p("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=fn(i=>l.value=!1,["self"]))},[n("div",Ee,[n("div",Ue,[n("span",Ie,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>l.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",Qe,[n("ul",He,[(c(!0),p(U,null,I(o.value,i=>(c(),p("li",{key:i.id,"data-id":i.id,class:Q(["toc-drawer-item",i.level,{"toc-active":d.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:x=>W(i.id)},t(i.text),9,Oe)],10,je))),128)),o.value.length?v("",!0):(c(),p("li",Fe,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},et=en(We,[["__scopeId","data-v-f1b0f654"]]);export{et as default};
+`,kn=["innerHTML"],Bn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(j,{emit:r}){const G=j,{t:D}=nn(),u=C(null),k=r;function z(d){return d.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,$=>$.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new un({html:!0,linkify:!0,typographer:!0,highlight(d,$){const o=$&&H.getLanguage($)?$:null,_=o?H.highlight(d,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(d).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${_}</code></pre></div>`}});T.use(yn),T.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function L(d){if(!d)return"";const $=[];let o=d.replace(/```[\s\S]*?```/g,_=>($.push(_),`__CODE_BLOCK_${$.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(_,l)=>{try{return`<div class="katex-block">${Y.renderToString(l.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${l}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(_,l)=>{try{return`<span class="katex-inline">${Y.renderToString(l.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${l}$`}}),$.forEach((_,l)=>{o=o.replace(`__CODE_BLOCK_${l}__`,_)}),o}function w(d){if(!d)return d;const $=window.location.origin;return d.replace(/<img\s+([^>]*?)>/g,(o,_)=>_.includes("loading=")?o:`<img ${_} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,_)=>{const l=_.match(/href="([^"]*)"/);if(l){const f=l[1];if(f.startsWith("http://")||f.startsWith("https://"))try{if(new URL(f).origin!==$&&!_.includes("target="))return`<a ${_} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const B=Q(()=>w(T.render(L(G.source||""))));q(B,async()=>{await P(),g(),k("rendered",u.value)}),Z(async()=>{await P(),g(),k("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach($=>{$.classList.add("copy-injected");const o=$.querySelector("code"),_=(o==null?void 0:o.textContent)||"",l=document.createElement("button");l.className="copy-btn",l.type="button",l.setAttribute("aria-label",D("common.copyCode")),l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.addEventListener("click",()=>{_&&navigator.clipboard.writeText(_).then(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',l.classList.add("copied"),setTimeout(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.classList.remove("copied")},2e3)})}),$.appendChild(l)})}return(d,$)=>(c(),x("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:B.value},null,8,kn))}},Rn=en(Bn,[["__scopeId","data-v-b6bba450"]]),Mn={class:"zhihu-page"},Nn={class:"zhihu-shell"},qn={class:"zhihu-body"},Pn={class:"zhihu-hero"},Gn={class:"zhihu-hero-content"},Dn={class:"zhihu-title"},Xn={class:"zhihu-subtitle"},En={class:"zhihu-tabs"},Un={class:"tab active"},In={class:"tab"},Fn={class:"tab"},Hn={class:"zhihu-hero-card"},Qn={class:"hero-label"},jn={class:"hero-desc"},On={class:"hero-actions"},Vn={class:"hero-pill"},Wn={class:"hero-pill"},Kn={class:"hero-pill"},Jn={class:"zhihu-container"},Yn={class:"zhihu-main"},Zn={key:0,class:"feed"},ne={class:"feed-content"},ee={class:"feed-title"},te={class:"feed-excerpt"},ae={class:"feed-footer"},re={class:"feed-meta"},ie={class:"meta-tag"},se={class:"meta-date"},oe={class:"meta-read"},le={key:1,class:"post-view"},_e={class:"post-header"},de={class:"post-title"},$e={class:"post-meta"},ce={class:"post-tag"},pe={key:2,class:"post-empty"},xe={class:"zhihu-side"},me={key:0,class:"toc-drawer-toggle"},he=["aria-label"],fe={class:"side-card profile"},ue={class:"profile-header"},ye={class:"profile-name"},ge={class:"profile-desc"},be={class:"profile-stats"},ve=["href"],Ce={class:"side-card"},ze={class:"side-title"},Te={class:"tag-list"},Le={class:"tag"},we={class:"tag"},Ae={class:"tag"},Se={class:"tag"},ke={class:"side-card"},Be={class:"side-title"},Re={class:"side-text"},Me={class:"side-btn"},Ne={class:"toc-header"},qe={class:"toc-title"},Pe=["aria-label"],Ge={class:"toc-list"},De=["data-id"],Xe=["onClick"],Ee={key:0,class:"toc-empty"},Ue={class:"toc-drawer-panel"},Ie={class:"toc-drawer-header"},Fe={class:"toc-drawer-title"},He={class:"toc-drawer-body"},Qe={class:"toc-drawer-list"},je=["data-id"],Oe=["onClick"],Ve={key:0,class:"toc-drawer-empty"},We=768,Ke={__name:"Blog",setup(j){const{t:r}=nn(),G=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":Ln,"../markdowns/2026-05-27-随机森林：集成学习的决策树军团.md":wn,"../markdowns/first-blog.md":An,"../markdowns/考研信息调研.md":Sn});function D(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function k(s){var h;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),m=((h=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:h.length)??0,p=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+m;return{wordCount:p,readMinutes:Math.max(1,Math.round(p/300)),excerpt:u(e)}}const z=new Map,T=s=>(z.has(s)||z.set(s,k(s)),z.get(s)),L=Object.entries(G).map(([s,e])=>{const m=D(e),i=s.match(/\/([^/]+)\.md$/),p=i?i[1]:s;let h=p,b=null;const M=m.match(/^#\s+(.+)$/m);M&&(h=M[1].trim());const X=p.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],M||(h=X[2]));const on=b??p,E=T(m);return{path:s,slug:p,title:h,content:m,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),w=pn(),B=xn(),g=Q(()=>!!w.params.slug),d=Q(()=>w.params.slug?tn(w.params.slug):null),$=C(null),o=C([]),_=C(""),l=C(!1),f=C(!1);let y=null,A=null,S=null;function O(){f.value=window.innerWidth<We}function V(){B.push({name:"BlogHome"})}function tn(s){return L.find(e=>e.slug===s)}function an(s){const e=s??$.value;if(!e){o.value=[];return}const m=Array.from(e.querySelectorAll("h2, h3"));o.value=m.map(i=>{var h;const p=i.tagName.toLowerCase();return{id:i.id,text:((h=i.textContent)==null?void 0:h.trim())||"标题",level:p}})}function W(s){const e=document.getElementById(s);if(!e)return;l.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(R(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const p=window.scrollY;let h=null;for(const b of s)b.getBoundingClientRect().top+p-90<=p+5&&(h=b);h&&(_.value=h.id)}function m(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}A=m,window.addEventListener("scroll",A,{passive:!0}),e()}function R(){y&&(cancelAnimationFrame(y),y=null),A&&(window.removeEventListener("scroll",A),A=null)}function sn(){S=new ResizeObserver(()=>O()),S.observe(document.documentElement)}return q(d,s=>{s||(o.value=[],R())},{immediate:!0}),q(o,async()=>{if(!o.value.length){R();return}await P(),rn()}),q(_,async s=>{if(!s)return;await P();const e=document.querySelector(".post-toc"),m=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(m&&m.scrollIntoView({behavior:"smooth",block:"nearest"}),l.value){const i=document.querySelector(".toc-drawer-body"),p=i==null?void 0:i.querySelector(`[data-id="${s}"]`);p&&p.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),ln(()=>{R(),S==null||S.disconnect()}),(s,e)=>{const m=mn("router-link");return c(),x("section",Mn,[N(fn),n("div",Nn,[n("div",qn,[n("div",Pn,[n("div",Gn,[n("div",Dn,t(a(r)("blog.heroTitle")),1),n("p",Xn,t(a(r)("blog.heroSubtitle")),1),n("div",En,[n("button",Un,t(a(r)("blog.tabRecommend")),1),n("button",In,t(a(r)("blog.tabLatest")),1),n("button",Fn,t(a(r)("blog.tabEssay")),1)])]),n("div",Hn,[n("div",Qn,t(a(r)("blog.heroLabel")),1),n("div",jn,t(a(r)("blog.heroDesc")),1),n("div",On,[n("span",Vn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Wn,t(a(r)("blog.heroTechVue")),1),n("span",Kn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Jn,[n("main",Yn,[g.value?d.value?(c(),x("div",le,[n("div",_e,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",de,t(d.value.title),1),n("div",$e,[n("span",ce,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(d.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:d.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:$,class:"post-content"},[N(Rn,{source:d.value.content,onRendered:an},null,8,["source"])],512)])):(c(),x("div",pe,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(c(),x("div",Zn,[(c(!0),x(U,null,I(a(L),i=>(c(),x("article",{key:i.slug,class:"feed-item"},[N(m,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",ne,[n("h2",ee,t(i.title),1),n("p",te,t(i.excerpt),1)]),n("div",ae,[n("div",re,[n("span",ie,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",se,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",xe,[g.value&&o.value.length?(c(),x("div",me,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>l.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),_n(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",fe,[n("div",ue,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ye,t(a(r)("blog.profileName")),1),n("div",ge,t(a(r)("blog.profileDesc")),1)])]),n("div",be,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,ve)]),n("div",Ce,[n("div",ze,t(a(r)("blog.sidebarTags")),1),n("div",Te,[n("span",Le,t(a(r)("blog.tagLearning")),1),n("span",we,t(a(r)("blog.tagAlgorithm")),1),n("span",Ae,t(a(r)("blog.tagFrontend")),1),n("span",Se,t(a(r)("blog.tagLife")),1)])]),n("div",ke,[n("div",Be,t(a(r)("blog.sidebarUpdate")),1),n("p",Re,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Me,t(a(r)("blog.sidebarFollow")),1)]),g.value?(c(),x("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":f.value}])},[n("div",Ne,[n("div",qe,t(a(r)("blog.tocTitle")),1),f.value?(c(),x("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>l.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Pe)):v("",!0)]),n("ul",Ge,[(c(!0),x(U,null,I(o.value,i=>(c(),x("li",{key:i.id,"data-id":i.id,class:F(["toc-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:p=>W(i.id)},t(i.text),9,Xe)],10,De))),128)),o.value.length?v("",!0):(c(),x("li",Ee,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(c(),dn(cn,{to:"body"},[N($n,{name:"drawer"},{default:K(()=>[f.value&&l.value?(c(),x("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=hn(i=>l.value=!1,["self"]))},[n("div",Ue,[n("div",Ie,[n("span",Fe,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>l.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",He,[n("ul",Qe,[(c(!0),x(U,null,I(o.value,i=>(c(),x("li",{key:i.id,"data-id":i.id,class:F(["toc-drawer-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:p=>W(i.id)},t(i.text),9,Oe)],10,je))),128)),o.value.length?v("",!0):(c(),x("li",Ve,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},tt=en(Ke,[["__scopeId","data-v-f1b0f654"]]);export{tt as default};
