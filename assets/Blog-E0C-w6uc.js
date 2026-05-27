@@ -1,4 +1,4 @@
-import{r as C,c as Q,k as N,o as Z,B as G,d,e as f,a as $n,g as M,f as n,C as t,D as a,F as U,J as I,G as ln,E as v,K as F,h as _n,w as K,T as cn,L as dn,u as xn,M as fn,b as mn,H as pn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-BM194Hp4.js";import{N as hn}from"./NavBar-BA4xE7hP.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
+import{r as C,c as Q,k as N,o as Z,B as G,d,e as f,a as $n,g as M,f as n,C as t,D as a,F as U,J as I,G as ln,E as v,K as F,h as _n,w as K,T as cn,L as dn,u as xn,M as fn,b as mn,H as pn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-Bq3WVtQ5.js";import{N as hn}from"./NavBar-o6qDlmp8.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -6079,11 +6079,9 @@ $$(a - b)(a + b) = a^2 - b^2$$
 
 **常用变形**：
 
-| 原式 | 有理化后 |
-|------|----------|
-| $\\sqrt{a} - \\sqrt{b}$ | 乘以 $\\dfrac{\\sqrt{a} + \\sqrt{b}}{\\sqrt{a} + \\sqrt{b}}$ |
-| $\\sqrt[3]{a} - \\sqrt[3]{b}$ | 乘以 $a^2 + ab + b^2$ |
-| $\\sqrt{x+1} - x$ | 乘以 $\\dfrac{\\sqrt{x+1} + x}{\\sqrt{x+1} + x}$ |
+- $\\sqrt{a} - \\sqrt{b}$：乘以 $\\dfrac{\\sqrt{a} + \\sqrt{b}}{\\sqrt{a} + \\sqrt{b}}$
+- $\\sqrt[3]{a} - \\sqrt[3]{b}$：乘以 $a^2 + ab + b^2$
+- $\\sqrt{x+1} - x$：乘以 $\\dfrac{\\sqrt{x+1} + x}{\\sqrt{x+1} + x}$
 
 ### 适用范围
 
