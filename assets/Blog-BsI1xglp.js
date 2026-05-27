@@ -1,4 +1,4 @@
-import{r as C,c as Q,k as N,o as Z,B as G,d as c,e as f,a as $n,g as M,f as n,C as t,D as a,F as U,J as I,G as ln,E as v,K as F,h as _n,w as K,T as dn,L as cn,u as xn,M as fn,b as mn,H as pn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-DM6XL4Vt.js";import{N as hn}from"./NavBar-DDbIOyh7.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
+import{r as C,c as Q,k as N,o as Z,B as G,d,e as f,a as $n,g as M,f as n,C as t,D as a,F as U,J as I,G as ln,E as v,K as F,h as _n,w as K,T as cn,L as dn,u as xn,M as fn,b as mn,H as pn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-BM194Hp4.js";import{N as hn}from"./NavBar-BA4xE7hP.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -5318,7 +5318,7 @@ $H'' - e^{-x}H = 0$，$H(0) = 0$，$H'(0) = h(0) = 0$。
 ---
 
 *本文系统总结了考研数学二中常微分方程的所有类型与求解方法，祝各位考生备考顺利。*
-`,kn=`# 极限求解完全指南：21 种方法分类与实战
+`,An=`# 极限求解完全指南：21 种方法分类与实战
 
 > *"极限是高等数学的灵魂，而求解极限的方法则是通向这座殿堂的钥匙。"*
 
@@ -5418,16 +5418,33 @@ $$\\lim\\frac{f(x)}{g(x)} = \\frac{\\lim f(x)}{\\lim g(x)} \\quad (\\lim g(x) \\
 
 ### 典型例题
 
-**例 2**：求 $\\displaystyle\\lim_{x \\to 1} \\left( \\frac{x}{x-1} + \\frac{2}{\\ln x} \\right)$
+**例 2**：求 $\\displaystyle\\lim_{x \\to 0^+} \\left( \\frac{1}{x} - \\frac{1}{\\sin x} \\right)$
 
 **解**：
 
-当 $x \\to 1$ 时，$\\frac{x}{x-1} \\to \\infty$（极限不存在），但这是加减结构，我们需要分别判断：
+当 $x \\to 0^+$ 时，$\\frac{1}{x} \\to +\\infty$，$\\frac{1}{\\sin x} \\to +\\infty$，整体是 $\\infty - \\infty$ 未定式。
 
-第一部分 $\\lim_{x \\to 1} \\frac{x}{x-1}$ 不存在（趋于 $\\infty$）
-第二部分 $\\lim_{x \\to 1} \\frac{2}{\\ln x}$ 不存在（趋于 $\\infty$）
+**错误做法（不能直接拆分）**：
 
-两个无穷大相减是 $\\infty - \\infty$ 未定式，**不能直接拆分**。
+分别求 $\\lim_{x \\to 0^+} \\frac{1}{x} = +\\infty$ 和 $\\lim_{x \\to 0^+} \\frac{1}{\\sin x} = +\\infty$，两项都趋于正无穷，但直接相减没有意义。
+
+**正确做法（先通分化为 $\\frac{0}{0}$ 型）**：
+
+$$\\frac{1}{x} - \\frac{1}{\\sin x} = \\frac{\\sin x - x}{x \\sin x}$$
+
+对分子分母做泰勒展开（$x \\to 0$）：
+
+$$\\sin x = x - \\frac{x^3}{6} + o(x^3)$$
+
+所以 $\\sin x - x = -\\frac{x^3}{6} + o(x^3)$
+
+$$x \\sin x = x \\cdot \\left(x - \\frac{x^3}{6} + o(x^3)\\right) = x^2 + o(x^2)$$
+
+故：
+
+$$\\lim_{x \\to 0^+} \\frac{\\sin x - x}{x \\sin x} = \\lim_{x \\to 0} \\frac{-x^3/6}{x^2} = \\lim_{x \\to 0} \\left(-\\frac{x}{6}\\right) = 0$$
+
+**关键点**：加减拆分要求**各部分极限均存在且有限**，否则不能拆分。$\\infty - \\infty$ 型需先通分/有理化转化为 $0/0$ 或 $\\infty/\\infty$ 型。
 
 **修正例 3**：求 $\\displaystyle\\lim_{x \\to 0} \\left( \\frac{\\sin x}{x} + \\frac{1 - \\cos x}{x^2} \\right)$
 
@@ -5472,17 +5489,15 @@ $$\\lim f(x) \\cdot g(x) = \\left(\\lim f(x)\\right) \\cdot \\left(\\lim g(x)\\r
 
 ### 典型例题
 
-**例 4**：求 $\\displaystyle\\lim_{x \\to \\infty} \\frac{2x \\sin x}{x^2 + 1}$
+**例 4**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{\\cos x \\cdot \\sin x}{x}$
 
 **解**：
 
-当 $x \\to \\infty$ 时，分子分母的最高次都是 $x^2$，但关键是识别非零因子：
+当 $x \\to 0$ 时，分子 $\\cos x \\to 1$（非零常数），可直接剥离：
 
-$$\\lim_{x \\to \\infty} \\frac{2x \\sin x}{x^2 + 1} = \\lim_{x \\to \\infty} \\frac{2x}{x^2 + 1} \\cdot \\sin x$$
+$$\\lim_{x \\to 0} \\frac{\\cos x \\cdot \\sin x}{x} = \\left(\\lim_{x \\to 0} \\cos x\\right) \\cdot \\left(\\lim_{x \\to 0} \\frac{\\sin x}{x}\\right) = 1 \\cdot 1 = 1$$
 
-先算 $\\lim_{x \\to \\infty} \\frac{2x}{x^2 + 1} = \\lim_{x \\to \\infty} \\frac{2/x}{1 + 1/x^2} = 0$
-
-所以原式 $= 0 \\cdot \\sin x$（有界函数）$= 0$
+**辨析**：本题剥离的是极限为 1 的 $\\cos x$，属于"剥离非零因子"的典型应用。注意：如果某个因子的极限为 0 或不存在，则不能直接剥离，需用其他方法（如"无穷小 × 有界 = 无穷小"）。
 
 ---
 
@@ -5596,25 +5611,35 @@ $$\\lim_{n \\to \\infty} S_n = \\frac{1}{2}$$
 
 注意到 $n!$ 在和中占绝对主导地位：
 
-$$(n-1)! + n! \\leq 1! + 2! + \\cdots + n! \\leq (n-2)! \\cdot 2 + n!$$
+**下界**：显然 $n! \\leq 1! + 2! + \\cdots + n!$，故
 
-（因为 $k! \\leq (n-2)!$ 对 $k \\leq n-2$ 成立，而 $(n-1)! = (n-1)(n-2)! \\leq (n-1)(n-2)!$）
+$$\\frac{1! + 2! + \\cdots + n!}{n!} \\geq 1$$
 
-实际上，更精确的放缩：
+**上界（关键：必须构造收敛到 1 的上界）**：
 
-$$n! \\leq 1! + 2! + \\cdots + n! \\leq n! + (n-1)! + \\cdots + 2 \\cdot 1!$$
+将分子分为前 $n-2$ 项、第 $n-1$ 项和第 $n$ 项：
 
-两边除以 $n!$：
-
-$$1 \\leq \\frac{1! + 2! + \\cdots + n!}{n!} \\leq 1 + \\frac{1}{n} + \\cdots$$
-
-右端 $1 + \\frac{1}{n} + \\frac{1}{n(n-1)} + \\cdots < 1 + \\frac{1}{n} + \\frac{1}{n^2} + \\cdots = \\frac{1}{1 - 1/n} = \\frac{n}{n-1}$
+- 前 $n-2$ 项：每项 $k! \\leq (n-2)!$，故和 $\\leq (n-2) \\cdot (n-2)!$
+- 第 $n-1$ 项：$(n-1)!$
+- 第 $n$ 项：$n!$
 
 所以：
 
-$$1 \\leq \\frac{1! + 2! + \\cdots + n!}{n!} \\leq \\frac{n}{n-1} \\to 1$$
+$$1! + 2! + \\cdots + n! \\leq (n-2)(n-2)! + (n-1)! + n!$$
 
-由夹逼准则：
+两边除以 $n!$：
+
+$$\\frac{1! + 2! + \\cdots + n!}{n!} \\leq \\frac{(n-2)(n-2)!}{n!} + \\frac{(n-1)!}{n!} + 1 = \\frac{n-2}{n(n-1)} + \\frac{1}{n} + 1$$
+
+当 $n \\to \\infty$ 时：
+
+$$\\frac{n-2}{n(n-1)} + \\frac{1}{n} + 1 \\to 0 + 0 + 1 = 1$$
+
+**夹逼**：
+
+$$1 \\leq \\frac{1! + 2! + \\cdots + n!}{n!} \\leq 1 + \\frac{1}{n} + \\frac{n-2}{n(n-1)}$$
+
+两端极限均为 $1$，故由夹逼准则：
 
 $$\\lim_{n \\to \\infty} \\frac{1! + 2! + \\cdots + n!}{n!} = 1$$
 
@@ -5666,9 +5691,13 @@ $$= 1 \\cdot 1 \\cdot 1 \\cdot \\frac{3}{5} = \\frac{3}{5}$$
 
 利用 $1 - \\cos x = 2\\sin^2\\frac{x}{2}$：
 
-$$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\lim_{x \\to 0} \\frac{2\\sin^2\\frac{x}{2}}{x^2} = \\lim_{x \\to 0} 2 \\cdot \\left(\\frac{\\sin\\frac{x}{2}}{x/2}\\right)^2 \\cdot \\frac{1}{4} \\cdot x^0$$
+$$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\lim_{x \\to 0} \\frac{2\\sin^2\\frac{x}{2}}{x^2} = \\lim_{x \\to 0} \\frac{2}{x^2} \\cdot \\sin^2\\frac{x}{2}$$
 
-$$= 2 \\cdot 1^2 \\cdot \\frac{1}{2} = 1$$
+将 $\\sin^2\\frac{x}{2}$ 写成 $\\left(\\frac{\\sin\\frac{x}{2}}{\\frac{x}{2}}\\right)^2 \\cdot \\frac{x^2}{4}$：
+
+$$= \\lim_{x \\to 0} \\frac{2}{x^2} \\cdot \\left(\\frac{\\sin\\frac{x}{2}}{\\frac{x}{2}}\\right)^2 \\cdot \\frac{x^2}{4} = \\lim_{x \\to 0} \\frac{2}{4} \\cdot \\left(\\frac{\\sin\\frac{x}{2}}{\\frac{x}{2}}\\right)^2 = \\frac{1}{2} \\cdot 1^2 = \\frac{1}{2}$$
+
+所以 $\\displaystyle\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2}$
 
 ---
 
@@ -5837,25 +5866,29 @@ $$= e^2 \\cdot 1 = e^2$$
 
 **方法一：泰勒展开**
 
+需要将 $\\sin x$、$\\tan x$、$\\arctan x$ 展开到 $x^3$ 阶：
+
 $$\\sin x = x - \\frac{x^3}{6} + o(x^3)$$
 
 $$\\tan x = x + \\frac{x^3}{3} + o(x^3)$$
 
-$$\\arcsin x = x + \\frac{x^3}{6} + o(x^3)$$
+$$\\arctan x = x - \\frac{x^3}{3} + o(x^3)$$
 
 所以：
 
-$$\\sin x - \\tan x = -\\frac{x^3}{2} + o(x^3)$$
+$$\\sin x - \\tan x = \\left(x - \\frac{x^3}{6}\\right) - \\left(x + \\frac{x^3}{3}\\right) + o(x^3) = -\\frac{x^3}{2} + o(x^3)$$
 
-$$\\arctan x - \\sin x = -\\frac{x^3}{6} + o(x^3)$$
+$$\\arctan x - \\sin x = \\left(x - \\frac{x^3}{3}\\right) - \\left(x - \\frac{x^3}{6}\\right) + o(x^3) = -\\frac{x^3}{6} + o(x^3)$$
 
-$$\\lim_{x \\to 0} \\frac{\\sin x - \\tan x}{\\arctan x - \\sin x} = \\frac{-x^3/2}{-x^3/6} = 3$$
+$$\\lim_{x \\to 0} \\frac{\\sin x - \\tan x}{\\arctan x - \\sin x} = \\frac{-x^3/2}{-x^3/6} = \\frac{1/2}{1/6} = 3$$
 
-**方法二：提取公因式后替换**
+**方法二：为何不适用提取公因式法？**
 
-$$\\frac{\\sin x - \\tan x}{\\arctan x - \\sin x} = \\frac{\\sin x(1 - \\frac{1}{\\cos x})}{\\sin x \\cdot \\frac{x}{\\arctan x} - \\sin x}$$
+本题分子分母都是同阶首项相减（$x - x = 0$），首项相互抵消，必须展开到高阶才能得到正确结果。
 
-（在乘除部分使用等价替换）
+若强行提取公因式，分子 $\\sin x - \\tan x = \\sin x(1 - \\sec x)$，分母 $\\arctan x - \\sin x$ 无法提取出 $\\sin x$（因为 $\\arctan x \\neq x$ 在乘除中可以简单替换）。即使尝试提取，也会陷入"越替换越乱"的困境，因为高阶项的贡献无法通过简单的等价替换捕捉。
+
+**结论**：此类"差值型"极限（分子分母同阶首项相消），泰勒展开是唯一可靠的方法。
 
 ---
 
@@ -5951,11 +5984,21 @@ $$\\lim_{x \\to +\\infty} \\frac{\\ln x}{x^{0.01}} = 0$$
 
 **解**：
 
-$$\\lim_{x \\to 0} \\frac{x^2}{\\sin x} = \\lim_{x \\to 0} \\frac{x^2}{x} = 0 \\implies x^2 \\text{ 是更高阶}$$
+先比较 $\\sin x$ 与 $x$：
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\implies \\sin x \\sim x$$
+
+所以 $\\sin x$ 是 **1 阶**无穷小。
+
+再比较 $1 - \\cos x$ 与 $x^2$：
 
 $$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2} \\implies 1 - \\cos x \\sim \\frac{1}{2}x^2$$
 
-所以阶数：$x^2 > 1 - \\cos x$（同阶）$>$ $\\sin x$（1 阶）$>$ $x^2$（2 阶）
+所以 $1 - \\cos x$ 与 $x^2$ 是**同阶**的 **2 阶**无穷小。
+
+**结论**：当 $x \\to 0$ 时，无穷小的阶数从低到高排列为：
+
+$$\\sin x \\text{（1 阶）} < 1 - \\cos x \\sim x^2 \\text{（2 阶）}$$
 
 ---
 
@@ -5986,9 +6029,13 @@ $$\\lim \\frac{f(x)}{g(x)} = \\lim \\frac{f'(x)}{g'(x)}$$
 
 | 禁忌 | 说明 | 后果 |
 |------|------|------|
-| 非未定式 | $\\lim \\dfrac{x + \\sin x}{x}$ | $\\infty/\\infty$ 但 $\\neq 1$ |
-| 只导一部分 | 只导分子 | 结果错误 |
-| 导完不存在 | $\\lim \\dfrac{x}{1 + \\cos x}$ 求导后 | $\\dfrac{1}{-\\sin x}$ 不存在 |
+| 非未定式 | 分子分母极限不构成 $0/0$ 或 $\\infty/\\infty$ | 不能使用洛必达 |
+| 只导一部分 | 只导分子或分母 | 结果错误 |
+| 导完不存在 | 强行使用洛必达后极限不存在 | 无法判断原极限 |
+
+**特别提醒**：
+
+对于 $\\lim_{x \\to \\infty} \\frac{x + \\sin x}{x}$，虽然形式上是 $\\frac{\\infty}{\\infty}$ 型，但原极限 $\\lim_{x \\to \\infty} \\left(1 + \\frac{\\sin x}{x}\\right) = 1$ **实际上可以直接求出**，根本不需要洛必达。若强行对分子分母求导得 $\\frac{1 + \\cos x}{1}$，该极限不存在（在 0 和 2 之间震荡），此时**洛必达失效**，但原极限存在且等于 1。
 
 ### 适用范围
 
@@ -6106,15 +6153,25 @@ $$f(-x) = \\frac{-x \\sin(-x)}{1 + x^2} = \\frac{-x \\cdot (-\\sin x)}{1 + x^2} 
 
 $$\\int_{-n}^{n} f(x)\\,dx = 2\\int_{0}^{n} f(x)\\,dx$$
 
-原式：
+原式变为：
 
-$$\\frac{1}{n} \\cdot 2\\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$$
+$$\\frac{2}{n} \\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$$
 
-由于 $0 \\leq \\left|\\frac{x \\sin x}{1 + x^2}\\right| \\leq \\frac{x}{1 + x^2} \\leq \\frac{1}{2}$（有界）
+**关键分析**：对被积函数进行积分估计。
 
-所以 $\\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$ 是**有界量**
+注意 $\\frac{x \\sin x}{1 + x^2}$ 是**振荡衰减**的。令 $g(x) = \\frac{x}{1 + x^2}$，则 $g'(x) = \\frac{1 - x^2}{(1+x^2)^2}$，可知 $g(x)$ 在 $[1, \\infty)$ 上单调递减，且 $\\lim_{x \\to \\infty} g(x) = 0$。
 
-$$\\lim_{n \\to \\infty} \\frac{1}{n} \\cdot \\text{有界量} = 0$$
+由**广义积分收敛性**（狄利克雷判别法）：$\\int_0^{\\infty} \\frac{x \\sin x}{1 + x^2}\\,dx$ 收敛。
+
+因此 $\\int_0^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$ 是**有界量**（设其绝对值不超过 $M$）。
+
+于是：
+
+$$\\left|\\frac{2}{n} \\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx\\right| \\leq \\frac{2}{n} \\cdot M \\to 0$$
+
+故：
+
+$$\\lim_{n \\to \\infty} \\frac{1}{n} \\int_{-n}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx = 0$$
 
 ---
 
@@ -6131,13 +6188,17 @@ $$\\lim_{n \\to \\infty} \\frac{1}{n} \\cdot \\text{有界量} = 0$$
 
 $$\\frac{1}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b}$$
 
-其中 $A = \\dfrac{1}{b-a}$，$B = \\dfrac{1}{a-b}$
+其中 $A = \\dfrac{1}{a-b}$，$B = \\dfrac{1}{b-a}$
+
+**验证**：将 $A, B$ 代入右侧通分：
+
+$$\\frac{A(x-b) + B(x-a)}{(x-a)(x-b)} = \\frac{\\frac{x-b}{a-b} + \\frac{x-a}{b-a}}{(x-a)(x-b)} = \\frac{\\frac{x-b}{a-b} - \\frac{x-a}{a-b}}{(x-a)(x-b)} = \\frac{a-b}{(a-b)(x-a)(x-b)} = \\frac{1}{(x-a)(x-b)} \\checkmark$$
 
 **常见裂项模式**：
 
 | 分母形式 | 裂项结果 |
 |----------|----------|
-| $(x-a)(x-b)$ | $\\frac{1}{b-a}\\left(\\frac{1}{x-a} - \\frac{1}{x-b}\\right)$ |
+| $(x-a)(x-b)$ | $\\frac{1}{a-b}\\left(\\frac{1}{x-a} - \\frac{1}{x-b}\\right)$ |
 | $x(x+1)$ | $\\frac{1}{x} - \\frac{1}{x+1}$ |
 | $(2n-1)(2n+1)$ | $\\frac{1}{2}\\left(\\frac{1}{2n-1} - \\frac{1}{2n+1}\\right)$ |
 
@@ -6361,9 +6422,11 @@ $$\\lim_{n \\to \\infty} \\frac{1}{n}\\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right
 
 | 求和形式 | 积分形式 |
 |----------|----------|
-| $\\frac{1}{n}\\sum f\\left(\\frac{k}{n}\\right)$ | $\\int_0^1 f(x)\\,dx$ |
-| $\\frac{1}{n}\\sum f\\left(\\frac{k}{n}\\right) \\cdot \\frac{1}{n}$ | $\\int_0^1 f(x)\\,dx$（需配凑）|
+| $\\frac{1}{n}\\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right)$ | $\\int_0^1 f(x)\\,dx$ |
+| $\\frac{1}{n}\\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right) \\cdot \\frac{1}{n}$ | $\\to 0$（有额外的 $\\frac{1}{n}$ 因子趋于 0，需正确识别主因子）|
 | $\\sum_{k=1}^{n} \\frac{1}{n+k}$ | $\\int_0^1 \\frac{1}{1+x}\\,dx$ |
+
+**注**：定积分定义的本质是 $\\frac{1}{n}\\sum f\\left(\\frac{k}{n}\\right) \\to \\int_0^1 f(x)\\,dx$。如果求和式中多了一个 $\\frac{1}{n}$ 因子，则整体趋于 0，需根据实际情况判断。
 
 ### 适用范围
 
@@ -6412,33 +6475,39 @@ $$= \\left[-\\frac{\\cos(\\pi x)}{\\pi}\\right]_0^1 = -\\frac{\\cos\\pi - \\cos 
 
 ### 典型例题
 
-**例 27**：设 $x_1 = 1$，$x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right)$，求 $\\lim_{n \\to \\infty} x_n$
+**例 27**：设 $x_1 = 2$，$x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right)$，求 $\\lim_{n \\to \\infty} x_n$
 
 **解**：
 
 **第一步**：猜测极限
 
-令 $A = \\frac{1}{2}\\left(A + \\frac{2}{A}\\right)$，得 $A^2 = 2$，$A = \\sqrt{2}$（正数）。
+令 $A = \\frac{1}{2}\\left(A + \\frac{2}{A}\\right)$，得 $A^2 = 2$，$A = \\sqrt{2}$（取正数）。
 
 **第二步**：证明有界
 
 由 $x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right) \\geq \\sqrt{x_n \\cdot \\frac{2}{x_n}} = \\sqrt{2}$
 
-（由 AM-GM 不等式）
+（由 AM-GM 不等式：$\\frac{a+b}{2} \\geq \\sqrt{ab}$）
 
-所以 $x_n \\geq \\sqrt{2}$，下界为 $\\sqrt{2}$。
+所以 $x_n \\geq \\sqrt{2}$，数列有下界 $\\sqrt{2}$。
 
 **第三步**：证明单调
 
-$$x_{n+1} - x_n = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right) - x_n = \\frac{1}{2}\\left(\\frac{2}{x_n} - x_n\\right) = \\frac{1 - x_n^2}{2x_n} \\leq 0$$
+$$x_{n+1} - x_n = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right) - x_n = \\frac{1}{2} \\cdot \\frac{2 - x_n^2}{x_n} = \\frac{2 - x_n^2}{2x_n}$$
 
-因为 $x_n \\geq \\sqrt{2}$，所以 $x_{n+1} \\leq x_n$。
+因为 $x_n \\geq \\sqrt{2}$，所以 $x_n^2 \\geq 2$，即 $2 - x_n^2 \\leq 0$。
+
+又 $x_n > 0$，故 $x_{n+1} - x_n \\leq 0$，即 $x_{n+1} \\leq x_n$。
 
 数列单调递减有下界，极限存在。
 
 **第四步**：取极限
 
-$$\\lim_{n \\to \\infty} x_n = \\sqrt{2}$$
+设 $\\lim_{n \\to \\infty} x_n = A$，由 $x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right)$：
+
+$$A = \\frac{1}{2}\\left(A + \\frac{2}{A}\\right) \\implies A^2 = 2 \\implies A = \\sqrt{2}$$
+
+所以 $\\lim_{n \\to \\infty} x_n = \\sqrt{2}$。
 
 ---
 
@@ -6568,7 +6637,7 @@ $$\\cos x = 1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\cdots$$
 $$\\ln(1+x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} - \\cdots$$
 
 $$(1+x)^\\alpha = 1 + \\alpha x + \\frac{\\alpha(\\alpha-1)}{2!}x^2 + \\cdots$$
-`,An=`# 随机森林：集成学习的决策树军团
+`,kn=`# 随机森林：集成学习的决策树军团
 
 > *"如果你觉得随机森林只是一个简单的'投票'算法，那你可能低估了这支军队的协作智慧。"*
 > — Leo Breiman，随机森林创始人
@@ -7288,4 +7357,4 @@ router.replace({ ...route, params: { locale: lang } })
 2024 年：一志愿复试 32 人==（初试最高分 429 分、最低分 303 分）==，录取 23 人（初试最高分 429 分、最低分 324 分）
 2023 年：一志愿复试 26 人==（初试最高分 412 分、最低分 283 分）==，录取 20 人（初试最高分 412 分、最低分 311 分）
 2022 年：录取 19 人==（初试最高分 392 分、最低分 309 分==）
-`,qn=["innerHTML"],Bn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(j,{emit:r}){const P=j,{t:D}=nn(),u=C(null),S=r;function z(_){return _.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,d=>d.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new un({html:!0,linkify:!0,typographer:!0,highlight(_,d){const o=d&&H.getLanguage(d)?d:null,l=o?H.highlight(_,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(_).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${l}</code></pre></div>`}});T.use(yn),T.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function L(_){if(!_)return"";const d=[];let o=_.replace(/```[\s\S]*?```/g,l=>(d.push(l),`__CODE_BLOCK_${d.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(l,$)=>{try{return`<div class="katex-block">${Y.renderToString($.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${$}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(l,$)=>{try{return`<span class="katex-inline">${Y.renderToString($.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${$}$`}}),d.forEach((l,$)=>{o=o.replace(`__CODE_BLOCK_${$}__`,l)}),o}function k(_){if(!_)return _;const d=window.location.origin;return _.replace(/<img\s+([^>]*?)>/g,(o,l)=>l.includes("loading=")?o:`<img ${l} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,l)=>{const $=l.match(/href="([^"]*)"/);if($){const h=$[1];if(h.startsWith("http://")||h.startsWith("https://"))try{if(new URL(h).origin!==d&&!l.includes("target="))return`<a ${l} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const q=Q(()=>k(T.render(L(P.source||""))));N(q,async()=>{await G(),g(),S("rendered",u.value)}),Z(async()=>{await G(),g(),S("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(d=>{d.classList.add("copy-injected");const o=d.querySelector("code"),l=(o==null?void 0:o.textContent)||"",$=document.createElement("button");$.className="copy-btn",$.type="button",$.setAttribute("aria-label",D("common.copyCode")),$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.addEventListener("click",()=>{l&&navigator.clipboard.writeText(l).then(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',$.classList.add("copied"),setTimeout(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.classList.remove("copied")},2e3)})}),d.appendChild($)})}return(_,d)=>(c(),f("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:q.value},null,8,qn))}},Rn=en(Bn,[["__scopeId","data-v-b6bba450"]]),Mn={class:"zhihu-page"},Nn={class:"zhihu-shell"},Gn={class:"zhihu-body"},Pn={class:"zhihu-hero"},Dn={class:"zhihu-hero-content"},Xn={class:"zhihu-title"},En={class:"zhihu-subtitle"},Un={class:"zhihu-tabs"},In={class:"tab active"},Fn={class:"tab"},Hn={class:"tab"},Qn={class:"zhihu-hero-card"},jn={class:"hero-label"},On={class:"hero-desc"},Vn={class:"hero-actions"},Wn={class:"hero-pill"},Kn={class:"hero-pill"},Jn={class:"hero-pill"},Yn={class:"zhihu-container"},Zn={class:"zhihu-main"},ne={key:0,class:"feed"},ee={class:"feed-content"},te={class:"feed-title"},ae={class:"feed-excerpt"},re={class:"feed-footer"},ie={class:"feed-meta"},se={class:"meta-tag"},oe={class:"meta-date"},$e={class:"meta-read"},le={key:1,class:"post-view"},_e={class:"post-header"},de={class:"post-title"},ce={class:"post-meta"},xe={class:"post-tag"},fe={key:2,class:"post-empty"},me={class:"zhihu-side"},pe={key:0,class:"toc-drawer-toggle"},he=["aria-label"],ue={class:"side-card profile"},ye={class:"profile-header"},ge={class:"profile-name"},be={class:"profile-desc"},ve={class:"profile-stats"},Ce=["href"],ze={class:"side-card"},Te={class:"side-title"},Le={class:"tag-list"},ke={class:"tag"},Ae={class:"tag"},we={class:"tag"},Se={class:"tag"},qe={class:"side-card"},Be={class:"side-title"},Re={class:"side-text"},Me={class:"side-btn"},Ne={class:"toc-header"},Ge={class:"toc-title"},Pe=["aria-label"],De={class:"toc-list"},Xe=["data-id"],Ee=["onClick"],Ue={key:0,class:"toc-empty"},Ie={class:"toc-drawer-panel"},Fe={class:"toc-drawer-header"},He={class:"toc-drawer-title"},Qe={class:"toc-drawer-body"},je={class:"toc-drawer-list"},Oe=["data-id"],Ve=["onClick"],We={key:0,class:"toc-drawer-empty"},Ke=768,Je={__name:"Blog",setup(j){const{t:r}=nn(),P=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":Ln,"../markdowns/2026-05-27-极限求解完全指南：21种方法分类与实战.md":kn,"../markdowns/2026-05-27-随机森林：集成学习的决策树军团.md":An,"../markdowns/first-blog.md":wn,"../markdowns/考研信息调研.md":Sn});function D(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function S(s){var p;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),m=((p=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:p.length)??0,x=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+m;return{wordCount:x,readMinutes:Math.max(1,Math.round(x/300)),excerpt:u(e)}}const z=new Map,T=s=>(z.has(s)||z.set(s,S(s)),z.get(s)),L=Object.entries(P).map(([s,e])=>{const m=D(e),i=s.match(/\/([^/]+)\.md$/),x=i?i[1]:s;let p=x,b=null;const R=m.match(/^#\s+(.+)$/m);R&&(p=R[1].trim());const X=x.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],R||(p=X[2]));const on=b??x,E=T(m);return{path:s,slug:x,title:p,content:m,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),k=xn(),q=fn(),g=Q(()=>!!k.params.slug),_=Q(()=>k.params.slug?tn(k.params.slug):null),d=C(null),o=C([]),l=C(""),$=C(!1),h=C(!1);let y=null,A=null,w=null;function O(){h.value=window.innerWidth<Ke}function V(){q.push({name:"BlogHome"})}function tn(s){return L.find(e=>e.slug===s)}function an(s){const e=s??d.value;if(!e){o.value=[];return}const m=Array.from(e.querySelectorAll("h2, h3"));o.value=m.map(i=>{var p;const x=i.tagName.toLowerCase();return{id:i.id,text:((p=i.textContent)==null?void 0:p.trim())||"标题",level:x}})}function W(s){const e=document.getElementById(s);if(!e)return;$.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(B(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const x=window.scrollY;let p=null;for(const b of s)b.getBoundingClientRect().top+x-90<=x+5&&(p=b);p&&(l.value=p.id)}function m(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}A=m,window.addEventListener("scroll",A,{passive:!0}),e()}function B(){y&&(cancelAnimationFrame(y),y=null),A&&(window.removeEventListener("scroll",A),A=null)}function sn(){w=new ResizeObserver(()=>O()),w.observe(document.documentElement)}return N(_,s=>{s||(o.value=[],B())},{immediate:!0}),N(o,async()=>{if(!o.value.length){B();return}await G(),rn()}),N(l,async s=>{if(!s)return;await G();const e=document.querySelector(".post-toc"),m=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(m&&m.scrollIntoView({behavior:"smooth",block:"nearest"}),$.value){const i=document.querySelector(".toc-drawer-body"),x=i==null?void 0:i.querySelector(`[data-id="${s}"]`);x&&x.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),$n(()=>{B(),w==null||w.disconnect()}),(s,e)=>{const m=mn("router-link");return c(),f("section",Mn,[M(hn),n("div",Nn,[n("div",Gn,[n("div",Pn,[n("div",Dn,[n("div",Xn,t(a(r)("blog.heroTitle")),1),n("p",En,t(a(r)("blog.heroSubtitle")),1),n("div",Un,[n("button",In,t(a(r)("blog.tabRecommend")),1),n("button",Fn,t(a(r)("blog.tabLatest")),1),n("button",Hn,t(a(r)("blog.tabEssay")),1)])]),n("div",Qn,[n("div",jn,t(a(r)("blog.heroLabel")),1),n("div",On,t(a(r)("blog.heroDesc")),1),n("div",Vn,[n("span",Wn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Kn,t(a(r)("blog.heroTechVue")),1),n("span",Jn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Yn,[n("main",Zn,[g.value?_.value?(c(),f("div",le,[n("div",_e,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",de,t(_.value.title),1),n("div",ce,[n("span",xe,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(_.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:_.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:d,class:"post-content"},[M(Rn,{source:_.value.content,onRendered:an},null,8,["source"])],512)])):(c(),f("div",fe,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(c(),f("div",ne,[(c(!0),f(U,null,I(a(L),i=>(c(),f("article",{key:i.slug,class:"feed-item"},[M(m,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",ee,[n("h2",te,t(i.title),1),n("p",ae,t(i.excerpt),1)]),n("div",re,[n("div",ie,[n("span",se,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",$e,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",me,[g.value&&o.value.length?(c(),f("div",pe,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>$.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),ln(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",ue,[n("div",ye,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ge,t(a(r)("blog.profileName")),1),n("div",be,t(a(r)("blog.profileDesc")),1)])]),n("div",ve,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,Ce)]),n("div",ze,[n("div",Te,t(a(r)("blog.sidebarTags")),1),n("div",Le,[n("span",ke,t(a(r)("blog.tagLearning")),1),n("span",Ae,t(a(r)("blog.tagAlgorithm")),1),n("span",we,t(a(r)("blog.tagFrontend")),1),n("span",Se,t(a(r)("blog.tagLife")),1)])]),n("div",qe,[n("div",Be,t(a(r)("blog.sidebarUpdate")),1),n("p",Re,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Me,t(a(r)("blog.sidebarFollow")),1)]),g.value?(c(),f("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":h.value}])},[n("div",Ne,[n("div",Ge,t(a(r)("blog.tocTitle")),1),h.value?(c(),f("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>$.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Pe)):v("",!0)]),n("ul",De,[(c(!0),f(U,null,I(o.value,i=>(c(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:x=>W(i.id)},t(i.text),9,Ee)],10,Xe))),128)),o.value.length?v("",!0):(c(),f("li",Ue,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(c(),_n(cn,{to:"body"},[M(dn,{name:"drawer"},{default:K(()=>[h.value&&$.value?(c(),f("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=pn(i=>$.value=!1,["self"]))},[n("div",Ie,[n("div",Fe,[n("span",He,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>$.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",Qe,[n("ul",je,[(c(!0),f(U,null,I(o.value,i=>(c(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-drawer-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:x=>W(i.id)},t(i.text),9,Ve)],10,Oe))),128)),o.value.length?v("",!0):(c(),f("li",We,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},at=en(Je,[["__scopeId","data-v-f1b0f654"]]);export{at as default};
+`,qn=["innerHTML"],Bn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(j,{emit:r}){const P=j,{t:D}=nn(),u=C(null),S=r;function z(_){return _.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,c=>c.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new un({html:!0,linkify:!0,typographer:!0,highlight(_,c){const o=c&&H.getLanguage(c)?c:null,l=o?H.highlight(_,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(_).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${l}</code></pre></div>`}});T.use(yn),T.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function L(_){if(!_)return"";const c=[];let o=_.replace(/```[\s\S]*?```/g,l=>(c.push(l),`__CODE_BLOCK_${c.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(l,$)=>{try{return`<div class="katex-block">${Y.renderToString($.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${$}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(l,$)=>{try{return`<span class="katex-inline">${Y.renderToString($.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${$}$`}}),c.forEach((l,$)=>{o=o.replace(`__CODE_BLOCK_${$}__`,l)}),o}function A(_){if(!_)return _;const c=window.location.origin;return _.replace(/<img\s+([^>]*?)>/g,(o,l)=>l.includes("loading=")?o:`<img ${l} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,l)=>{const $=l.match(/href="([^"]*)"/);if($){const h=$[1];if(h.startsWith("http://")||h.startsWith("https://"))try{if(new URL(h).origin!==c&&!l.includes("target="))return`<a ${l} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const q=Q(()=>A(T.render(L(P.source||""))));N(q,async()=>{await G(),g(),S("rendered",u.value)}),Z(async()=>{await G(),g(),S("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(c=>{c.classList.add("copy-injected");const o=c.querySelector("code"),l=(o==null?void 0:o.textContent)||"",$=document.createElement("button");$.className="copy-btn",$.type="button",$.setAttribute("aria-label",D("common.copyCode")),$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.addEventListener("click",()=>{l&&navigator.clipboard.writeText(l).then(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',$.classList.add("copied"),setTimeout(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.classList.remove("copied")},2e3)})}),c.appendChild($)})}return(_,c)=>(d(),f("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:q.value},null,8,qn))}},Rn=en(Bn,[["__scopeId","data-v-b6bba450"]]),Mn={class:"zhihu-page"},Nn={class:"zhihu-shell"},Gn={class:"zhihu-body"},Pn={class:"zhihu-hero"},Dn={class:"zhihu-hero-content"},Xn={class:"zhihu-title"},En={class:"zhihu-subtitle"},Un={class:"zhihu-tabs"},In={class:"tab active"},Fn={class:"tab"},Hn={class:"tab"},Qn={class:"zhihu-hero-card"},jn={class:"hero-label"},On={class:"hero-desc"},Vn={class:"hero-actions"},Wn={class:"hero-pill"},Kn={class:"hero-pill"},Jn={class:"hero-pill"},Yn={class:"zhihu-container"},Zn={class:"zhihu-main"},ne={key:0,class:"feed"},ee={class:"feed-content"},te={class:"feed-title"},ae={class:"feed-excerpt"},re={class:"feed-footer"},ie={class:"feed-meta"},se={class:"meta-tag"},oe={class:"meta-date"},$e={class:"meta-read"},le={key:1,class:"post-view"},_e={class:"post-header"},ce={class:"post-title"},de={class:"post-meta"},xe={class:"post-tag"},fe={key:2,class:"post-empty"},me={class:"zhihu-side"},pe={key:0,class:"toc-drawer-toggle"},he=["aria-label"],ue={class:"side-card profile"},ye={class:"profile-header"},ge={class:"profile-name"},be={class:"profile-desc"},ve={class:"profile-stats"},Ce=["href"],ze={class:"side-card"},Te={class:"side-title"},Le={class:"tag-list"},Ae={class:"tag"},ke={class:"tag"},we={class:"tag"},Se={class:"tag"},qe={class:"side-card"},Be={class:"side-title"},Re={class:"side-text"},Me={class:"side-btn"},Ne={class:"toc-header"},Ge={class:"toc-title"},Pe=["aria-label"],De={class:"toc-list"},Xe=["data-id"],Ee=["onClick"],Ue={key:0,class:"toc-empty"},Ie={class:"toc-drawer-panel"},Fe={class:"toc-drawer-header"},He={class:"toc-drawer-title"},Qe={class:"toc-drawer-body"},je={class:"toc-drawer-list"},Oe=["data-id"],Ve=["onClick"],We={key:0,class:"toc-drawer-empty"},Ke=768,Je={__name:"Blog",setup(j){const{t:r}=nn(),P=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":Ln,"../markdowns/2026-05-27-极限求解完全指南：21种方法分类与实战.md":An,"../markdowns/2026-05-27-随机森林：集成学习的决策树军团.md":kn,"../markdowns/first-blog.md":wn,"../markdowns/考研信息调研.md":Sn});function D(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function S(s){var p;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),m=((p=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:p.length)??0,x=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+m;return{wordCount:x,readMinutes:Math.max(1,Math.round(x/300)),excerpt:u(e)}}const z=new Map,T=s=>(z.has(s)||z.set(s,S(s)),z.get(s)),L=Object.entries(P).map(([s,e])=>{const m=D(e),i=s.match(/\/([^/]+)\.md$/),x=i?i[1]:s;let p=x,b=null;const R=m.match(/^#\s+(.+)$/m);R&&(p=R[1].trim());const X=x.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],R||(p=X[2]));const on=b??x,E=T(m);return{path:s,slug:x,title:p,content:m,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),A=xn(),q=fn(),g=Q(()=>!!A.params.slug),_=Q(()=>A.params.slug?tn(A.params.slug):null),c=C(null),o=C([]),l=C(""),$=C(!1),h=C(!1);let y=null,k=null,w=null;function O(){h.value=window.innerWidth<Ke}function V(){q.push({name:"BlogHome"})}function tn(s){return L.find(e=>e.slug===s)}function an(s){const e=s??c.value;if(!e){o.value=[];return}const m=Array.from(e.querySelectorAll("h2, h3"));o.value=m.map(i=>{var p;const x=i.tagName.toLowerCase();return{id:i.id,text:((p=i.textContent)==null?void 0:p.trim())||"标题",level:x}})}function W(s){const e=document.getElementById(s);if(!e)return;$.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(B(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const x=window.scrollY;let p=null;for(const b of s)b.getBoundingClientRect().top+x-90<=x+5&&(p=b);p&&(l.value=p.id)}function m(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}k=m,window.addEventListener("scroll",k,{passive:!0}),e()}function B(){y&&(cancelAnimationFrame(y),y=null),k&&(window.removeEventListener("scroll",k),k=null)}function sn(){w=new ResizeObserver(()=>O()),w.observe(document.documentElement)}return N(_,s=>{s||(o.value=[],B())},{immediate:!0}),N(o,async()=>{if(!o.value.length){B();return}await G(),rn()}),N(l,async s=>{if(!s)return;await G();const e=document.querySelector(".post-toc"),m=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(m&&m.scrollIntoView({behavior:"smooth",block:"nearest"}),$.value){const i=document.querySelector(".toc-drawer-body"),x=i==null?void 0:i.querySelector(`[data-id="${s}"]`);x&&x.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),$n(()=>{B(),w==null||w.disconnect()}),(s,e)=>{const m=mn("router-link");return d(),f("section",Mn,[M(hn),n("div",Nn,[n("div",Gn,[n("div",Pn,[n("div",Dn,[n("div",Xn,t(a(r)("blog.heroTitle")),1),n("p",En,t(a(r)("blog.heroSubtitle")),1),n("div",Un,[n("button",In,t(a(r)("blog.tabRecommend")),1),n("button",Fn,t(a(r)("blog.tabLatest")),1),n("button",Hn,t(a(r)("blog.tabEssay")),1)])]),n("div",Qn,[n("div",jn,t(a(r)("blog.heroLabel")),1),n("div",On,t(a(r)("blog.heroDesc")),1),n("div",Vn,[n("span",Wn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Kn,t(a(r)("blog.heroTechVue")),1),n("span",Jn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Yn,[n("main",Zn,[g.value?_.value?(d(),f("div",le,[n("div",_e,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",ce,t(_.value.title),1),n("div",de,[n("span",xe,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(_.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:_.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:c,class:"post-content"},[M(Rn,{source:_.value.content,onRendered:an},null,8,["source"])],512)])):(d(),f("div",fe,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(d(),f("div",ne,[(d(!0),f(U,null,I(a(L),i=>(d(),f("article",{key:i.slug,class:"feed-item"},[M(m,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",ee,[n("h2",te,t(i.title),1),n("p",ae,t(i.excerpt),1)]),n("div",re,[n("div",ie,[n("span",se,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",$e,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",me,[g.value&&o.value.length?(d(),f("div",pe,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>$.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),ln(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",ue,[n("div",ye,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ge,t(a(r)("blog.profileName")),1),n("div",be,t(a(r)("blog.profileDesc")),1)])]),n("div",ve,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,Ce)]),n("div",ze,[n("div",Te,t(a(r)("blog.sidebarTags")),1),n("div",Le,[n("span",Ae,t(a(r)("blog.tagLearning")),1),n("span",ke,t(a(r)("blog.tagAlgorithm")),1),n("span",we,t(a(r)("blog.tagFrontend")),1),n("span",Se,t(a(r)("blog.tagLife")),1)])]),n("div",qe,[n("div",Be,t(a(r)("blog.sidebarUpdate")),1),n("p",Re,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Me,t(a(r)("blog.sidebarFollow")),1)]),g.value?(d(),f("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":h.value}])},[n("div",Ne,[n("div",Ge,t(a(r)("blog.tocTitle")),1),h.value?(d(),f("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>$.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Pe)):v("",!0)]),n("ul",De,[(d(!0),f(U,null,I(o.value,i=>(d(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:x=>W(i.id)},t(i.text),9,Ee)],10,Xe))),128)),o.value.length?v("",!0):(d(),f("li",Ue,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(d(),_n(dn,{to:"body"},[M(cn,{name:"drawer"},{default:K(()=>[h.value&&$.value?(d(),f("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=pn(i=>$.value=!1,["self"]))},[n("div",Ie,[n("div",Fe,[n("span",He,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>$.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",Qe,[n("ul",je,[(d(!0),f(U,null,I(o.value,i=>(d(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-drawer-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:x=>W(i.id)},t(i.text),9,Ve)],10,Oe))),128)),o.value.length?v("",!0):(d(),f("li",We,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},at=en(Je,[["__scopeId","data-v-f1b0f654"]]);export{at as default};
