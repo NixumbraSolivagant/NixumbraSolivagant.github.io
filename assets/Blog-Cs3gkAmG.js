@@ -1,4 +1,4 @@
-import{r as C,c as Q,k as q,o as Z,B as P,d as c,e as x,a as ln,g as N,f as n,C as t,D as a,F as U,J as I,G as _n,E as v,K as F,h as dn,w as K,T as $n,L as cn,u as pn,M as xn,b as mn,H as hn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-CpP3gxdr.js";import{N as fn}from"./NavBar-DIifWQ27.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
+import{r as C,c as Q,k as N,o as Z,B as G,d as c,e as f,a as $n,g as M,f as n,C as t,D as a,F as U,J as I,G as ln,E as v,K as F,h as _n,w as K,T as dn,L as cn,u as xn,M as fn,b as mn,H as pn}from"./vendor-vue-BYbH1h2J.js";import{u as nn}from"./index-DM6XL4Vt.js";import{N as hn}from"./NavBar-DDbIOyh7.js";import{M as un,a as yn,b as J,H,k as Y}from"./vendor-md-9MIaiziu.js";import{_ as en,S as gn}from"./author-CBA2vuEx.js";const bn=`# JavaScript 异步编程：从回调到 async/await
 
 ## 概述
 
@@ -5318,7 +5318,1257 @@ $H'' - e^{-x}H = 0$，$H(0) = 0$，$H'(0) = h(0) = 0$。
 ---
 
 *本文系统总结了考研数学二中常微分方程的所有类型与求解方法，祝各位考生备考顺利。*
-`,wn=`# 随机森林：集成学习的决策树军团
+`,kn=`# 极限求解完全指南：21 种方法分类与实战
+
+> *"极限是高等数学的灵魂，而求解极限的方法则是通向这座殿堂的钥匙。"*
+
+## 引言：未定式的困境
+
+在高等数学中，极限计算是所有分析的基石。然而，当我们面对形如 $\\frac{0}{0}$、$\\frac{\\infty}{\\infty}$、$0 \\cdot \\infty$、$\\infty - \\infty$、$0^0$、$1^\\infty$、$\\infty^0$ 等**未定式**时，直接代入往往无功而返。
+
+本文系统梳理 **21 种极限求解方法**，每种方法包括：
+- **判断特征**：如何识别此类问题
+- **一般方法**：解题的标准化步骤
+- **适用范围**：何时应该使用、何时不宜使用
+- **典型例题**：从识别到求解的完整演示
+
+---
+
+## 类型总览
+
+| 编号 | 方法 | 核心思想 | 典型特征 |
+|------|------|----------|----------|
+| 1 | 直接代入 | 利用连续性 | 函数在 $x_0$ 处连续 |
+| 2 | 拆分法 | 化整为零 | 极限式可分解为多个简单式 |
+| 3 | 剥离法 | 提取非零因子 | 乘积中含有极限非零的因子 |
+| 4 | 抓大头 | 主项控制 | $x \\to \\infty$ 的多项式之比 |
+| 5 | 夹逼准则 | 两面夹击 | 放缩后上下界极限相同 |
+| 6 | 第一重要极限 | $\\frac{\\sin x}{x}$ 型 | 出现 $\\sin$ 与变量相除 |
+| 7 | 单调有界 | 递推求极限 | 数列由递推公式定义 |
+| 8 | 第二重要极限 | $(1+\\frac{1}{n})^n$ 型 | 出现 $1^\\infty$ 型未定式 |
+| 9 | 等价无穷小 | 替换简化 | $x \\to 0$ 时的乘除替换 |
+| 10 | 无穷大常识 | 比较阶数 | 多项式、指数、对数的大小比较 |
+| 11 | 无穷小比阶 | 高阶吸收低阶 | 比较无穷小的阶数 |
+| 12 | 洛必达法则 | 求导降阶 | $0/0$ 或 $\\infty/\\infty$ 型 |
+| 13 | 根式有理化 | 消根 | 分子/分母含根号 |
+| 14 | 奇偶问题 | 对称性简化 | 涉及奇偶函数或对称区间 |
+| 15 | 裂项问题 | 拆项相消 | 分母为因式乘积 |
+| 16 | 指数型问题 | 对数变换 | 出现幂指函数 $f(x)^{g(x)}$ |
+| 17 | 泰勒公式 | 展开到阶 | 小量展开到足够阶数 |
+| 18 | 中值定理 | 拉格朗日/柯西 | 出现 $f(b)-f(a)$ 结构 |
+| 19 | 积分法 | 定积分定义 | 求 $n$ 项和的极限 |
+| 20 | 普通递推 | 构造单调有界 | 递推数列求极限 |
+| 21 | 渐近线计算 | 极限三大类 | $x \\to \\infty$ 时的直线逼近 |
+
+---
+
+## 1. 直接代入
+
+### 判断特征
+
+- 题目中 $x$ 趋向某个值 $x_0$，且函数在 $x_0$ 处**有定义且连续**
+- 非未定式（不是 $0/0$、$\\infty/\\infty$ 等）
+
+### 一般方法
+
+**步骤 1**：直接将 $x_0$ 代入表达式
+**步骤 2**：计算得到数值，即为极限
+
+### 适用范围
+
+- 适用于**所有连续函数**
+- 不适用于：$x_0$ 为间断点、出现未定式的情况
+
+### 典型例题
+
+**例 1**：求 $\\displaystyle\\lim_{x \\to 2} \\frac{x^2 + 3x - 1}{x + 1}$
+
+**解**：
+
+函数 $f(x) = \\frac{x^2 + 3x - 1}{x + 1}$ 在 $x = 2$ 处连续（分母不为零），直接代入：
+
+$$\\lim_{x \\to 2} \\frac{x^2 + 3x - 1}{x + 1} = \\frac{2^2 + 3 \\cdot 2 - 1}{2 + 1} = \\frac{4 + 6 - 1}{3} = \\frac{9}{3} = 3$$
+
+---
+
+## 2. 拆分法
+
+### 判断特征
+
+- 极限式是**多个简单函数的和、差、积、商**组合
+- 拆分后每部分的极限都**存在**（加减拆分要求每部分极限存在）
+
+### 一般方法
+
+**步骤 1**：识别可拆分的结构
+**步骤 2**：利用极限四则运算法则拆分
+
+$$\\lim[f(x) \\pm g(x)] = \\lim f(x) \\pm \\lim g(x)$$
+
+$$\\lim[f(x) \\cdot g(x)] = \\lim f(x) \\cdot \\lim g(x)$$
+
+$$\\lim\\frac{f(x)}{g(x)} = \\frac{\\lim f(x)}{\\lim g(x)} \\quad (\\lim g(x) \\neq 0)$$
+
+**步骤 3**：分别求各部分极限
+
+### 适用范围
+
+- 各部分极限**必须存在**才能拆分（尤其是加减法）
+- 不适用于：拆分后某部分极限不存在的情况
+
+### 典型例题
+
+**例 2**：求 $\\displaystyle\\lim_{x \\to 1} \\left( \\frac{x}{x-1} + \\frac{2}{\\ln x} \\right)$
+
+**解**：
+
+当 $x \\to 1$ 时，$\\frac{x}{x-1} \\to \\infty$（极限不存在），但这是加减结构，我们需要分别判断：
+
+第一部分 $\\lim_{x \\to 1} \\frac{x}{x-1}$ 不存在（趋于 $\\infty$）
+第二部分 $\\lim_{x \\to 1} \\frac{2}{\\ln x}$ 不存在（趋于 $\\infty$）
+
+两个无穷大相减是 $\\infty - \\infty$ 未定式，**不能直接拆分**。
+
+**修正例 3**：求 $\\displaystyle\\lim_{x \\to 0} \\left( \\frac{\\sin x}{x} + \\frac{1 - \\cos x}{x^2} \\right)$
+
+**解**：
+
+两个部分极限都存在：
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$
+
+$$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2}$$
+
+所以：
+
+$$\\lim_{x \\to 0} \\left( \\frac{\\sin x}{x} + \\frac{1 - \\cos x}{x^2} \\right) = 1 + \\frac{1}{2} = \\frac{3}{2}$$
+
+---
+
+## 3. 剥离法（非零因子提前）
+
+### 判断特征
+
+- 表达式是**乘积形式**
+- 其中某个因子的极限是**非零常数**
+- 剩余部分仍然构成有效极限
+
+### 一般方法
+
+**步骤 1**：识别极限非零的因子
+**步骤 2**：将其"剥离"出来，单独计算
+**步骤 3**：剩余部分继续求解
+
+数学表达式：
+
+$$\\lim f(x) \\cdot g(x) = \\left(\\lim f(x)\\right) \\cdot \\left(\\lim g(x)\\right)$$
+
+只要 $\\lim f(x) = A \\neq 0$，就可以先算这部分。
+
+### 适用范围
+
+- 乘法结构中，某个因子的极限存在且非零
+- 不适用于：因子极限为 0 或不存在的情况
+
+### 典型例题
+
+**例 4**：求 $\\displaystyle\\lim_{x \\to \\infty} \\frac{2x \\sin x}{x^2 + 1}$
+
+**解**：
+
+当 $x \\to \\infty$ 时，分子分母的最高次都是 $x^2$，但关键是识别非零因子：
+
+$$\\lim_{x \\to \\infty} \\frac{2x \\sin x}{x^2 + 1} = \\lim_{x \\to \\infty} \\frac{2x}{x^2 + 1} \\cdot \\sin x$$
+
+先算 $\\lim_{x \\to \\infty} \\frac{2x}{x^2 + 1} = \\lim_{x \\to \\infty} \\frac{2/x}{1 + 1/x^2} = 0$
+
+所以原式 $= 0 \\cdot \\sin x$（有界函数）$= 0$
+
+---
+
+## 4. 抓大头法
+
+### 判断特征
+
+- $x \\to \\infty$（或 $-\\infty$、$+\\infty$）
+- 分子、分母都是**多项式**（或幂函数组合）
+- 分子分母的最高次幂不同
+
+### 一般方法
+
+**步骤 1**：找出分子和分母的**最高次幂**
+**步骤 2**：比较指数 $n$ 和 $m$：
+
+| 情况 | 结果 |
+|------|------|
+| $n < m$（分子次数低） | 极限为 $0$ |
+| $n = m$（次数相同） | 极限为 $\\dfrac{a_n}{b_m}$（最高次系数之比） |
+| $n > m$（分子次数高） | 极限为 $\\infty$ |
+
+**步骤 3**：写出结果
+
+### 适用范围
+
+- $x \\to \\infty$ 的多项式/幂函数之比
+- 不适用于：$x \\to 0$ 或非多项式结构
+
+### 典型例题
+
+**例 5**：求 $\\displaystyle\\lim_{x \\to \\infty} \\frac{3x^3 + 2x^2 - x + 1}{2x^3 - 5x + 7}$
+
+**解**：
+
+分子最高次：$x^3$，系数 $3$
+分母最高次：$x^3$，系数 $2$
+
+因为 $n = m = 3$：
+
+$$\\lim_{x \\to \\infty} \\frac{3x^3 + 2x^2 - x + 1}{2x^3 - 5x + 7} = \\frac{3}{2}$$
+
+**例 6**：求 $\\displaystyle\\lim_{x \\to \\infty} \\frac{x^2 + 1}{x^3 + 2}$
+
+**解**：
+
+分子最高次：$x^2$，分母最高次：$x^3$
+
+因为 $n = 2 < m = 3$：
+
+$$\\lim_{x \\to \\infty} \\frac{x^2 + 1}{x^3 + 2} = 0$$
+
+---
+
+## 5. 夹逼准则（基础 + 提升）
+
+### 判断特征
+
+- 难以直接计算，但可以**构造上下界**
+- 上下界的极限容易求得且**相等**
+
+### 一般方法
+
+**基础步骤**：
+
+1. 将原表达式放大为 $g(x) \\leq f(x) \\leq h(x)$
+2. 求 $\\lim g(x) = \\lim h(x) = A$
+3. 由夹逼准则，$\\lim f(x) = A$
+
+**提升技巧**：
+
+1. **放缩要精确**：上下界不能差太远
+2. **常用放缩**：
+   - $|\\sin x| \\leq 1$
+   - $x - 1 < [x] \\leq x$（取整函数）
+   - $\\frac{x}{1+x} < \\ln(1+x) < x$（对数不等式）
+
+### 适用范围
+
+- 求和型极限（特别是 $n$ 项和）
+- 出现有界量乘无穷小
+- 不适用于：无法构造有效上下界的情况
+
+### 典型例题（基础）
+
+**例 7**：求 $\\displaystyle\\lim_{n \\to \\infty} \\left( \\frac{1}{n^2 + 1} + \\frac{2}{n^2 + 2} + \\cdots + \\frac{n}{n^2 + n} \\right)$
+
+**解**：
+
+记 $S_n = \\sum_{k=1}^{n} \\frac{k}{n^2 + k}$
+
+放缩：
+
+$$\\frac{k}{n^2 + n} \\leq \\frac{k}{n^2 + k} \\leq \\frac{k}{n^2 + 1}$$
+
+求和：
+
+$$\\sum_{k=1}^{n} \\frac{k}{n^2 + n} = \\frac{1}{n^2 + n} \\cdot \\frac{n(n+1)}{2} = \\frac{n(n+1)}{2(n^2 + n)} = \\frac{1}{2}$$
+
+$$\\sum_{k=1}^{n} \\frac{k}{n^2 + 1} = \\frac{1}{n^2 + 1} \\cdot \\frac{n(n+1)}{2} = \\frac{n(n+1)}{2(n^2 + 1)} \\to \\frac{1}{2}$$
+
+所以 $S_n$ 被夹在趋于 $\\frac{1}{2}$ 的两个数列之间：
+
+$$\\lim_{n \\to \\infty} S_n = \\frac{1}{2}$$
+
+### 典型例题（提升）
+
+**例 8**：求 $\\displaystyle\\lim_{n \\to \\infty} \\frac{1! + 2! + \\cdots + n!}{n!}$
+
+**解**：
+
+注意到 $n!$ 在和中占绝对主导地位：
+
+$$(n-1)! + n! \\leq 1! + 2! + \\cdots + n! \\leq (n-2)! \\cdot 2 + n!$$
+
+（因为 $k! \\leq (n-2)!$ 对 $k \\leq n-2$ 成立，而 $(n-1)! = (n-1)(n-2)! \\leq (n-1)(n-2)!$）
+
+实际上，更精确的放缩：
+
+$$n! \\leq 1! + 2! + \\cdots + n! \\leq n! + (n-1)! + \\cdots + 2 \\cdot 1!$$
+
+两边除以 $n!$：
+
+$$1 \\leq \\frac{1! + 2! + \\cdots + n!}{n!} \\leq 1 + \\frac{1}{n} + \\cdots$$
+
+右端 $1 + \\frac{1}{n} + \\frac{1}{n(n-1)} + \\cdots < 1 + \\frac{1}{n} + \\frac{1}{n^2} + \\cdots = \\frac{1}{1 - 1/n} = \\frac{n}{n-1}$
+
+所以：
+
+$$1 \\leq \\frac{1! + 2! + \\cdots + n!}{n!} \\leq \\frac{n}{n-1} \\to 1$$
+
+由夹逼准则：
+
+$$\\lim_{n \\to \\infty} \\frac{1! + 2! + \\cdots + n!}{n!} = 1$$
+
+---
+
+## 6. 第一重要极限
+
+### 判断特征
+
+- 表达式含有 $\\dfrac{\\sin x}{x}$ 或可化为此类形式
+- 分子分母同趋于 $0$
+
+### 一般方法
+
+**核心公式**：
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$
+
+**变形技巧**：
+
+- 若 $x \\to 0$，则 $\\sin kx \\sim kx$
+- 核心是让**正弦里的量**与**分母**相同
+
+$$\\lim_{\\text{某种形式}} \\frac{\\sin u}{u} = 1$$
+
+### 适用范围
+
+- $x \\to 0$ 的 $0/0$ 型
+- 分子或分母含 $\\sin$、$\\tan$、$\\arcsin$、$\\arctan$
+- 不适用于：$x \\to \\infty$ 或非正弦相关结构
+
+### 典型例题
+
+**例 9**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{\\tan 3x}{\\sin 5x}$
+
+**解**：
+
+$$\\lim_{x \\to 0} \\frac{\\tan 3x}{\\sin 5x} = \\lim_{x \\to 0} \\frac{\\sin 3x}{3x} \\cdot \\frac{3x}{\\cos 3x} \\cdot \\frac{5x}{\\sin 5x} \\cdot \\frac{1}{5x}$$
+
+整理：
+
+$$= \\lim_{x \\to 0} \\frac{\\sin 3x}{3x} \\cdot \\frac{1}{\\cos 3x} \\cdot \\frac{5x}{\\sin 5x} \\cdot \\frac{3}{5}$$
+
+$$= 1 \\cdot 1 \\cdot 1 \\cdot \\frac{3}{5} = \\frac{3}{5}$$
+
+**例 10**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2}$
+
+**解**：
+
+利用 $1 - \\cos x = 2\\sin^2\\frac{x}{2}$：
+
+$$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\lim_{x \\to 0} \\frac{2\\sin^2\\frac{x}{2}}{x^2} = \\lim_{x \\to 0} 2 \\cdot \\left(\\frac{\\sin\\frac{x}{2}}{x/2}\\right)^2 \\cdot \\frac{1}{4} \\cdot x^0$$
+
+$$= 2 \\cdot 1^2 \\cdot \\frac{1}{2} = 1$$
+
+---
+
+## 7. 单调有界收敛定理
+
+### 判断特征
+
+- 数列由**递推公式**定义，如 $x_{n+1} = f(x_n)$
+- 需要求 $\\lim_{n \\to \\infty} x_n$
+
+### 一般方法
+
+**步骤 1（证明极限存在）**：
+- **单调性**：计算 $x_{n+1} - x_n$ 或 $\\frac{x_{n+1}}{x_n}$
+- **有界性**：找出上下界
+
+**步骤 2（求极限值）**：
+- 在递推式两边取极限，设 $\\lim x_n = A$
+- 解方程 $A = f(A)$
+
+**步骤 3（验证）**：
+- 确保方程的解唯一且符合有界性条件
+
+### 适用范围
+
+- 递推型数列极限
+- 不适用于：无法证明单调性或无界的数列
+
+### 典型例题
+
+**例 11**：设 $x_1 = \\sqrt{2}$，$x_{n+1} = \\sqrt{2 + x_n}$，求 $\\lim_{n \\to \\infty} x_n$
+
+**解**：
+
+**第一步**：证明有界性
+
+数学归纳法：
+- $x_1 = \\sqrt{2} < 2$
+- 设 $x_n < 2$，则 $x_{n+1} = \\sqrt{2 + x_n} < \\sqrt{2 + 2} = 2$
+
+所以 $x_n < 2$ 对所有 $n$ 成立，数列有上界 2。
+
+**第二步**：证明单调性
+
+$$x_{n+1} - x_n = \\sqrt{2 + x_n} - x_n$$
+
+需要判断 $\\sqrt{2 + x} > x$ 对 $x \\in (0, 2)$ 是否成立：
+
+$$\\sqrt{2 + x} > x \\iff 2 + x > x^2 \\iff x^2 - x - 2 < 0 \\iff (x-2)(x+1) < 0$$
+
+对 $x \\in (0, 2)$ 成立，所以 $x_{n+1} > x_n$。
+
+数列单调递增且有上界，极限存在。
+
+**第三步**：求极限值
+
+设 $\\lim_{n \\to \\infty} x_n = A$，在 $x_{n+1} = \\sqrt{2 + x_n}$ 两边取极限：
+
+$$A = \\sqrt{2 + A}$$
+
+$$A^2 = 2 + A \\implies A^2 - A - 2 = 0$$
+
+$$(A - 2)(A + 1) = 0$$
+
+得 $A = 2$ 或 $A = -1$。由 $x_n > 0$，得 $A = 2$。
+
+所以 $\\lim_{n \\to \\infty} x_n = 2$。
+
+---
+
+## 8. 第二重要极限
+
+### 判断特征
+
+- 出现 $1^\\infty$ 型未定式
+- 表达式可化为 $\\left(1 + \\frac{1}{x}\\right)^x$ 或 $\\left(1 + u\\right)^{1/u}$
+
+### 一般方法
+
+**核心公式**：
+
+$$\\lim_{x \\to \\infty} \\left(1 + \\frac{1}{x}\\right)^x = e$$
+
+$$\\lim_{u \\to 0} (1 + u)^{1/u} = e$$
+
+**标准变形**：
+
+将表达式凑成 $\\left(1 + \\frac{1}{\\text{某式}}\\right)^{\\text{某式}}$ 的形式。
+
+若 $A^\\infty$ 型，设 $A = 1 + B$，其中 $B \\to 0$，然后凑指数。
+
+### 适用范围
+
+- $1^\\infty$ 型未定式
+- 底数趋于 1、指数趋于无穷
+- 不适用于：底数不趋于 1 的幂指函数
+
+### 典型例题
+
+**例 12**：求 $\\displaystyle\\lim_{x \\to 0} (1 - 2x)^{1/x}$
+
+**解**：
+
+这是 $1^\\infty$ 型，变形：
+
+$$(1 - 2x)^{1/x} = \\left[(1 + (-2x))^{1/(-2x)}\\right]^{-2} \\cdot (1 - 2x)^{0}$$
+
+更规范的写法：
+
+$$(1 - 2x)^{1/x} = \\left[(1 + (-2x))^{1/(-2x)}\\right]^{-2}$$
+
+当 $x \\to 0$ 时，$-2x \\to 0$，所以 $\\left(1 + (-2x)\\right)^{1/(-2x)} \\to e$
+
+$$\\lim_{x \\to 0} (1 - 2x)^{1/x} = e^{-2}$$
+
+**例 13**：求 $\\displaystyle\\lim_{x \\to \\infty} \\left(\\frac{x+1}{x-1}\\right)^x$
+
+**解**：
+
+$$\\frac{x+1}{x-1} = \\frac{x-1+2}{x-1} = 1 + \\frac{2}{x-1}$$
+
+令 $u = x - 1 \\to \\infty$：
+
+$$\\lim_{x \\to \\infty} \\left(1 + \\frac{2}{x-1}\\right)^x = \\lim_{u \\to \\infty} \\left(1 + \\frac{2}{u}\\right)^{u+1}$$
+
+$$= \\lim_{u \\to \\infty} \\left(1 + \\frac{2}{u}\\right)^u \\cdot \\left(1 + \\frac{2}{u}\\right)$$
+
+$$= e^2 \\cdot 1 = e^2$$
+
+---
+
+## 9. 等价无穷小替换
+
+### 判断特征
+
+- $x \\to 0$ 时的 $0/0$ 型
+- 分子或分母是**乘积形式**中的因子
+
+### 一般方法
+
+**常用等价关系（$x \\to 0$）**：
+
+| 等价无穷小 | 表达式 |
+|-----------|--------|
+| $\\sin x \\sim x$ | $\\tan x \\sim x$ |
+| $1 - \\cos x \\sim \\dfrac{x^2}{2}$ | $\\arcsin x \\sim x$ |
+| $\\ln(1+x) \\sim x$ | $e^x - 1 \\sim x$ |
+| $(1+x)^\\alpha - 1 \\sim \\alpha x$ | $a^x - 1 \\sim x \\ln a$ |
+
+**使用原则**：
+- 只能在**乘除**中替换，**不能**在加减中直接替换
+- 替换要**同步**（分子分母同阶替换）
+
+### 适用范围
+
+- $x \\to 0$ 时的乘除结构
+- 不适用于：加减结构（除非整体替换）、非无穷小因子
+
+### 典型例题
+
+**例 14**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{\\sin x - \\tan x}{\\arctan x - \\sin x}$
+
+**解**：
+
+这是 $0/0$ 型，但分子分母都是**加减结构**，不能直接替换。
+
+**方法一：泰勒展开**
+
+$$\\sin x = x - \\frac{x^3}{6} + o(x^3)$$
+
+$$\\tan x = x + \\frac{x^3}{3} + o(x^3)$$
+
+$$\\arcsin x = x + \\frac{x^3}{6} + o(x^3)$$
+
+所以：
+
+$$\\sin x - \\tan x = -\\frac{x^3}{2} + o(x^3)$$
+
+$$\\arctan x - \\sin x = -\\frac{x^3}{6} + o(x^3)$$
+
+$$\\lim_{x \\to 0} \\frac{\\sin x - \\tan x}{\\arctan x - \\sin x} = \\frac{-x^3/2}{-x^3/6} = 3$$
+
+**方法二：提取公因式后替换**
+
+$$\\frac{\\sin x - \\tan x}{\\arctan x - \\sin x} = \\frac{\\sin x(1 - \\frac{1}{\\cos x})}{\\sin x \\cdot \\frac{x}{\\arctan x} - \\sin x}$$
+
+（在乘除部分使用等价替换）
+
+---
+
+## 10. 无穷大阶数常识
+
+### 判断特征
+
+- 比较 $x \\to \\infty$ 时不同函数的增长速度
+- 需要判断趋于无穷的快慢
+
+### 一般方法
+
+**阶数排序（从慢到快）**：
+
+$$\\ln x < x^\\alpha < x^\\beta < a^x < x^x$$
+
+其中 $0 < \\alpha < \\beta$，$a > 1$
+
+**核心原则**：
+- **指数函数**快于**幂函数**
+- **幂函数**快于**对数函数**
+- 同类函数中，**指数底大**更快，**幂次高**更快
+
+### 适用范围
+
+- 判断极限是否存在（无穷大的比较）
+- 放缩构造夹逼
+- 不适用于：$x \\to 0$ 情形（那是无穷小的世界）
+
+### 典型例题
+
+**例 15**：判断 $\\displaystyle\\lim_{x \\to +\\infty} \\frac{x^3}{e^x}$ 是否存在
+
+**解**：
+
+当 $x \\to +\\infty$ 时：
+- $x^3$ 是多项式（幂函数）
+- $e^x$ 是指数函数
+
+指数函数增长更快，所以：
+
+$$\\lim_{x \\to +\\infty} \\frac{x^3}{e^x} = 0$$
+
+（分子被分母"追上并超越"）
+
+**例 16**：求 $\\displaystyle\\lim_{x \\to +\\infty} \\frac{\\ln x}{x^{0.01}}$
+
+**解**：
+
+对数函数慢于幂函数，所以：
+
+$$\\lim_{x \\to +\\infty} \\frac{\\ln x}{x^{0.01}} = 0$$
+
+---
+
+## 11. 无穷小比阶
+
+### 判断特征
+
+- 比较两个趋于 0 的量谁"更小"
+- 涉及高阶、低阶、同阶无穷小
+
+### 一般方法
+
+**定义**：
+
+设 $\\alpha(x) \\to 0$，$\\beta(x) \\to 0$：
+
+- 若 $\\lim \\dfrac{\\alpha}{\\beta} = 0$，则 $\\alpha$ 是 $\\beta$ 的**高阶**无穷小（$\\alpha = o(\\beta)$）
+- 若 $\\lim \\dfrac{\\alpha}{\\beta} = c \\neq 0$，则 $\\alpha$ 与 $\\beta$ 是**同阶**无穷小
+- 若 $\\lim \\dfrac{\\alpha}{\\beta} = 1$，则 $\\alpha$ 与 $\\beta$ 是**等价**无穷小（$\\alpha \\sim \\beta$）
+- 若 $\\lim \\dfrac{\\alpha}{\\beta^k} = c \\neq 0$，则 $\\alpha$ 是 **$k$ 阶**无穷小
+
+### 适用范围
+
+- 确定主项（主导项）
+- 在泰勒展开中确定展开阶数
+- 不适用于：趋于非零或无穷的量
+
+### 典型例题
+
+**例 17**：当 $x \\to 0$ 时，确定无穷小的阶数：
+
+(a) $1 - \\cos^2 x$；(b) $\\sqrt{1 + x^2} - 1$
+
+**解**：
+
+(a) $1 - \\cos^2 x = \\sin^2 x \\sim x^2$，所以是 **2 阶**无穷小
+
+(b) $\\sqrt{1 + x^2} - 1 \\sim \\frac{1}{2}x^2$，所以是 **2 阶**无穷小
+
+**例 18**：设 $x \\to 0$，比较 $x^2$、$\\sin x$、$1 - \\cos x$ 的阶数
+
+**解**：
+
+$$\\lim_{x \\to 0} \\frac{x^2}{\\sin x} = \\lim_{x \\to 0} \\frac{x^2}{x} = 0 \\implies x^2 \\text{ 是更高阶}$$
+
+$$\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2} \\implies 1 - \\cos x \\sim \\frac{1}{2}x^2$$
+
+所以阶数：$x^2 > 1 - \\cos x$（同阶）$>$ $\\sin x$（1 阶）$>$ $x^2$（2 阶）
+
+---
+
+## 12. 洛必达法则
+
+### 判断特征
+
+- $0/0$ 型或 $\\infty/\\infty$ 型
+- 分子分母都可导（或可多次求导）
+
+### 一般方法
+
+**法则内容**：
+
+若 $\\lim \\dfrac{f(x)}{g(x)}$ 为 $\\dfrac{0}{0}$ 或 $\\dfrac{\\infty}{\\infty}$ 型，且 $g'(x) \\neq 0$，则：
+
+$$\\lim \\frac{f(x)}{g(x)} = \\lim \\frac{f'(x)}{g'(x)}$$
+
+**使用要点**：
+
+1. 验证类型是否为 $0/0$ 或 $\\infty/\\infty$
+2. 分子分母**同时**求导
+3. 求导后**重新判断类型**
+4. 若仍是未定式，**重复使用**
+5. 可结合其他方法（等价替换、化简等）
+
+**三大禁忌**：
+
+| 禁忌 | 说明 | 后果 |
+|------|------|------|
+| 非未定式 | $\\lim \\dfrac{x + \\sin x}{x}$ | $\\infty/\\infty$ 但 $\\neq 1$ |
+| 只导一部分 | 只导分子 | 结果错误 |
+| 导完不存在 | $\\lim \\dfrac{x}{1 + \\cos x}$ 求导后 | $\\dfrac{1}{-\\sin x}$ 不存在 |
+
+### 适用范围
+
+- $0/0$ 型和 $\\infty/\\infty$ 型
+- 不适用于：其他 5 种未定式（需转化）、导数不存在的函数、循环使用
+
+### 典型例题
+
+**例 19**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{e^x - 1 - x}{x^2}$
+
+**解**：
+
+$0/0$ 型，使用洛必达：
+
+第一次：
+
+$$\\lim_{x \\to 0} \\frac{e^x - 1 - x}{x^2} = \\lim_{x \\to 0} \\frac{e^x - 1}{2x}$$
+
+仍是 $0/0$ 型，继续：
+
+第二次：
+
+$$\\lim_{x \\to 0} \\frac{e^x - 1}{2x} = \\lim_{x \\to 0} \\frac{e^x}{2} = \\frac{1}{2}$$
+
+所以 $\\displaystyle\\lim_{x \\to 0} \\frac{e^x - 1 - x}{x^2} = \\frac{1}{2}$
+
+---
+
+## 13. 根式有理化
+
+### 判断特征
+
+- 分子或分母含**根号**
+- 直接代入导致 $0/0$ 或 $\\infty - \\infty$
+
+### 一般方法
+
+**基本公式**：
+
+$$(a - b)(a + b) = a^2 - b^2$$
+
+**常用变形**：
+
+| 原式 | 有理化后 |
+|------|----------|
+| $\\sqrt{a} - \\sqrt{b}$ | 乘以 $\\dfrac{\\sqrt{a} + \\sqrt{b}}{\\sqrt{a} + \\sqrt{b}}$ |
+| $\\sqrt[3]{a} - \\sqrt[3]{b}$ | 乘以 $a^2 + ab + b^2$ |
+| $\\sqrt{x+1} - x$ | 乘以 $\\dfrac{\\sqrt{x+1} + x}{\\sqrt{x+1} + x}$ |
+
+### 适用范围
+
+- 含有根号的 $0/0$ 型
+- $\\infty - \\infty$ 型（其中一个含根号）
+- 不适用于：根号内是常数可以直接代入的情况
+
+### 典型例题
+
+**例 20**：求 $\\displaystyle\\lim_{x \\to 4} \\frac{\\sqrt{x+5} - 3}{x - 4}$
+
+**解**：
+
+$0/0$ 型，分子有理化：
+
+$$\\frac{\\sqrt{x+5} - 3}{x - 4} = \\frac{(\\sqrt{x+5} - 3)(\\sqrt{x+5} + 3)}{(x - 4)(\\sqrt{x+5} + 3)} = \\frac{x + 5 - 9}{(x - 4)(\\sqrt{x+5} + 3)}$$
+
+$$= \\frac{x - 4}{(x - 4)(\\sqrt{x+5} + 3)} = \\frac{1}{\\sqrt{x+5} + 3}$$
+
+所以：
+
+$$\\lim_{x \\to 4} \\frac{\\sqrt{x+5} - 3}{x - 4} = \\frac{1}{\\sqrt{9} + 3} = \\frac{1}{6}$$
+
+---
+
+## 14. 奇偶性问题
+
+### 判断特征
+
+- 函数具有**奇偶性**
+- 积分区间**对称**（$[-a, a]$）
+- 极限涉及对称结构
+
+### 一般方法
+
+**奇偶函数的积分性质**：
+
+| 函数类型 | 对称区间积分 |
+|----------|--------------|
+| 奇函数 $f(-x) = -f(x)$ | $\\int_{-a}^{a} f(x)\\,dx = 0$ |
+| 偶函数 $f(-x) = f(x)$ | $\\int_{-a}^{a} f(x)\\,dx = 2\\int_{0}^{a} f(x)\\,dx$ |
+
+**在极限中的应用**：
+
+- 利用对称性**消去**某些项
+- 将复杂表达式**拆分**为奇偶部分
+
+### 适用范围
+
+- 对称区间的极限或积分
+- 分子分母具有对称结构
+- 不适用于：非对称区间或非奇偶函数
+
+### 典型例题
+
+**例 21**：求 $\\displaystyle\\lim_{n \\to \\infty} \\frac{1}{n} \\int_{-n}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$
+
+**解**：
+
+被积函数 $f(x) = \\frac{x \\sin x}{1 + x^2}$：
+
+$$f(-x) = \\frac{-x \\sin(-x)}{1 + x^2} = \\frac{-x \\cdot (-\\sin x)}{1 + x^2} = \\frac{x \\sin x}{1 + x^2} = f(x)$$
+
+所以 $f(x)$ 是**偶函数**。
+
+因此：
+
+$$\\int_{-n}^{n} f(x)\\,dx = 2\\int_{0}^{n} f(x)\\,dx$$
+
+原式：
+
+$$\\frac{1}{n} \\cdot 2\\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$$
+
+由于 $0 \\leq \\left|\\frac{x \\sin x}{1 + x^2}\\right| \\leq \\frac{x}{1 + x^2} \\leq \\frac{1}{2}$（有界）
+
+所以 $\\int_{0}^{n} \\frac{x \\sin x}{1 + x^2}\\,dx$ 是**有界量**
+
+$$\\lim_{n \\to \\infty} \\frac{1}{n} \\cdot \\text{有界量} = 0$$
+
+---
+
+## 15. 裂项问题
+
+### 判断特征
+
+- 分母是**多个因式的乘积**
+- 表达式可以分解为**部分分式**之和
+
+### 一般方法
+
+**裂项原则**：
+
+$$\\frac{1}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b}$$
+
+其中 $A = \\dfrac{1}{b-a}$，$B = \\dfrac{1}{a-b}$
+
+**常见裂项模式**：
+
+| 分母形式 | 裂项结果 |
+|----------|----------|
+| $(x-a)(x-b)$ | $\\frac{1}{b-a}\\left(\\frac{1}{x-a} - \\frac{1}{x-b}\\right)$ |
+| $x(x+1)$ | $\\frac{1}{x} - \\frac{1}{x+1}$ |
+| $(2n-1)(2n+1)$ | $\\frac{1}{2}\\left(\\frac{1}{2n-1} - \\frac{1}{2n+1}\\right)$ |
+
+### 适用范围
+
+- 分式分子为常数
+- 分母可因式分解
+- 不适用于：分子也是多项式（需先比较分子次数）
+
+### 典型例题
+
+**例 22**：求 $\\displaystyle\\lim_{n \\to \\infty} \\left( \\frac{1}{1 \\cdot 2} + \\frac{1}{2 \\cdot 3} + \\cdots + \\frac{1}{n(n+1)} \\right)$
+
+**解**：
+
+裂项：
+
+$$\\frac{1}{k(k+1)} = \\frac{1}{k} - \\frac{1}{k+1}$$
+
+所以：
+
+$$S_n = \\sum_{k=1}^{n} \\frac{1}{k(k+1)} = \\sum_{k=1}^{n} \\left(\\frac{1}{k} - \\frac{1}{k+1}\\right)$$
+
+$$= \\left(1 - \\frac{1}{2}\\right) + \\left(\\frac{1}{2} - \\frac{1}{3}\\right) + \\cdots + \\left(\\frac{1}{n} - \\frac{1}{n+1}\\right)$$
+
+$$= 1 - \\frac{1}{n+1}$$
+
+因此：
+
+$$\\lim_{n \\to \\infty} S_n = \\lim_{n \\to \\infty} \\left(1 - \\frac{1}{n+1}\\right) = 1$$
+
+---
+
+## 16. 指数型问题（幂指函数）
+
+### 判断特征
+
+- 表达式形如 $f(x)^{g(x)}$
+- 底数和指数都含变量
+- 常见 $0^0$、$1^\\infty$、$\\infty^0$ 型
+
+### 一般方法
+
+**核心变换**：
+
+$$f(x)^{g(x)} = e^{g(x) \\ln f(x)}$$
+
+**对数法步骤**：
+
+1. 令 $y = f(x)^{g(x)}$
+2. 取对数：$\\ln y = g(x) \\ln f(x)$
+3. 求 $\\lim \\ln y = \\lim g(x) \\ln f(x)$
+4. 原极限 $= e^{\\lim g(x) \\ln f(x)}$
+
+**$1^\\infty$ 特殊技巧**：
+
+若 $\\lim f(x) = 1$，$\\lim g(x) = \\infty$，令 $f(x) = 1 + u$，$u \\to 0$：
+
+$$\\lim f(x)^{g(x)} = \\lim (1+u)^{g(x)} = e^{\\lim g(x) \\cdot u}$$
+
+关键是求 $\\lim g(x) \\cdot u = \\lim g(x) \\cdot [f(x) - 1]$
+
+### 适用范围
+
+- 所有幂指函数极限
+- 不适用于：底数为负数的幂指函数（需复变理论）
+
+### 典型例题
+
+**例 23**：求 $\\displaystyle\\lim_{x \\to 0} (1 + \\sin x)^{\\cot x}$
+
+**解**：
+
+这是 $1^\\infty$ 型，令：
+
+$$y = (1 + \\sin x)^{\\cot x}$$
+
+取对数：
+
+$$\\ln y = \\cot x \\cdot \\ln(1 + \\sin x) = \\frac{\\cos x}{\\sin x} \\cdot \\ln(1 + \\sin x)$$
+
+当 $x \\to 0$ 时，$\\sin x \\to 0$，令 $t = \\sin x$：
+
+$$\\ln y = \\frac{\\cos x}{t} \\cdot \\ln(1 + t) = \\cos x \\cdot \\frac{\\ln(1+t)}{t}$$
+
+由于 $t \\to 0$，$\\dfrac{\\ln(1+t)}{t} \\to 1$，而 $\\cos x \\to 1$：
+
+$$\\lim_{x \\to 0} \\ln y = 1$$
+
+所以：
+
+$$\\lim_{x \\to 0} (1 + \\sin x)^{\\cot x} = e^1 = e$$
+
+---
+
+## 17. 泰勒公式
+
+### 判断特征
+
+- $x \\to 0$ 时的高精度计算
+- 等价无穷小替换不够用（加减中的替换）
+- 需要确定**精确阶数**
+
+### 一般方法
+
+**麦克劳林展开**：
+
+$$e^x = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots$$
+
+$$\\sin x = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\cdots$$
+
+$$\\cos x = 1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\cdots$$
+
+$$\\ln(1+x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} - \\cdots$$
+
+$$(1+x)^\\alpha = 1 + \\alpha x + \\frac{\\alpha(\\alpha-1)}{2!}x^2 + \\cdots$$
+
+**展开原则**：
+
+1. **从外向内**：先看整体结构的最低阶
+2. **乘除展开**：乘积展开到需要的阶数
+3. **加减小心**：加减不能随便扔项，要保留到消去后不为零的阶数
+
+### 适用范围
+
+- $x \\to 0$ 的极限
+- 高精度计算
+- 不适用于：$x \\to \\infty$（需用其他方法）
+
+### 典型例题
+
+**例 24**：求 $\\displaystyle\\lim_{x \\to 0} \\frac{x - \\sin x}{x - \\tan x}$
+
+**解**：
+
+直接用泰勒展开到 3 阶：
+
+$$\\sin x = x - \\frac{x^3}{6} + o(x^3)$$
+
+$$\\tan x = x + \\frac{x^3}{3} + o(x^3)$$
+
+所以：
+
+$$x - \\sin x = x - \\left(x - \\frac{x^3}{6} + o(x^3)\\right) = \\frac{x^3}{6} + o(x^3)$$
+
+$$x - \\tan x = x - \\left(x + \\frac{x^3}{3} + o(x^3)\\right) = -\\frac{x^3}{3} + o(x^3)$$
+
+$$\\lim_{x \\to 0} \\frac{x - \\sin x}{x - \\tan x} = \\frac{x^3/6}{-x^3/3} = \\frac{1/6}{-1/3} = -\\frac{1}{2}$$
+
+---
+
+## 18. 中值定理
+
+### 判断特征
+
+- 表达式出现 $f(b) - f(a)$
+- 涉及两个不同点的函数值之差
+- 可构造辅助函数
+
+### 一般方法
+
+**拉格朗日中值定理**：
+
+若 $f(x)$ 在 $[a, b]$ 连续，$(a, b)$ 可导，则存在 $\\xi \\in (a, b)$：
+
+$$f(b) - f(a) = f'(\\xi)(b - a)$$
+
+**柯西中值定理**（更常用）：
+
+若 $f, g$ 满足条件，存在 $\\xi$：
+
+$$\\frac{f(b) - f(a)}{g(b) - g(a)} = \\frac{f'(\\xi)}{g'(\\xi)}$$
+
+**应用技巧**：
+
+1. 将待求极限式化为 $\\dfrac{f(b) - f(a)}{g(b) - g(a)}$ 形式
+2. 令 $a \\to b$（即 $b - a \\to 0$），则 $\\xi \\to a$
+3. 极限转化为 $\\dfrac{f'(a)}{g'(a)}$
+
+### 适用范围
+
+- 含函数差值的 $0/0$ 型
+- 不适用于：不存在原函数或不可导的函数
+
+### 典型例题
+
+**例 25**：求 $\\displaystyle\\lim_{x \\to a} \\frac{f(x) - f(a)}{g(x) - g(a)}$，其中 $f, g$ 可导，$g'(a) \\neq 0$
+
+**解**：
+
+由拉格朗日中值定理，存在 $\\xi$ 介于 $x$ 和 $a$ 之间：
+
+$$\\frac{f(x) - f(a)}{g(x) - g(a)} = \\frac{f'(\\xi)}{g'(\\xi)}$$
+
+当 $x \\to a$ 时，$\\xi \\to a$，所以：
+
+$$\\lim_{x \\to a} \\frac{f(x) - f(a)}{g(x) - g(a)} = \\frac{f'(a)}{g'(a)}$$
+
+---
+
+## 19. 积分法（求和式极限）
+
+### 判断特征
+
+- 求 $n$ 项和（或 $n$ 项积）的极限
+- 形式如 $\\sum_{k=1}^{n} f(k)$、$\\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right)$
+
+### 一般方法
+
+**定积分定义**：
+
+$$\\lim_{n \\to \\infty} \\frac{1}{n}\\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right) = \\int_{0}^{1} f(x)\\,dx$$
+
+**关键步骤**：
+
+1. 提取 $\\frac{1}{n}$ 或 $\\frac{1}{n}$ 的幂
+2. 识别函数 $f\\left(\\frac{k}{n}\\right)$
+3. 确定积分区间
+
+**常见变形**：
+
+| 求和形式 | 积分形式 |
+|----------|----------|
+| $\\frac{1}{n}\\sum f\\left(\\frac{k}{n}\\right)$ | $\\int_0^1 f(x)\\,dx$ |
+| $\\frac{1}{n}\\sum f\\left(\\frac{k}{n}\\right) \\cdot \\frac{1}{n}$ | $\\int_0^1 f(x)\\,dx$（需配凑）|
+| $\\sum_{k=1}^{n} \\frac{1}{n+k}$ | $\\int_0^1 \\frac{1}{1+x}\\,dx$ |
+
+### 适用范围
+
+- $n$ 项和型极限
+- 各项有 $\\frac{1}{n}$ 的因子
+- 不适用于：各项无公共因子或发散的情况
+
+### 典型例题
+
+**例 26**：求 $\\displaystyle\\lim_{n \\to \\infty} \\frac{1}{n} \\left( \\sin\\frac{\\pi}{n} + \\sin\\frac{2\\pi}{n} + \\cdots + \\sin\\frac{n\\pi}{n} \\right)$
+
+**解**：
+
+$$\\frac{1}{n} \\sum_{k=1}^{n} \\sin\\frac{k\\pi}{n} = \\frac{1}{n} \\sum_{k=1}^{n} f\\left(\\frac{k}{n}\\right)$$
+
+其中 $f(x) = \\sin(\\pi x)$，区间为 $[0, 1]$。
+
+由定积分定义：
+
+$$\\lim_{n \\to \\infty} \\frac{1}{n} \\sum_{k=1}^{n} \\sin\\frac{k\\pi}{n} = \\int_0^1 \\sin(\\pi x)\\,dx$$
+
+$$= \\left[-\\frac{\\cos(\\pi x)}{\\pi}\\right]_0^1 = -\\frac{\\cos\\pi - \\cos 0}{\\pi} = \\frac{2}{\\pi}$$
+
+---
+
+## 20. 普通递推（数列极限）
+
+### 判断特征
+
+- 数列由递推公式定义
+- 需要先证明极限存在，再求值
+
+### 一般方法
+
+**标准流程**：
+
+1. **猜测极限**：令 $x_n \\to A$，解 $A = f(A)$
+2. **证明有界**：找出上界或下界
+3. **证明单调**：计算 $x_{n+1} - x_n$ 或比值
+4. **取极限**：由极限唯一性确定 $A$
+
+### 适用范围
+
+- 所有递推数列
+- 不适用于：无法证明收敛的情况
+
+### 典型例题
+
+**例 27**：设 $x_1 = 1$，$x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right)$，求 $\\lim_{n \\to \\infty} x_n$
+
+**解**：
+
+**第一步**：猜测极限
+
+令 $A = \\frac{1}{2}\\left(A + \\frac{2}{A}\\right)$，得 $A^2 = 2$，$A = \\sqrt{2}$（正数）。
+
+**第二步**：证明有界
+
+由 $x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right) \\geq \\sqrt{x_n \\cdot \\frac{2}{x_n}} = \\sqrt{2}$
+
+（由 AM-GM 不等式）
+
+所以 $x_n \\geq \\sqrt{2}$，下界为 $\\sqrt{2}$。
+
+**第三步**：证明单调
+
+$$x_{n+1} - x_n = \\frac{1}{2}\\left(x_n + \\frac{2}{x_n}\\right) - x_n = \\frac{1}{2}\\left(\\frac{2}{x_n} - x_n\\right) = \\frac{1 - x_n^2}{2x_n} \\leq 0$$
+
+因为 $x_n \\geq \\sqrt{2}$，所以 $x_{n+1} \\leq x_n$。
+
+数列单调递减有下界，极限存在。
+
+**第四步**：取极限
+
+$$\\lim_{n \\to \\infty} x_n = \\sqrt{2}$$
+
+---
+
+## 21. 渐近线计算
+
+### 判断特征
+
+- 求曲线 $y = f(x)$ 的渐近线
+- $x \\to \\infty$（或 $-\\infty$）时，曲线无限逼近直线
+
+### 一般方法
+
+**三类渐近线**：
+
+| 类型 | 条件 | 求法 |
+|------|------|------|
+| 水平渐近线 | $\\lim_{x \\to \\pm\\infty} f(x) = c$ | 直接求极限 |
+| 垂直渐近线 | $\\lim_{x \\to x_0} f(x) = \\pm\\infty$ | 分母为 0 的点 |
+| 斜渐近线 | $\\lim_{x \\to \\infty} \\frac{f(x)}{x} = k \\neq 0$ | 先求 $k, b$ |
+
+**斜渐近线步骤**：
+
+1. 计算 $k = \\lim_{x \\to \\infty} \\frac{f(x)}{x}$
+2. 计算 $b = \\lim_{x \\to \\infty} [f(x) - kx]$
+3. 渐近线：$y = kx + b$
+
+### 适用范围
+
+- 求曲线的渐近线方程
+- 分析函数在无穷远处的行为
+- 不适用于：有界函数（无水平/斜渐近线）
+
+### 典型例题
+
+**例 28**：求 $y = \\frac{x^2 + 1}{x}$ 的渐近线
+
+**解**：
+
+**垂直渐近线**：
+
+分母 $x = 0$ 处，分式无定义，且 $\\lim_{x \\to 0} \\frac{x^2 + 1}{x} = \\infty$
+
+所以 $x = 0$ 是垂直渐近线。
+
+**斜渐近线**：
+
+$$k = \\lim_{x \\to \\infty} \\frac{y}{x} = \\lim_{x \\to \\infty} \\frac{x^2 + 1}{x^2} = 1$$
+
+$$b = \\lim_{x \\to \\infty} (y - x) = \\lim_{x \\to \\infty} \\left(\\frac{x^2 + 1}{x} - x\\right) = \\lim_{x \\to \\infty} \\frac{1}{x} = 0$$
+
+所以斜渐近线为 $y = x$。
+
+（无水平渐近线，因为 $x \\to \\infty$ 时 $y \\to \\infty$）
+
+---
+
+## 总结：方法选择指南
+
+\`\`\`
+面对一道极限题，首先判断类型：
+
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  1. 是否为未定式？                                      │
+│     ├─ 否 → 直接代入 / 拆分法                           │
+│     │                                                  │
+│     └─ 是 → 判断具体类型                                │
+│                                                         │
+│  2. 具体是什么类型？                                     │
+│                                                         │
+│     ├─ 0/0 型 ──┬─ 含 sin/tan → 第一重要极限           │
+│     │           ├─ 可因式分解 → 直接化简               │
+│     │           ├─ 含根号 → 有理化                     │
+│     │           ├─ 分子分母可导 → 洛必达               │
+│     │           └─ 加减结构 → 泰勒展开                │
+│     │                                                  │
+│     ├─ ∞/∞ 型 ─┬─ 多项式 → 抓大头                      │
+│     │           ├─ 可导 → 洛必达                       │
+│     │           └─ 指幂混合 → 无穷大阶数               │
+│     │                                                  │
+│     ├─ 1^∞ 型 ──→ 第二重要极限 / 对数法                │
+│     │                                                  │
+│     ├─ 0^0/∞^0 → 对数法（化为 0·∞ 型）                │
+│     │                                                  │
+│     ├─ ∞-∞ 型 ──→ 通分 / 有理化 / 提公因子             │
+│     │                                                  │
+│     └─ 0·∞ 型 ──→ 转化为 0/0 或 ∞/∞                   │
+│                                                         │
+│  3. 特殊结构？                                          │
+│                                                         │
+│     ├─ 数列递推 → 单调有界定理                         │
+│     ├─ 求和极限 → 积分定义 / 夹逼准则                  │
+│     ├─ 对称区间 → 奇偶性分析                           │
+│     ├─ 分式裂项 → 部分分式展开                        │
+│     └─ 函数差值 → 中值定理                             │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+\`\`\`
+
+---
+
+## 附录：常用公式速查
+
+### 等价无穷小（$x \\to 0$）
+
+| $\\sin x \\sim x$ | $\\tan x \\sim x$ |
+|----------------|-----------------|
+| $1 - \\cos x \\sim \\dfrac{x^2}{2}$ | $\\arcsin x \\sim x$ |
+| $\\ln(1+x) \\sim x$ | $e^x - 1 \\sim x$ |
+| $(1+x)^\\alpha - 1 \\sim \\alpha x$ | $a^x - 1 \\sim x\\ln a$ |
+| $\\sin x - x \\sim -\\dfrac{x^3}{6}$ | $e^x - 1 - x \\sim \\dfrac{x^2}{2}$ |
+
+### 两个重要极限
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$
+
+$$\\lim_{x \\to \\infty} \\left(1 + \\frac{1}{x}\\right)^x = e$$
+
+### 泰勒展开（麦克劳林）
+
+$$e^x = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots$$
+
+$$\\sin x = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\cdots$$
+
+$$\\cos x = 1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\cdots$$
+
+$$\\ln(1+x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} - \\cdots$$
+
+$$(1+x)^\\alpha = 1 + \\alpha x + \\frac{\\alpha(\\alpha-1)}{2!}x^2 + \\cdots$$
+`,An=`# 随机森林：集成学习的决策树军团
 
 > *"如果你觉得随机森林只是一个简单的'投票'算法，那你可能低估了这支军队的协作智慧。"*
 > — Leo Breiman，随机森林创始人
@@ -5845,7 +7095,7 @@ plt.show()
 - Breiman, L. (2001). "Random Forests." *Machine Learning*, 45(1), 5-32.
 - Scikit-learn 官方文档：https://scikit-learn.org/stable/modules/ensemble.html#forest
 - *The Elements of Statistical Learning* — Trevor Hastie, Robert Tibshirani, Jerome Friedman
-`,An=`# 博客搭建记录
+`,wn=`# 博客搭建记录
 
 ## 前言
 
@@ -6038,4 +7288,4 @@ router.replace({ ...route, params: { locale: lang } })
 2024 年：一志愿复试 32 人==（初试最高分 429 分、最低分 303 分）==，录取 23 人（初试最高分 429 分、最低分 324 分）
 2023 年：一志愿复试 26 人==（初试最高分 412 分、最低分 283 分）==，录取 20 人（初试最高分 412 分、最低分 311 分）
 2022 年：录取 19 人==（初试最高分 392 分、最低分 309 分==）
-`,kn=["innerHTML"],Bn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(j,{emit:r}){const G=j,{t:D}=nn(),u=C(null),k=r;function z(d){return d.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,$=>$.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new un({html:!0,linkify:!0,typographer:!0,highlight(d,$){const o=$&&H.getLanguage($)?$:null,_=o?H.highlight(d,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(d).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${_}</code></pre></div>`}});T.use(yn),T.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function L(d){if(!d)return"";const $=[];let o=d.replace(/```[\s\S]*?```/g,_=>($.push(_),`__CODE_BLOCK_${$.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(_,l)=>{try{return`<div class="katex-block">${Y.renderToString(l.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${l}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(_,l)=>{try{return`<span class="katex-inline">${Y.renderToString(l.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${l}$`}}),$.forEach((_,l)=>{o=o.replace(`__CODE_BLOCK_${l}__`,_)}),o}function w(d){if(!d)return d;const $=window.location.origin;return d.replace(/<img\s+([^>]*?)>/g,(o,_)=>_.includes("loading=")?o:`<img ${_} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,_)=>{const l=_.match(/href="([^"]*)"/);if(l){const f=l[1];if(f.startsWith("http://")||f.startsWith("https://"))try{if(new URL(f).origin!==$&&!_.includes("target="))return`<a ${_} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const B=Q(()=>w(T.render(L(G.source||""))));q(B,async()=>{await P(),g(),k("rendered",u.value)}),Z(async()=>{await P(),g(),k("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach($=>{$.classList.add("copy-injected");const o=$.querySelector("code"),_=(o==null?void 0:o.textContent)||"",l=document.createElement("button");l.className="copy-btn",l.type="button",l.setAttribute("aria-label",D("common.copyCode")),l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.addEventListener("click",()=>{_&&navigator.clipboard.writeText(_).then(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',l.classList.add("copied"),setTimeout(()=>{l.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',l.classList.remove("copied")},2e3)})}),$.appendChild(l)})}return(d,$)=>(c(),x("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:B.value},null,8,kn))}},Rn=en(Bn,[["__scopeId","data-v-b6bba450"]]),Mn={class:"zhihu-page"},Nn={class:"zhihu-shell"},qn={class:"zhihu-body"},Pn={class:"zhihu-hero"},Gn={class:"zhihu-hero-content"},Dn={class:"zhihu-title"},Xn={class:"zhihu-subtitle"},En={class:"zhihu-tabs"},Un={class:"tab active"},In={class:"tab"},Fn={class:"tab"},Hn={class:"zhihu-hero-card"},Qn={class:"hero-label"},jn={class:"hero-desc"},On={class:"hero-actions"},Vn={class:"hero-pill"},Wn={class:"hero-pill"},Kn={class:"hero-pill"},Jn={class:"zhihu-container"},Yn={class:"zhihu-main"},Zn={key:0,class:"feed"},ne={class:"feed-content"},ee={class:"feed-title"},te={class:"feed-excerpt"},ae={class:"feed-footer"},re={class:"feed-meta"},ie={class:"meta-tag"},se={class:"meta-date"},oe={class:"meta-read"},le={key:1,class:"post-view"},_e={class:"post-header"},de={class:"post-title"},$e={class:"post-meta"},ce={class:"post-tag"},pe={key:2,class:"post-empty"},xe={class:"zhihu-side"},me={key:0,class:"toc-drawer-toggle"},he=["aria-label"],fe={class:"side-card profile"},ue={class:"profile-header"},ye={class:"profile-name"},ge={class:"profile-desc"},be={class:"profile-stats"},ve=["href"],Ce={class:"side-card"},ze={class:"side-title"},Te={class:"tag-list"},Le={class:"tag"},we={class:"tag"},Ae={class:"tag"},Se={class:"tag"},ke={class:"side-card"},Be={class:"side-title"},Re={class:"side-text"},Me={class:"side-btn"},Ne={class:"toc-header"},qe={class:"toc-title"},Pe=["aria-label"],Ge={class:"toc-list"},De=["data-id"],Xe=["onClick"],Ee={key:0,class:"toc-empty"},Ue={class:"toc-drawer-panel"},Ie={class:"toc-drawer-header"},Fe={class:"toc-drawer-title"},He={class:"toc-drawer-body"},Qe={class:"toc-drawer-list"},je=["data-id"],Oe=["onClick"],Ve={key:0,class:"toc-drawer-empty"},We=768,Ke={__name:"Blog",setup(j){const{t:r}=nn(),G=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":Ln,"../markdowns/2026-05-27-随机森林：集成学习的决策树军团.md":wn,"../markdowns/first-blog.md":An,"../markdowns/考研信息调研.md":Sn});function D(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function k(s){var h;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),m=((h=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:h.length)??0,p=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+m;return{wordCount:p,readMinutes:Math.max(1,Math.round(p/300)),excerpt:u(e)}}const z=new Map,T=s=>(z.has(s)||z.set(s,k(s)),z.get(s)),L=Object.entries(G).map(([s,e])=>{const m=D(e),i=s.match(/\/([^/]+)\.md$/),p=i?i[1]:s;let h=p,b=null;const M=m.match(/^#\s+(.+)$/m);M&&(h=M[1].trim());const X=p.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],M||(h=X[2]));const on=b??p,E=T(m);return{path:s,slug:p,title:h,content:m,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),w=pn(),B=xn(),g=Q(()=>!!w.params.slug),d=Q(()=>w.params.slug?tn(w.params.slug):null),$=C(null),o=C([]),_=C(""),l=C(!1),f=C(!1);let y=null,A=null,S=null;function O(){f.value=window.innerWidth<We}function V(){B.push({name:"BlogHome"})}function tn(s){return L.find(e=>e.slug===s)}function an(s){const e=s??$.value;if(!e){o.value=[];return}const m=Array.from(e.querySelectorAll("h2, h3"));o.value=m.map(i=>{var h;const p=i.tagName.toLowerCase();return{id:i.id,text:((h=i.textContent)==null?void 0:h.trim())||"标题",level:p}})}function W(s){const e=document.getElementById(s);if(!e)return;l.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(R(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const p=window.scrollY;let h=null;for(const b of s)b.getBoundingClientRect().top+p-90<=p+5&&(h=b);h&&(_.value=h.id)}function m(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}A=m,window.addEventListener("scroll",A,{passive:!0}),e()}function R(){y&&(cancelAnimationFrame(y),y=null),A&&(window.removeEventListener("scroll",A),A=null)}function sn(){S=new ResizeObserver(()=>O()),S.observe(document.documentElement)}return q(d,s=>{s||(o.value=[],R())},{immediate:!0}),q(o,async()=>{if(!o.value.length){R();return}await P(),rn()}),q(_,async s=>{if(!s)return;await P();const e=document.querySelector(".post-toc"),m=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(m&&m.scrollIntoView({behavior:"smooth",block:"nearest"}),l.value){const i=document.querySelector(".toc-drawer-body"),p=i==null?void 0:i.querySelector(`[data-id="${s}"]`);p&&p.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),ln(()=>{R(),S==null||S.disconnect()}),(s,e)=>{const m=mn("router-link");return c(),x("section",Mn,[N(fn),n("div",Nn,[n("div",qn,[n("div",Pn,[n("div",Gn,[n("div",Dn,t(a(r)("blog.heroTitle")),1),n("p",Xn,t(a(r)("blog.heroSubtitle")),1),n("div",En,[n("button",Un,t(a(r)("blog.tabRecommend")),1),n("button",In,t(a(r)("blog.tabLatest")),1),n("button",Fn,t(a(r)("blog.tabEssay")),1)])]),n("div",Hn,[n("div",Qn,t(a(r)("blog.heroLabel")),1),n("div",jn,t(a(r)("blog.heroDesc")),1),n("div",On,[n("span",Vn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Wn,t(a(r)("blog.heroTechVue")),1),n("span",Kn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Jn,[n("main",Yn,[g.value?d.value?(c(),x("div",le,[n("div",_e,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",de,t(d.value.title),1),n("div",$e,[n("span",ce,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(d.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:d.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:$,class:"post-content"},[N(Rn,{source:d.value.content,onRendered:an},null,8,["source"])],512)])):(c(),x("div",pe,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(c(),x("div",Zn,[(c(!0),x(U,null,I(a(L),i=>(c(),x("article",{key:i.slug,class:"feed-item"},[N(m,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",ne,[n("h2",ee,t(i.title),1),n("p",te,t(i.excerpt),1)]),n("div",ae,[n("div",re,[n("span",ie,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",se,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",xe,[g.value&&o.value.length?(c(),x("div",me,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>l.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),_n(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",fe,[n("div",ue,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ye,t(a(r)("blog.profileName")),1),n("div",ge,t(a(r)("blog.profileDesc")),1)])]),n("div",be,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,ve)]),n("div",Ce,[n("div",ze,t(a(r)("blog.sidebarTags")),1),n("div",Te,[n("span",Le,t(a(r)("blog.tagLearning")),1),n("span",we,t(a(r)("blog.tagAlgorithm")),1),n("span",Ae,t(a(r)("blog.tagFrontend")),1),n("span",Se,t(a(r)("blog.tagLife")),1)])]),n("div",ke,[n("div",Be,t(a(r)("blog.sidebarUpdate")),1),n("p",Re,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Me,t(a(r)("blog.sidebarFollow")),1)]),g.value?(c(),x("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":f.value}])},[n("div",Ne,[n("div",qe,t(a(r)("blog.tocTitle")),1),f.value?(c(),x("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>l.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Pe)):v("",!0)]),n("ul",Ge,[(c(!0),x(U,null,I(o.value,i=>(c(),x("li",{key:i.id,"data-id":i.id,class:F(["toc-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:p=>W(i.id)},t(i.text),9,Xe)],10,De))),128)),o.value.length?v("",!0):(c(),x("li",Ee,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(c(),dn(cn,{to:"body"},[N($n,{name:"drawer"},{default:K(()=>[f.value&&l.value?(c(),x("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=hn(i=>l.value=!1,["self"]))},[n("div",Ue,[n("div",Ie,[n("span",Fe,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>l.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",He,[n("ul",Qe,[(c(!0),x(U,null,I(o.value,i=>(c(),x("li",{key:i.id,"data-id":i.id,class:F(["toc-drawer-item",i.level,{"toc-active":_.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:p=>W(i.id)},t(i.text),9,Oe)],10,je))),128)),o.value.length?v("",!0):(c(),x("li",Ve,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},tt=en(Ke,[["__scopeId","data-v-f1b0f654"]]);export{tt as default};
+`,qn=["innerHTML"],Bn={__name:"MarkdownRenderer",props:{source:{type:String,default:""}},emits:["rendered"],setup(j,{emit:r}){const P=j,{t:D}=nn(),u=C(null),S=r;function z(_){return _.toLowerCase().normalize("NFC").replace(/[\u4e00-\u9fff]/g,d=>d.charCodeAt(0).toString(36)).replace(/[^\w\s-]/g,"").trim().replace(/[\s_-]+/g,"-").replace(/^-+|-+$/g,"")}const T=new un({html:!0,linkify:!0,typographer:!0,highlight(_,d){const o=d&&H.getLanguage(d)?d:null,l=o?H.highlight(_,{language:o,ignoreIllegals:!0}).value:H.highlightAuto(_).value;return`<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${o||"plaintext"}">${l}</code></pre></div>`}});T.use(yn),T.use(J,{slugify:z,level:[2,3,4],permalink:J.permalink.headerLink()});function L(_){if(!_)return"";const d=[];let o=_.replace(/```[\s\S]*?```/g,l=>(d.push(l),`__CODE_BLOCK_${d.length-1}__`));return o=o.replace(/\$\$([\s\S]+?)\$\$/g,(l,$)=>{try{return`<div class="katex-block">${Y.renderToString($.trim(),{displayMode:!0,throwOnError:!1})}</div>`}catch{return`$$${$}$$`}}).replace(new RegExp("(?<!\\w)\\$([^\\n$]+?)\\$","g"),(l,$)=>{try{return`<span class="katex-inline">${Y.renderToString($.trim(),{displayMode:!1,throwOnError:!1})}</span>`}catch{return`$${$}$`}}),d.forEach((l,$)=>{o=o.replace(`__CODE_BLOCK_${$}__`,l)}),o}function k(_){if(!_)return _;const d=window.location.origin;return _.replace(/<img\s+([^>]*?)>/g,(o,l)=>l.includes("loading=")?o:`<img ${l} loading="lazy">`).replace(/<a\s+([^>]*?)>/g,(o,l)=>{const $=l.match(/href="([^"]*)"/);if($){const h=$[1];if(h.startsWith("http://")||h.startsWith("https://"))try{if(new URL(h).origin!==d&&!l.includes("target="))return`<a ${l} target="_blank" rel="noopener noreferrer">`}catch{}}return o})}const q=Q(()=>k(T.render(L(P.source||""))));N(q,async()=>{await G(),g(),S("rendered",u.value)}),Z(async()=>{await G(),g(),S("rendered",u.value)});function g(){if(!u.value)return;u.value.querySelectorAll(".code-block-wrapper:not(.copy-injected)").forEach(d=>{d.classList.add("copy-injected");const o=d.querySelector("code"),l=(o==null?void 0:o.textContent)||"",$=document.createElement("button");$.className="copy-btn",$.type="button",$.setAttribute("aria-label",D("common.copyCode")),$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.addEventListener("click",()=>{l&&navigator.clipboard.writeText(l).then(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',$.classList.add("copied"),setTimeout(()=>{$.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',$.classList.remove("copied")},2e3)})}),d.appendChild($)})}return(_,d)=>(c(),f("div",{ref_key:"containerRef",ref:u,class:"md-renderer",innerHTML:q.value},null,8,qn))}},Rn=en(Bn,[["__scopeId","data-v-b6bba450"]]),Mn={class:"zhihu-page"},Nn={class:"zhihu-shell"},Gn={class:"zhihu-body"},Pn={class:"zhihu-hero"},Dn={class:"zhihu-hero-content"},Xn={class:"zhihu-title"},En={class:"zhihu-subtitle"},Un={class:"zhihu-tabs"},In={class:"tab active"},Fn={class:"tab"},Hn={class:"tab"},Qn={class:"zhihu-hero-card"},jn={class:"hero-label"},On={class:"hero-desc"},Vn={class:"hero-actions"},Wn={class:"hero-pill"},Kn={class:"hero-pill"},Jn={class:"hero-pill"},Yn={class:"zhihu-container"},Zn={class:"zhihu-main"},ne={key:0,class:"feed"},ee={class:"feed-content"},te={class:"feed-title"},ae={class:"feed-excerpt"},re={class:"feed-footer"},ie={class:"feed-meta"},se={class:"meta-tag"},oe={class:"meta-date"},$e={class:"meta-read"},le={key:1,class:"post-view"},_e={class:"post-header"},de={class:"post-title"},ce={class:"post-meta"},xe={class:"post-tag"},fe={key:2,class:"post-empty"},me={class:"zhihu-side"},pe={key:0,class:"toc-drawer-toggle"},he=["aria-label"],ue={class:"side-card profile"},ye={class:"profile-header"},ge={class:"profile-name"},be={class:"profile-desc"},ve={class:"profile-stats"},Ce=["href"],ze={class:"side-card"},Te={class:"side-title"},Le={class:"tag-list"},ke={class:"tag"},Ae={class:"tag"},we={class:"tag"},Se={class:"tag"},qe={class:"side-card"},Be={class:"side-title"},Re={class:"side-text"},Me={class:"side-btn"},Ne={class:"toc-header"},Ge={class:"toc-title"},Pe=["aria-label"],De={class:"toc-list"},Xe=["data-id"],Ee=["onClick"],Ue={key:0,class:"toc-empty"},Ie={class:"toc-drawer-panel"},Fe={class:"toc-drawer-header"},He={class:"toc-drawer-title"},Qe={class:"toc-drawer-body"},je={class:"toc-drawer-list"},Oe=["data-id"],Ve=["onClick"],We={key:0,class:"toc-drawer-empty"},Ke=768,Je={__name:"Blog",setup(j){const{t:r}=nn(),P=Object.assign({"../markdowns/2025-04-01-JavaScript异步编程.md":bn,"../markdowns/2026-05-09-强化学习：从MDP到DQN.md":vn,"../markdowns/2026-05-10-卷积神经网络：原理、架构与实战.md":Cn,"../markdowns/2026-05-12-XGBoost：梯度提升的工程极致.md":zn,"../markdowns/2026-05-22-LSTM：长短期记忆网络原理、架构与进阶.md":Tn,"../markdowns/2026-05-25-常微分方程：类型总结与求解方法.md":Ln,"../markdowns/2026-05-27-极限求解完全指南：21种方法分类与实战.md":kn,"../markdowns/2026-05-27-随机森林：集成学习的决策树军团.md":An,"../markdowns/first-blog.md":wn,"../markdowns/考研信息调研.md":Sn});function D(s){return s?typeof s=="string"?s:s&&typeof s=="object"&&"default"in s?s.default:String(s):""}function u(s){return s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g,"").replace(/\s+/g," ").trim().slice(0,120).concat("…")}function S(s){var p;const e=s.replace(/```[\s\S]*?```/g,"").replace(/[#>*_\-`]/g," ").replace(/\s+/g," ").trim(),m=((p=e.match(/[\u4e00-\u9fa5]/g))==null?void 0:p.length)??0,x=e.replace(/[\u4e00-\u9fa5]/g," ").split(/\s+/).filter(Boolean).length+m;return{wordCount:x,readMinutes:Math.max(1,Math.round(x/300)),excerpt:u(e)}}const z=new Map,T=s=>(z.has(s)||z.set(s,S(s)),z.get(s)),L=Object.entries(P).map(([s,e])=>{const m=D(e),i=s.match(/\/([^/]+)\.md$/),x=i?i[1]:s;let p=x,b=null;const R=m.match(/^#\s+(.+)$/m);R&&(p=R[1].trim());const X=x.match(/^(\d{4}-\d{2}-\d{2})[-_](.+)$/);X&&(b=X[1],R||(p=X[2]));const on=b??x,E=T(m);return{path:s,slug:x,title:p,content:m,date:b,sortKey:on,excerpt:E.excerpt,readMinutes:E.readMinutes,wordCount:E.wordCount}}).sort((s,e)=>s.sortKey===e.sortKey?0:s.sortKey<e.sortKey?1:-1),k=xn(),q=fn(),g=Q(()=>!!k.params.slug),_=Q(()=>k.params.slug?tn(k.params.slug):null),d=C(null),o=C([]),l=C(""),$=C(!1),h=C(!1);let y=null,A=null,w=null;function O(){h.value=window.innerWidth<Ke}function V(){q.push({name:"BlogHome"})}function tn(s){return L.find(e=>e.slug===s)}function an(s){const e=s??d.value;if(!e){o.value=[];return}const m=Array.from(e.querySelectorAll("h2, h3"));o.value=m.map(i=>{var p;const x=i.tagName.toLowerCase();return{id:i.id,text:((p=i.textContent)==null?void 0:p.trim())||"标题",level:x}})}function W(s){const e=document.getElementById(s);if(!e)return;$.value=!1;const i=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:i,behavior:"smooth"})}function rn(){if(B(),!o.value.length)return;const s=o.value.map(i=>document.getElementById(i.id)).filter(Boolean);if(!s.length)return;function e(){const x=window.scrollY;let p=null;for(const b of s)b.getBoundingClientRect().top+x-90<=x+5&&(p=b);p&&(l.value=p.id)}function m(){y||(y=requestAnimationFrame(()=>{e(),y=null}))}A=m,window.addEventListener("scroll",A,{passive:!0}),e()}function B(){y&&(cancelAnimationFrame(y),y=null),A&&(window.removeEventListener("scroll",A),A=null)}function sn(){w=new ResizeObserver(()=>O()),w.observe(document.documentElement)}return N(_,s=>{s||(o.value=[],B())},{immediate:!0}),N(o,async()=>{if(!o.value.length){B();return}await G(),rn()}),N(l,async s=>{if(!s)return;await G();const e=document.querySelector(".post-toc"),m=e==null?void 0:e.querySelector(`[data-id="${s}"]`);if(m&&m.scrollIntoView({behavior:"smooth",block:"nearest"}),$.value){const i=document.querySelector(".toc-drawer-body"),x=i==null?void 0:i.querySelector(`[data-id="${s}"]`);x&&x.scrollIntoView({behavior:"smooth",block:"nearest"})}}),Z(()=>{O(),sn()}),$n(()=>{B(),w==null||w.disconnect()}),(s,e)=>{const m=mn("router-link");return c(),f("section",Mn,[M(hn),n("div",Nn,[n("div",Gn,[n("div",Pn,[n("div",Dn,[n("div",Xn,t(a(r)("blog.heroTitle")),1),n("p",En,t(a(r)("blog.heroSubtitle")),1),n("div",Un,[n("button",In,t(a(r)("blog.tabRecommend")),1),n("button",Fn,t(a(r)("blog.tabLatest")),1),n("button",Hn,t(a(r)("blog.tabEssay")),1)])]),n("div",Qn,[n("div",jn,t(a(r)("blog.heroLabel")),1),n("div",On,t(a(r)("blog.heroDesc")),1),n("div",Vn,[n("span",Wn,t(a(r)("blog.heroTechMarkdown")),1),n("span",Kn,t(a(r)("blog.heroTechVue")),1),n("span",Jn,t(a(r)("blog.heroTechStudy")),1)])])]),n("div",Yn,[n("main",Zn,[g.value?_.value?(c(),f("div",le,[n("div",_e,[n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToList")),1),n("h1",de,t(_.value.title),1),n("div",ce,[n("span",xe,t(a(r)("blog.metaColumn")),1),e[7]||(e[7]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(_.value.date||a(r)("blog.postMetaDate")),1),e[8]||(e[8]=n("span",{class:"meta-dot"},"·",-1)),n("span",null,t(a(r)("blog.postMetaReadTime",{n:_.value.readMinutes})),1)])]),n("div",{ref_key:"postContentRef",ref:d,class:"post-content"},[M(Rn,{source:_.value.content,onRendered:an},null,8,["source"])],512)])):(c(),f("div",fe,[n("h2",null,t(a(r)("blog.postNotFound")),1),n("p",null,t(a(r)("blog.postNotFoundDesc")),1),n("button",{class:"back-btn",onClick:V},t(a(r)("blog.backToBlog")),1)])):(c(),f("div",ne,[(c(!0),f(U,null,I(a(L),i=>(c(),f("article",{key:i.slug,class:"feed-item"},[M(m,{to:{name:"BlogDetail",params:{slug:i.slug}},class:"feed-link"},{default:K(()=>[n("div",ee,[n("h2",te,t(i.title),1),n("p",ae,t(i.excerpt),1)]),n("div",re,[n("div",ie,[n("span",se,t(a(r)("blog.metaColumn")),1),e[4]||(e[4]=n("span",{class:"meta-dot"},"·",-1)),n("span",oe,t(i.date||a(r)("blog.metaNoDate")),1),e[5]||(e[5]=n("span",{class:"meta-dot"},"·",-1)),n("span",$e,t(a(r)("blog.metaReadMinutes",{n:i.readMinutes})),1)]),e[6]||(e[6]=n("span",{class:"feed-arrow"},"→",-1))])]),_:2},1032,["to"])]))),128))]))]),n("aside",me,[g.value&&o.value.length?(c(),f("div",pe,[n("button",{class:"drawer-btn",onClick:e[0]||(e[0]=i=>$.value=!0),"aria-label":a(r)("blog.tocTitle")},[e[9]||(e[9]=n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[n("line",{x1:"3",y1:"6",x2:"21",y2:"6"}),n("line",{x1:"3",y1:"12",x2:"15",y2:"12"}),n("line",{x1:"3",y1:"18",x2:"18",y2:"18"})],-1)),ln(" "+t(a(r)("blog.tocTitle")),1)],8,he)])):v("",!0),n("div",ue,[n("div",ye,[e[10]||(e[10]=n("div",{class:"profile-avatar"},null,-1)),n("div",null,[n("div",ge,t(a(r)("blog.profileName")),1),n("div",be,t(a(r)("blog.profileDesc")),1)])]),n("div",ve,[n("div",null,[n("strong",null,t(a(L).length),1),n("span",null,t(a(r)("blog.statsArticles")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsActive")),1),n("span",null,t(a(r)("blog.statsCode")),1)]),n("div",null,[n("strong",null,t(a(r)("blog.statsGithub")),1),n("span",null,t(a(r)("blog.statsCode")),1)])]),n("a",{class:"profile-link",href:a(gn).githubUrl,target:"_blank",rel:"noreferrer"},t(a(r)("blog.visitGithub")),9,Ce)]),n("div",ze,[n("div",Te,t(a(r)("blog.sidebarTags")),1),n("div",Le,[n("span",ke,t(a(r)("blog.tagLearning")),1),n("span",Ae,t(a(r)("blog.tagAlgorithm")),1),n("span",we,t(a(r)("blog.tagFrontend")),1),n("span",Se,t(a(r)("blog.tagLife")),1)])]),n("div",qe,[n("div",Be,t(a(r)("blog.sidebarUpdate")),1),n("p",Re,t(a(r)("blog.sidebarUpdateDesc")),1),n("button",Me,t(a(r)("blog.sidebarFollow")),1)]),g.value?(c(),f("div",{key:1,class:F(["side-card post-toc",{"toc-mobile":h.value}])},[n("div",Ne,[n("div",Ge,t(a(r)("blog.tocTitle")),1),h.value?(c(),f("button",{key:0,class:"toc-close",onClick:e[1]||(e[1]=i=>$.value=!1),"aria-label":a(r)("blog.modalClose")},e[11]||(e[11]=[n("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]),8,Pe)):v("",!0)]),n("ul",De,[(c(!0),f(U,null,I(o.value,i=>(c(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-link",onClick:x=>W(i.id)},t(i.text),9,Ee)],10,Xe))),128)),o.value.length?v("",!0):(c(),f("li",Ue,t(a(r)("blog.tocEmpty")),1))])],2)):v("",!0)])])])]),(c(),_n(cn,{to:"body"},[M(dn,{name:"drawer"},{default:K(()=>[h.value&&$.value?(c(),f("div",{key:0,class:"toc-drawer-overlay",onClick:e[3]||(e[3]=pn(i=>$.value=!1,["self"]))},[n("div",Ie,[n("div",Fe,[n("span",He,t(a(r)("blog.tocTitle")),1),n("button",{class:"toc-close",onClick:e[2]||(e[2]=i=>$.value=!1)},e[12]||(e[12]=[n("svg",{width:"18",height:"18",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5"},[n("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),n("line",{x1:"6",y1:"6",x2:"18",y2:"18"})],-1)]))]),n("nav",Qe,[n("ul",je,[(c(!0),f(U,null,I(o.value,i=>(c(),f("li",{key:i.id,"data-id":i.id,class:F(["toc-drawer-item",i.level,{"toc-active":l.value===i.id}])},[n("button",{type:"button",class:"toc-drawer-link",onClick:x=>W(i.id)},t(i.text),9,Ve)],10,Oe))),128)),o.value.length?v("",!0):(c(),f("li",We,t(a(r)("blog.tocEmpty")),1))])])])])):v("",!0)]),_:1})]))])}}},at=en(Je,[["__scopeId","data-v-f1b0f654"]]);export{at as default};
