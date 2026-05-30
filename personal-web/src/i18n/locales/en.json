@@ -96,10 +96,37 @@
     "hobbyHikingDesc": "Into the wild, feeling nature's calm",
     "hobbyMartial": "Martial Arts",
     "hobbyMartialDesc": "Self-cultivation and discipline",
+    "hobbyPhotography": "Photography",
+    "hobbyPhotographyDesc": "Capturing beautiful moments through the lens",
     "sectionContact": "Contact Me",
     "contactEmail": "Email",
     "contactGithub": "GitHub",
-    "contactNote": "Feel free to reach out if you have any questions, collaboration ideas, or just want to chat!"
+    "contactNote": "Feel free to reach out if you have any questions, collaboration ideas, or just want to chat!",
+    "hobbyDetailCycling": {
+      "title": "Cycling",
+      "subtitle": "Exploring Cities and Nature",
+      "description": "Cycling is one of my favorite outdoor activities. Every time I hop on my bike and ride through city streets or country roads, that sense of freedom is intoxicating. Whether it's a sunrise ride in the morning or an evening cruise along the riverbank, cycling always lets me clear my mind and enjoy the peace and beauty of the moment."
+    },
+    "hobbyDetailCube": {
+      "title": "Rubik's Cube",
+      "subtitle": "The Art of Speedcubing",
+      "description": "The Rubik's Cube is more than just a puzzle toy — it's an art form. From fumbling with it initially to smoothly solving it now, every breakthrough brings great satisfaction. Speedcubing requires focus, memory, and finger coordination, and this challenge keeps me engaged."
+    },
+    "hobbyDetailHiking": {
+      "title": "Hiking",
+      "subtitle": "Into the Wild, Feeling Nature",
+      "description": "Away from the city's noise, deep into the mountains, feeling nature's tranquility and grandeur. Hiking is not just physical exercise, but also spiritual renewal. Every climb is a challenge to myself, and reaching every summit brings different scenery and insights."
+    },
+    "hobbyDetailMartial": {
+      "title": "Martial Arts",
+      "subtitle": "Self-Cultivation and Discipline",
+      "description": "Martial arts are treasures of traditional Chinese culture. Through daily training, one can not only strengthen the body but also refine the mind. Every movement requires focus and persistence. This practice has taught me patience and self-discipline, and given me deeper understanding and respect for traditional culture."
+    },
+    "hobbyDetailPhotography": {
+      "title": "Photography",
+      "subtitle": "Capturing Beautiful Moments",
+      "description": "Photography is the art of telling stories through light and shadow. Whether it's the city skyline at dawn or an unexpected moment in daily life, I hope to capture these beautiful moments through my lens. Photography has taught me to observe and appreciate the scenery before me."
+    }
   },
   "animation": {
     "heroTitle": "Animations",

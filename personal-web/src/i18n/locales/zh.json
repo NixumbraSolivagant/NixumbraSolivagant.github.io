@@ -96,10 +96,37 @@
     "hobbyHikingDesc": "走进山野，感受大自然的宁静",
     "hobbyMartial": "武术",
     "hobbyMartialDesc": "修身养性，锤炼意志",
+    "hobbyPhotography": "摄影",
+    "hobbyPhotographyDesc": "用镜头捕捉生活中的美好瞬间",
     "sectionContact": "联系我",
     "contactEmail": "邮箱",
     "contactGithub": "GitHub",
-    "contactNote": "如果你有任何问题、合作意向或只是想聊聊天，欢迎联系我！"
+    "contactNote": "如果你有任何问题、合作意向或只是想聊聊天，欢迎联系我！",
+    "hobbyDetailCycling": {
+      "title": "骑行",
+      "subtitle": "探索城市与自然的边界",
+      "description": "骑行是我最热爱的户外运动之一。每当跨上自行车，穿过城市的街道或乡间的小路，那种自由的感觉让人沉醉。无论是清晨的日出骑行，还是傍晚的河堤漫游，骑行总能让我放空思绪，享受当下的宁静与美好。"
+    },
+    "hobbyDetailCube": {
+      "title": "魔方",
+      "subtitle": "三阶速拧的艺术",
+      "description": "魔方不仅仅是一个益智玩具，更是一门艺术。从最初的手足无措到如今的流畅还原，每一次突破都带来极大的成就感。速拧的过程需要专注、记忆和手指的协调配合，这种挑战让我乐在其中。"
+    },
+    "hobbyDetailHiking": {
+      "title": "徒步",
+      "subtitle": "走进山野，感受自然",
+      "description": "远离城市的喧嚣，走进大山深处，感受大自然的宁静与壮美。徒步不仅是身体的锻炼，更是心灵的洗礼。每一次攀登都是对自己的挑战，每一次到达山顶都能收获不一样的风景和感悟。"
+    },
+    "hobbyDetailMartial": {
+      "title": "武术",
+      "subtitle": "修身养性，锤炼意志",
+      "description": "武术是中国传统文化的瑰宝。通过日复一日的训练，不仅可以强健体魄，更能磨砺心性。每一个动作都需要专注与坚持，这种修行让我学会了耐心和自律，也让我对传统文化有了更深的理解和敬意。"
+    },
+    "hobbyDetailPhotography": {
+      "title": "摄影",
+      "subtitle": "用镜头捕捉生活中的美好瞬间",
+      "description": "摄影是一种用光影讲述故事的艺术。无论是晨曦中的城市天际线，还是日常生活中不经意的瞬间，我都希望通过镜头将这些美好定格。摄影让我学会了观察，也让我更加珍惜眼前的风景。"
+    }
   },
   "animation": {
     "heroTitle": "动画展示",

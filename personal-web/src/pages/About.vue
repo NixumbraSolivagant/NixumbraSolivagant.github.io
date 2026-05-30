@@ -88,25 +88,30 @@
         </h2>
         <div class="about-card">
           <div class="hobby-grid">
-            <div class="hobby-item">
+            <div class="hobby-item clickable" @click="openHobbyDetail('cycling')">
               <div class="hobby-icon">🚴</div>
               <h3>{{ t('about.hobbyCycling') }}</h3>
               <p>{{ t('about.hobbyCyclingDesc') }}</p>
             </div>
-            <div class="hobby-item">
+            <div class="hobby-item clickable" @click="openHobbyDetail('cube')">
               <div class="hobby-icon">🧩</div>
               <h3>{{ t('about.hobbyCube') }}</h3>
               <p>{{ t('about.hobbyCubeDesc') }}</p>
             </div>
-            <div class="hobby-item">
+            <div class="hobby-item clickable" @click="openHobbyDetail('hiking')">
               <div class="hobby-icon">🥾</div>
               <h3>{{ t('about.hobbyHiking') }}</h3>
               <p>{{ t('about.hobbyHikingDesc') }}</p>
             </div>
-            <div class="hobby-item">
-              <div class="hobby-icon">🥋</div>
+            <div class="hobby-item clickable" @click="openHobbyDetail('martial')">
+              <div class="hobby-icon"><img src="/static/img/hobbies/martial/martial-icon.png" alt="martial" /></div>
               <h3>{{ t('about.hobbyMartial') }}</h3>
               <p>{{ t('about.hobbyMartialDesc') }}</p>
+            </div>
+            <div class="hobby-item clickable" @click="openHobbyDetail('photography')">
+              <div class="hobby-icon">📷</div>
+              <h3>{{ t('about.hobbyPhotography') }}</h3>
+              <p>{{ t('about.hobbyPhotographyDesc') }}</p>
             </div>
           </div>
         </div>
@@ -133,14 +138,43 @@
       </div>
     </div>
   </section>
+
+  <HobbyDetail v-model="showHobbyDetail" :hobby="currentHobby" :key="currentHobbyId" />
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import NavBar from '@/components/NavBar.vue'
+import HobbyDetail from '@/components/HobbyDetail.vue'
 import { SITE_AUTHOR } from '@/config/author.js'
+import { hobbiesData } from '@/config/hobbies.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const showHobbyDetail = ref(false)
+const currentHobbyId = ref('')
+
+const getHobbyDetail = (id) => {
+  const key = `about.hobbyDetail${id.charAt(0).toUpperCase() + id.slice(1)}`
+  const hobbyConfig = hobbiesData[id] || {}
+  return {
+    title: t(`${key}.title`),
+    subtitle: t(`${key}.subtitle`),
+    description: t(`${key}.description`),
+    images: hobbyConfig.images || [],
+  }
+}
+
+const currentHobby = computed(() => {
+  if (!currentHobbyId.value) return {}
+  return getHobbyDetail(currentHobbyId.value)
+})
+
+const openHobbyDetail = (id) => {
+  currentHobbyId.value = id
+  showHobbyDetail.value = true
+}
 </script>
 
 <style scoped>
@@ -329,9 +363,25 @@ const { t } = useI18n()
   border: 1px solid var(--card_stroke_color);
 }
 
+.hobby-item.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hobby-item.clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
 .hobby-icon {
   font-size: 1.8rem;
   margin-bottom: 8px;
+}
+
+.hobby-icon img {
+  width: 2.2rem;
+  height: 2.2rem;
+  object-fit: contain;
 }
 
 .hobby-item h3 {
