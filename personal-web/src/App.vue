@@ -6,7 +6,7 @@ const route = useRoute()
 const showNav = computed(() => route.path !== '/')
 
 // ===== 全局背景轮播 =====
-// 预加载 + 双层 crossfade + 亮度缓存
+// 改为延迟加载：只预加载下一张，不预加载全部
 const backgroundMedia = ref([])
 const currentBgIndex = ref(0)
 let bgTimer = null
@@ -19,18 +19,24 @@ let activeLayer = 'A'
 // 亮度缓存
 const luminanceCache = new Map()
 
-const preloadImages = (medias) => {
-  medias.forEach(m => {
-    if (m.type === 'image') {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.src = m.src
-    }
-  })
+// 缓存已加载的图片，避免重复请求
+const loadedImages = new Set()
+
+// 只预加载下一张图片，而不是全部
+const preloadNextImage = () => {
+  if (!backgroundMedia.value.length) return
+  const nextIndex = (currentBgIndex.value + 1) % backgroundMedia.value.length
+  const nextMedia = backgroundMedia.value[nextIndex]
+  if (!nextMedia || nextMedia.type === 'video' || loadedImages.has(nextMedia.src)) return
+
+  const img = new Image()
+  img.crossOrigin = 'anonymous'
+  img.src = nextMedia.src
+  loadedImages.add(nextMedia.src)
 }
 
 const detectLuminance = (imageUrl) => {
-  if (luminanceCache.has(imageUrl)) return luminanceCache.get(imageUrl)
+  if (luminanceCache.has(imageUrl)) return Promise.resolve(luminanceCache.get(imageUrl))
 
   const img = new Image()
   img.crossOrigin = 'anonymous'
@@ -105,6 +111,7 @@ const switchToBg = async (media) => {
       video.play().catch(() => {})
     }
     applyTheme(false)
+    preloadNextImage()
     return
   }
 
@@ -126,6 +133,9 @@ const switchToBg = async (media) => {
 
   const isDark = await detectLuminance(media.src)
   applyTheme(isDark)
+
+  // 切换完成后预加载下一张
+  preloadNextImage()
 }
 
 const startBgRotation = () => {
@@ -133,8 +143,11 @@ const startBgRotation = () => {
   const first = backgroundMedia.value[currentBgIndex.value]
   if (first) {
     if (layerA.value) layerA.value.style.backgroundImage = `url(${first.src})`
+    loadedImages.add(first.src)
     if (first.type === 'image') detectLuminance(first.src).then(applyTheme)
     else applyTheme(false)
+    // 只预加载当前这张和下一张
+    preloadNextImage()
   }
   bgTimer = window.setInterval(() => {
     let nextIndex
@@ -169,7 +182,6 @@ onMounted(async () => {
         .sort((a, b) => a.src.localeCompare(b.src))
     }
 
-    preloadImages(backgroundMedia.value)
     startBgRotation()
 })
 

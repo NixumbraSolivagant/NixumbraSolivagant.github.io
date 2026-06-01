@@ -1,6 +1,6 @@
 const defaultConfig = {
   G: 2000000,
-  trailLength: 200,
+  trailLength: 100,  // 减少轨迹长度
   bodyRadius: 16,
   enableTrails: true,
   maxVelocity: 500,
@@ -113,16 +113,16 @@ export function useThreeBody(config = {}) {
   // 创建爆炸效果
   function createExplosion(x, y) {
     const explosionParticles = []
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 30; i++) {  // 减少粒子数量
       const angle = Math.random() * Math.PI * 2
-      const speed = Math.random() * 8 + 2
+      const speed = Math.random() * 6 + 2
       const color = colors[Math.floor(Math.random() * colors.length)]
       explosionParticles.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: Math.random() * 6 + 2,
+        size: Math.random() * 4 + 2,
         alpha: 1,
         color: color,
         life: 1,
@@ -132,7 +132,7 @@ export function useThreeBody(config = {}) {
     explosions.push({
       particles: explosionParticles,
       age: 0,
-      maxAge: 1.5,
+      maxAge: 1.0,  // 减少持续时间
     })
   }
 
@@ -267,22 +267,27 @@ export function useThreeBody(config = {}) {
   }
 
   function drawTrails() {
-      if (!cfg.enableTrails) return
+    if (!cfg.enableTrails) return
     for (let i = 0; i < trails.length; i++) {
       const trail = trails[i]
       const color = bodies[i].color
       if (trail.length < 2) continue
 
-      for (let j = 1; j < trail.length; j++) {
-        const alpha = (j / trail.length) * 0.5
-        const width = 1 + (j / trail.length) * 2
+      // 优化：减少绘制点数，每隔一点画一次
+      ctx.lineWidth = 2
+      ctx.lineCap = 'round'
+      ctx.beginPath()
+
+      for (let j = 0; j < trail.length; j++) {
+        const alpha = (j / trail.length) * 0.4
         ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`
-        ctx.lineWidth = width
-        ctx.lineCap = 'round'
-        ctx.beginPath()
-        ctx.moveTo(trail[j - 1].x, trail[j - 1].y)
-        ctx.lineTo(trail[j].x, trail[j].y)
-        ctx.stroke()
+        if (j > 0) {
+          ctx.lineWidth = 1 + (j / trail.length) * 2
+          ctx.beginPath()
+          ctx.moveTo(trail[j - 1].x, trail[j - 1].y)
+          ctx.lineTo(trail[j].x, trail[j].y)
+          ctx.stroke()
+        }
       }
     }
   }
@@ -315,31 +320,34 @@ export function useThreeBody(config = {}) {
     for (const body of sorted) {
       const { x, y, radius, color } = body
 
-      const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 4)
-      glowGradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.5)`)
-      glowGradient.addColorStop(0.3, `rgba(${color.r}, ${color.g}, ${color.b}, 0.2)`)
+      // 简化发光效果：使用单一渐变而不是多层
+      const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 3)
+      glowGradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.6)`)
       glowGradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`)
 
       ctx.fillStyle = glowGradient
       ctx.beginPath()
-      ctx.arc(x, y, radius * 4, 0, Math.PI * 2)
+      ctx.arc(x, y, radius * 3, 0, Math.PI * 2)
       ctx.fill()
 
-      const bodyGradient = ctx.createRadialGradient(
-        x - radius * 0.3, y - radius * 0.3, 0, x, y, radius
-      )
-      bodyGradient.addColorStop(0, `rgba(255, 255, 255, 1)`)
-      bodyGradient.addColorStop(0.3, `rgba(${color.r}, ${color.g}, ${color.b}, 1)`)
-      bodyGradient.addColorStop(1, `rgba(${Math.floor(color.r * 0.4)}, ${Math.floor(color.g * 0.4)}, ${Math.floor(color.b * 0.4)}, 0.9)`)
-
-      ctx.fillStyle = bodyGradient
+      // 简化球体
+      ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
       ctx.beginPath()
       ctx.arc(x, y, radius, 0, Math.PI * 2)
       ctx.fill()
 
-      ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.7)`
-      ctx.lineWidth = 2
-      ctx.stroke()
+      // 高光
+      const highlightGradient = ctx.createRadialGradient(
+        x - radius * 0.3, y - radius * 0.3, 0, x, y, radius
+      )
+      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)')
+      highlightGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)')
+      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+      ctx.fillStyle = highlightGradient
+      ctx.beginPath()
+      ctx.arc(x, y, radius, 0, Math.PI * 2)
+      ctx.fill()
     }
   }
 
