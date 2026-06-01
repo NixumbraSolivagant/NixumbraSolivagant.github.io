@@ -205,32 +205,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
-.skip-link {
-  position: absolute;
-  top: -100%;
-  left: 0;
-  z-index: 99999;
-  padding: 8px 16px;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 0 0 8px 0;
-  transition: top 0.2s;
-}
-.skip-link:focus {
-  top: 0;
-}
-
-.brand-logo {
-  font-size: 1.2rem;
-  letter-spacing: 0.06em;
-  background: linear-gradient(120deg, #bd34fe, #e0321b 30%, #41d1ff 60%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 /* 双层 crossfade 背景 */
 .bg-layer {
   position: fixed;
@@ -254,20 +228,5 @@ onBeforeUnmount(() => {
 }
 .bg-layer--active {
   opacity: 1;
-}
-
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
 }
 </style>

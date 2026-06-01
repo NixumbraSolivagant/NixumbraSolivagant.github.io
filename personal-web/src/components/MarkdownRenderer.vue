@@ -8,9 +8,43 @@ import { useI18n } from 'vue-i18n'
 import MarkdownIt from 'markdown-it'
 import MarkdownItMark from 'markdown-it-mark'
 import anchor from 'markdown-it-anchor'
-import hljs from 'highlight.js'
-import katex from 'katex'
+import hljs from 'highlight.js/lib/core'
+import javascript from 'highlight.js/lib/languages/javascript'
+import python from 'highlight.js/lib/languages/python'
+import cpp from 'highlight.js/lib/languages/cpp'
+import c from 'highlight.js/lib/languages/c'
+import typescript from 'highlight.js/lib/languages/typescript'
+import bash from 'highlight.js/lib/languages/bash'
+import json from 'highlight.js/lib/languages/json'
+import css from 'highlight.js/lib/languages/css'
+import xml from 'highlight.js/lib/languages/xml'
+import rust from 'highlight.js/lib/languages/rust'
+import go from 'highlight.js/lib/languages/go'
+import java from 'highlight.js/lib/languages/java'
+import markdown from 'highlight.js/lib/languages/markdown'
 import 'katex/dist/katex.min.css'
+
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('js', javascript)
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('py', python)
+hljs.registerLanguage('cpp', cpp)
+hljs.registerLanguage('c', c)
+hljs.registerLanguage('typescript', typescript)
+hljs.registerLanguage('ts', typescript)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('sh', bash)
+hljs.registerLanguage('shell', bash)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('css', css)
+hljs.registerLanguage('html', xml)
+hljs.registerLanguage('xml', xml)
+hljs.registerLanguage('rust', rust)
+hljs.registerLanguage('rs', rust)
+hljs.registerLanguage('go', go)
+hljs.registerLanguage('java', java)
+hljs.registerLanguage('markdown', markdown)
+hljs.registerLanguage('md', markdown)
 
 const props = defineProps({
   source: {
@@ -44,7 +78,6 @@ const md = new MarkdownIt({
     const highlighted = language
       ? hljs.highlight(code, { language, ignoreIllegals: true }).value
       : hljs.highlightAuto(code).value
-    // Store only a hash reference, not the raw code, to avoid XSS
     return `<div class="code-block-wrapper"><pre class="hljs"><code class="hljs language-${language || 'plaintext'}">${highlighted}</code></pre></div>`
   },
 })

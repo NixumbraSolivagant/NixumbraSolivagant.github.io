@@ -35,20 +35,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { i18n } from '@/i18n/index.js'
+import { useLocale } from '@/composables/useLocale.js'
 import { SITE_AUTHOR } from '@/config/author.js'
 
 const { t } = useI18n()
-
-const locale = computed(() => i18n.global.locale.value)
-
-function toggleLocale() {
-  const next = locale.value === 'zh' ? 'en' : 'zh'
-  i18n.global.locale.value = next
-  localStorage.setItem('locale', next)
-}
+const { locale, toggleLocale } = useLocale()
 </script>
 
 <style scoped>

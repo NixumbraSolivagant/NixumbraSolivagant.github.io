@@ -959,7 +959,6 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-/* ── 响应式断点 ── */
 @media (max-width: 1024px) {
   .zhihu-hero,
   .zhihu-container {
@@ -1149,36 +1148,5 @@ onBeforeUnmount(() => {
   padding: 10px 12px;
   border-radius: 10px;
   font-weight: 600;
-}
-
-@media (max-width: 1024px) {
-  .zhihu-hero,
-  .zhihu-container {
-    grid-template-columns: 1fr;
-  }
-
-  .zhihu-hero-card {
-    order: -1;
-  }
-
-}
-
-@media (max-width: 640px) {
-  .zhihu-shell {
-    padding: 0 0 40px;
-  }
-
-  .zhihu-body {
-    padding: 0 12px;
-  }
-
-  .zhihu-hero-content {
-    padding: 22px;
-  }
-
-  .feed-item,
-  .post-view {
-    padding: 22px;
-  }
 }
 </style>

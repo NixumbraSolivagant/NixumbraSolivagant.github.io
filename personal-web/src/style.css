@@ -1,14 +1,70 @@
+/* CSS Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Default theme (dark) */
+  --main_text_color: #f8fafc;
+  --item_left_title_color: #f8fafc;
+  --item_left_text_color: #e2e8f0;
+  --footer_text_color: #e2e8f0;
+  --fill: #ffffff;
+  --text_bg_color: rgba(0, 0, 0, 0.45);
+  --item_bg_color: rgba(15, 23, 42, 0.52);
+  --item_hover_color: rgba(15, 23, 42, 0.65);
+  --left_tag_item: rgba(15, 23, 42, 0.55);
+  --back_filter_color: rgba(0, 0, 0, 0.35);
+  --card_stroke_color: rgba(255, 255, 255, 0.2);
+  --accent: #38bdf8;
+  --accent_strong: #7dd3fc;
 }
 
 body {
   margin: 0;
+  background: transparent;
 }
 
 #app {
   min-height: 100vh;
+}
+
+/* Page Transition Animations */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 99999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
 }

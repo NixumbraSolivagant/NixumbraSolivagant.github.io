@@ -300,22 +300,16 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useThreeBody } from '../composables/useThreeBody.js'
-import GlobeViewer from '../components/GlobeViewer.vue'
-import { i18n } from '../i18n/index.js'
+import { useLocale } from '@/composables/useLocale.js'
 import { SITE_AUTHOR } from '../config/author.js'
 
+const GlobeViewer = defineAsyncComponent(() => import('../components/GlobeViewer.vue'))
+
 const { t } = useI18n()
-
-const locale = computed(() => i18n.global.locale.value)
-
-function toggleLocale() {
-  const next = locale.value === 'zh' ? 'en' : 'zh'
-  i18n.global.locale.value = next
-  localStorage.setItem('locale', next)
-}
+const { locale, toggleLocale } = useLocale()
 
 const handlePop = imageUrl => {
   if (typeof window !== 'undefined' && typeof window.pop === 'function') {
