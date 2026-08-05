@@ -1,15 +1,12 @@
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
-const showNav = computed(() => route.path !== '/')
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 // ===== 全局背景轮播 =====
 // 改为延迟加载：只预加载下一张，不预加载全部
 const backgroundMedia = ref([])
 const currentBgIndex = ref(0)
 let bgTimer = null
+let visibilityHandler = null
 
 // 双层 DOM 节点引用
 const layerA = ref(null)  // 当前显示层
@@ -138,17 +135,9 @@ const switchToBg = async (media) => {
   preloadNextImage()
 }
 
-const startBgRotation = () => {
-  if (!backgroundMedia.value.length) return
-  const first = backgroundMedia.value[currentBgIndex.value]
-  if (first) {
-    if (layerA.value) layerA.value.style.backgroundImage = `url(${first.src})`
-    loadedImages.add(first.src)
-    if (first.type === 'image') detectLuminance(first.src).then(applyTheme)
-    else applyTheme(false)
-    // 只预加载当前这张和下一张
-    preloadNextImage()
-  }
+const scheduleBgRotation = () => {
+  if (bgTimer || !backgroundMedia.value.length) return
+
   bgTimer = window.setInterval(() => {
     let nextIndex
     do {
@@ -159,34 +148,60 @@ const startBgRotation = () => {
   }, 12000)
 }
 
+const startBgRotation = () => {
+  if (!backgroundMedia.value.length) return
+  const first = backgroundMedia.value[currentBgIndex.value]
+  if (first) {
+    if (layerA.value) layerA.value.style.backgroundImage = `url(${first.src})`
+    loadedImages.add(first.src)
+    if (first.type === 'image') detectLuminance(first.src).then(applyTheme)
+    else applyTheme(false)
+    preloadNextImage()
+  }
+  scheduleBgRotation()
+}
+
+const pauseBgRotation = () => {
+  if (bgTimer) {
+    clearInterval(bgTimer)
+    bgTimer = null
+  }
+
+  document.getElementById('background-video')?.pause()
+}
+
+const resumeBgRotation = () => {
+  if (bgTimer || !backgroundMedia.value.length) return
+
+  const video = document.getElementById('background-video')
+  if (video?.style.display === 'block') video.play().catch(() => {})
+  scheduleBgRotation()
+}
+
 onMounted(async () => {
-    // Load the media manifest generated at build time.
-    // Falls back to an empty array in dev (manifest is only written to dist/).
-    const manifestUrl = '/media-manifest.json'
+    const manifestUrl = `${import.meta.env.BASE_URL}media-manifest.json`
     try {
       const resp = await fetch(manifestUrl)
-      if (resp.ok) {
-        backgroundMedia.value = await resp.json()
-      }
-    } catch {
-      // No manifest yet — dev server fallback: glob /static/media via raw import
-      const modules = import.meta.glob('/public/static/media/*.{png,jpg,jpeg,webp,gif,mp4,webm}', { eager: true })
-      backgroundMedia.value = Object.values(modules)
-        .filter(Boolean)
-        .map(mod => {
-          const src = typeof mod === 'string' ? mod : mod.default
-          const lower = (src || '').toLowerCase()
-          const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm')
-          return { type: isVideo ? 'video' : 'image', src }
-        })
-        .sort((a, b) => a.src.localeCompare(b.src))
+      if (!resp.ok) throw new Error(`Unable to load media manifest: ${resp.status}`)
+
+      const media = await resp.json()
+      backgroundMedia.value = Array.isArray(media) ? media : []
+    } catch (error) {
+      console.warn(error)
     }
 
     startBgRotation()
+
+    visibilityHandler = () => {
+      if (document.hidden) pauseBgRotation()
+      else resumeBgRotation()
+    }
+    document.addEventListener('visibilitychange', visibilityHandler)
 })
 
 onBeforeUnmount(() => {
-  if (bgTimer) clearInterval(bgTimer)
+  pauseBgRotation()
+  if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
 })
 </script>
 
@@ -205,7 +220,7 @@ onBeforeUnmount(() => {
       muted
       loop
       playsinline
-      preload="auto"
+      preload="metadata"
     ></video>
 
     <router-view id="main-content" v-slot="{ Component, route: r }">

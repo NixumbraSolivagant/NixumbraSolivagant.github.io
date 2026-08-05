@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useLocale } from '@/composables/useLocale.js'
 import { SITE_AUTHOR } from '@/config/author.js'
 

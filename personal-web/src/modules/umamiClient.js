@@ -24,7 +24,7 @@ const ENDPOINT = `${API_BASE}/websites/${WEBSITE_ID}/metrics`
  * @param {number} [limit=10] - max number of countries to return
  * @returns {Promise<Array<{x: string, y: number}>>} country code → visitor count
  */
-export async function fetchCountryStats(limit = 10) {
+async function fetchCountryStats(limit = 10) {
   if (!API_KEY || !WEBSITE_ID) {
     console.warn('[Umami] VITE_UMAMI_API_KEY or VITE_UMAMI_WEBSITE_ID not set — using mock data')
     return getMockData()

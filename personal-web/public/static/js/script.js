@@ -7,19 +7,16 @@ console.log(' %c  > ^ <', 'color: #8B4513; font-size: 20px;');
 console.log('  %c /  ~ \\', 'color: #8B4513; font-size: 20px;');
 console.log('  %c/______\\', 'color: #8B4513; font-size: 20px;');
 
-document.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-});
-
-function handlePress(event) {
+// 首页项目卡片的按下反馈
+function handlePress() {
     this.classList.add('pressed');
 }
 
-function handleRelease(event) {
+function handleRelease() {
     this.classList.remove('pressed');
 }
 
-function handleCancel(event) {
+function handleCancel() {
     this.classList.remove('pressed');
 }
 
@@ -40,38 +37,37 @@ function toggleClass(selector, className) {
     });
 }
 
+// 赞助/QQ 二维码弹层
 function pop(imageURL) {
-    var tcMainElement = document.querySelector(".tc-img");
+    var tcMainElement = document.querySelector('.tc-img');
     if (imageURL) {
         tcMainElement.src = imageURL;
     }
-    toggleClass(".tc-main", "active");
-    toggleClass(".tc", "active");
+    toggleClass('.tc-main', 'active');
+    toggleClass('.tc', 'active');
 }
 
 var tc = document.getElementsByClassName('tc');
 var tc_main = document.getElementsByClassName('tc-main');
-tc[0].addEventListener('click', function (event) {
+tc[0].addEventListener('click', function () {
     pop();
 });
 tc_main[0].addEventListener('click', function (event) {
     event.stopPropagation();
 });
 
-
-
 function setCookie(name, value, days) {
-    var expires = "";
+    var expires = '';
     if (days) {
         var date = new Date();
         date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        expires = "; expires=" + date.toUTCString();
+        expires = '; expires=' + date.toUTCString();
     }
-    document.cookie = name + "=" + value + expires + "; path=/";
+    document.cookie = name + '=' + value + expires + '; path=/';
 }
 
 function getCookie(name) {
-    var nameEQ = name + "=";
+    var nameEQ = name + '=';
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i];
@@ -85,136 +81,34 @@ function getCookie(name) {
     return null;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-
-
-
-
-
-
+// script.js 由首页挂载后动态注入，DOM 通常已就绪；
+// 保留 DOMContentLoaded 分支仅用于脚本被提前加载的情况。
+function initTheme() {
     var html = document.querySelector('html');
-    var themeState = getCookie("themeState") || "Light";
-    var tanChiShe = document.getElementById("tanChiShe");
-
-
-
-
-
+    var themeState = getCookie('themeState') || 'Light';
+    var tanChiShe = document.getElementById('tanChiShe');
 
     function changeTheme(theme) {
-        tanChiShe.src = "/static/svg/snake-" + theme + ".svg";
+        tanChiShe.src = '/static/svg/snake-' + theme + '.svg';
         html.dataset.theme = theme;
-        setCookie("themeState", theme, 365);
+        setCookie('themeState', theme, 365);
         themeState = theme;
     }
 
-
-
-
-
-
-
-    var Checkbox = document.getElementById('myonoffswitch')
+    var Checkbox = document.getElementById('myonoffswitch');
     Checkbox.addEventListener('change', function () {
-        if (themeState == "Dark") {
-            changeTheme("Light");
-        } else if (themeState == "Light") {
-            changeTheme("Dark");
-        } else {
-            changeTheme("Dark");
-        }
+        changeTheme(themeState == 'Dark' ? 'Light' : 'Dark');
     });
 
-
-
-    if (themeState == "Dark") {
+    if (themeState == 'Dark') {
         Checkbox.checked = false;
     }
 
     changeTheme(themeState);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-
-    var fpsElement = document.createElement('div');
-    fpsElement.id = 'fps';
-    fpsElement.style.zIndex = '10000';
-    fpsElement.style.position = 'fixed';
-    fpsElement.style.left = '0';
-    document.body.insertBefore(fpsElement, document.body.firstChild);
-
-    var showFPS = (function () {
-        var requestAnimationFrame = window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
-            function (callback) {
-                window.setTimeout(callback, 1000 / 60);
-            };
-
-        var fps = 0,
-            last = Date.now(),
-            offset, step, appendFps;
-
-        step = function () {
-            offset = Date.now() - last;
-            fps += 1;
-
-            if (offset >= 1000) {
-                last += offset;
-                appendFps(fps);
-                fps = 0;
-            }
-
-            requestAnimationFrame(step);
-        };
-
-        appendFps = function (fpsValue) {
-            fpsElement.textContent = 'FPS: ' + fpsValue;
-        };
-
-        step();
-    })();
-    
-    
-    
-    //pop('./static/img/tz.jpg')
-    
-    
-    
-});
-
-
-
-
-
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}

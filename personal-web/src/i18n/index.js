@@ -12,8 +12,3 @@ export const i18n = createI18n({
   fallbackLocale: 'en',
   messages: { zh, en },
 })
-
-export const SUPPORTED_LOCALES = [
-  { code: 'zh', name: '中文' },
-  { code: 'en', name: 'EN' },
-]

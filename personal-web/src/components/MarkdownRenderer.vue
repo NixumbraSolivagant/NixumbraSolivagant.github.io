@@ -4,6 +4,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import 'highlight.js/styles/github-dark.css'
 import { useI18n } from 'vue-i18n'
 import MarkdownIt from 'markdown-it'
 import MarkdownItMark from 'markdown-it-mark'
@@ -122,16 +123,15 @@ function preprocess(source) {
   return placeholder
 }
 
-// Post-processing: add lazy loading to images, open external links in new tab
+// Post-processing: optimize image loading, open external links in new tab
 function postprocess(html) {
   if (!html) return html
   const currentHost = window.location.origin
 
   return html.replace(/<img\s+([^>]*?)>/g, (match, attrs) => {
-    if (!attrs.includes('loading=')) {
-      return `<img ${attrs} loading="lazy">`
-    }
-    return match
+    const loading = attrs.includes('loading=') ? '' : ' loading="lazy"'
+    const decoding = attrs.includes('decoding=') ? '' : ' decoding="async"'
+    return `<img ${attrs}${loading}${decoding}>`
   }).replace(/<a\s+([^>]*?)>/g, (match, attrs) => {
     const hrefMatch = attrs.match(/href="([^"]*)"/)
     if (hrefMatch) {

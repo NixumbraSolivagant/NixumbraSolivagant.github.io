@@ -1071,7 +1071,7 @@ onBeforeUnmount(() => {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: url('/static/img/avatar.png') center 20% / cover no-repeat;
+  background: url('/static/img/avatar.webp') center 20% / cover no-repeat;
   border: 3px solid var(--accent);
 }
 

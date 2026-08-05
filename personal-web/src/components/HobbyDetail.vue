@@ -15,6 +15,7 @@
               :src="currentImage"
               :alt="hobby.title"
               class="hero-image"
+              decoding="async"
             />
           </div>
 
@@ -33,6 +34,8 @@
                 :src="img"
                 :alt="`${hobby.title} ${index + 1}`"
                 class="gallery-thumb"
+                loading="lazy"
+                decoding="async"
                 :class="{ active: currentImage === img }"
                 @click="currentImage = img"
               />

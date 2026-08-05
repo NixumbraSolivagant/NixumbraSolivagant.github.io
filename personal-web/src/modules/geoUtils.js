@@ -2,7 +2,7 @@
  * ISO 3166-1 alpha-2 country code → approximate [latitude, longitude]
  * Sorted alphabetically for binary search compatibility.
  */
-export const COUNTRY_COORDS = {
+const COUNTRY_COORDS = {
   AD: [42.5, 1.5],
   AE: [24.0, 54.0],
   AF: [33.0, 65.0],

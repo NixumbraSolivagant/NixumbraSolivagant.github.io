@@ -166,6 +166,8 @@ export class EarthRenderer {
     this.canvas     = canvas
     this._markers  = []
     this._destroyed = false
+    this._active = true
+    this._raf = null
 
     // Sun drifts across the globe over time (longitude in degrees)
     this._sunLon = 0
@@ -313,7 +315,10 @@ export class EarthRenderer {
   }
 
   _animate() {
-    if (this._destroyed) return
+    if (this._destroyed || !this._active) {
+      this._raf = null
+      return
+    }
     this._raf = requestAnimationFrame(() => this._animate())
 
     const t = this.clock.getElapsedTime()
@@ -347,6 +352,19 @@ export class EarthRenderer {
 
     this.controls?.update()
     this.composer.render()
+  }
+
+  setActive(active) {
+    if (this._destroyed || this._active === active) return
+    this._active = active
+
+    if (!active) {
+      cancelAnimationFrame(this._raf)
+      this._raf = null
+      return
+    }
+
+    if (this.clock && this._raf === null) this._animate()
   }
 
   // ── Public API ──────────────────────────────────────────────────────────
@@ -403,6 +421,7 @@ export class EarthRenderer {
   destroy() {
     if (this._destroyed) return
     this._destroyed = true
+    this._active = false
     cancelAnimationFrame(this._raf)
 
     if (this._markers) {

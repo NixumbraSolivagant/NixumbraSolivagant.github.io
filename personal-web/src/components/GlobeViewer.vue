@@ -71,6 +71,9 @@ const countryCount  = ref(0)
 
 let renderer  = null
 let pollTimer = null
+let viewportObserver = null
+let visibilityHandler = null
+let isInViewport = true
 
 function onInteract() {
   hasInteracted.value = true
@@ -100,6 +103,23 @@ async function loadData() {
   }
 }
 
+function stopPolling() {
+  clearInterval(pollTimer)
+  pollTimer = null
+}
+
+function startPolling() {
+  if (pollTimer || props.refreshInterval <= 0 || document.hidden || !isInViewport) return
+  pollTimer = setInterval(loadData, props.refreshInterval)
+}
+
+function syncActivity() {
+  const active = isInViewport && !document.hidden
+  renderer?.setActive(active)
+  if (active) startPolling()
+  else stopPolling()
+}
+
 onMounted(async () => {
   await nextTick()
 
@@ -120,9 +140,17 @@ onMounted(async () => {
     earthReady.value = true
     await loadData()
 
-    if (props.refreshInterval > 0) {
-      pollTimer = setInterval(loadData, props.refreshInterval)
+    if ('IntersectionObserver' in window && viewportEl.value) {
+      viewportObserver = new IntersectionObserver(([entry]) => {
+        isInViewport = entry.isIntersecting
+        syncActivity()
+      }, { threshold: 0.01 })
+      viewportObserver.observe(viewportEl.value)
     }
+
+    visibilityHandler = syncActivity
+    document.addEventListener('visibilitychange', visibilityHandler)
+    syncActivity()
   } catch (e) {
     console.error('[GlobeViewer] init failed:', e)
     hasError.value = true
@@ -130,7 +158,9 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  clearInterval(pollTimer)
+  stopPolling()
+  viewportObserver?.disconnect()
+  if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
   renderer?.destroy()
   renderer = null
 })

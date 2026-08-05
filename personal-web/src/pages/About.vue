@@ -3,7 +3,7 @@
     <NavBar />
     <div class="about-hero">
       <div class="about-avatar">
-        <img src="/static/img/avatar.png" alt="Avatar" />
+        <img src="/static/img/avatar.webp" alt="Avatar" decoding="async" />
         <div class="avatar-ring"></div>
       </div>
       <div class="about-intro">
@@ -104,7 +104,7 @@
               <p>{{ t('about.hobbyHikingDesc') }}</p>
             </div>
             <div class="hobby-item clickable" @click="openHobbyDetail('martial')">
-              <div class="hobby-icon"><img src="/static/img/hobbies/martial/martial-icon.png" alt="martial" /></div>
+              <div class="hobby-icon"><img src="/static/img/hobbies/martial/martial-icon.webp" alt="martial" loading="lazy" decoding="async" /></div>
               <h3>{{ t('about.hobbyMartial') }}</h3>
               <p>{{ t('about.hobbyMartialDesc') }}</p>
             </div>

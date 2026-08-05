@@ -157,7 +157,6 @@ const makers = {
 }
 
 // ── Mount & unmount ─────────────────────────────────────────────────────────
-let THREEloaded = false
 let THREE = null
 
 const initAnimations = () => {
@@ -188,7 +187,6 @@ const initAnimations = () => {
 
 onMounted(async () => {
   THREE = await import('three')
-  THREEloaded = true
   window._THREE = THREE
   // Refs aren't populated until after first render, so defer
   await nextTick()

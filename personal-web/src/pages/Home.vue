@@ -7,11 +7,12 @@
 
     <div class="nix-main">
       <div class="nix-left">
-        <div class="logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
+        <div class="logo" style="background-image: url(/static/img/avatar.webp); background-position: center -10%;">
           <img
             style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
             src="/static/img/logokuang.png"
             alt="logo"
+            decoding="async"
           />
         </div>
           <div class="left-div left-des">
@@ -64,11 +65,12 @@
             <p class="quote-text">"{{ currentQuote.text }}"</p>
             <div class="quote-author">— {{ currentQuote.author }}</div>
           </div>
-          <div class="index-logo" style="background-image: url(/static/img/avatar.png); background-position: center -10%;">
+          <div class="index-logo" style="background-image: url(/static/img/avatar.webp); background-position: center -10%;">
             <img
               style="position: absolute; top: -15%; left: -10%; width: 120%; aspect-ratio: 1/1;"
               src="/static/img/logokuang.png"
               alt="logo"
+              decoding="async"
             />
           </div>
           <div class="welcome">
@@ -165,7 +167,7 @@
           </div>
 
           <div class="tanChiShe">
-            <img id="tanChiShe" src="/static/svg/snake-Light.svg" alt="" />
+            <img id="tanChiShe" src="/static/svg/snake-Light.svg" alt="" loading="lazy" decoding="async" />
           </div>
         </header>
 
@@ -193,7 +195,7 @@
                 <p>{{ t('home.projectBlogDesc') }}</p>
               </div>
               <div class="projectItemRight">
-                <img src="/static/img/i1.png" alt="" />
+                <img src="/static/img/i1.png" alt="" loading="lazy" decoding="async" />
               </div>
             </router-link>
             <router-link class="projectItem a" to="/about">
@@ -202,7 +204,7 @@
                 <p>{{ t('home.projectAboutDesc') }}</p>
               </div>
               <div class="projectItemRight">
-                <img src="/static/img/i2.png" alt="" />
+                <img src="/static/img/i2.png" alt="" loading="lazy" decoding="async" />
               </div>
             </router-link>
             <router-link class="projectItem a" to="/animation">
@@ -211,7 +213,7 @@
                 <p>{{ t('home.projectAnimDesc') }}</p>
               </div>
               <div class="projectItemRight">
-                <img src="/static/img/i4.png" alt="" />
+                <img src="/static/img/i4.png" alt="" loading="lazy" decoding="async" />
               </div>
             </router-link>
             <a class="projectItem a" target="_blank" rel="noreferrer" href="https://github.com/NixumbraSolivagant">
@@ -220,7 +222,7 @@
                 <p>{{ t('home.projectGithubDesc') }}</p>
               </div>
               <div class="projectItemRight">
-                <img src="/static/img/i3.png" alt="" />
+                <img src="/static/img/i3.png" alt="" loading="lazy" decoding="async" />
               </div>
             </a>
           </div>
@@ -241,8 +243,8 @@
             {{ t('home.skillsTitle') }}
           </div>
           <div class="skill">
-            <img id="skillPc" src="/static/svg/skillPc.svg" alt="" />
-            <img id="skillWap" src="/static/svg/skillWap.svg" alt="" />
+            <img id="skillPc" src="/static/svg/skillPc.svg" alt="" loading="lazy" decoding="async" />
+            <img id="skillWap" src="/static/svg/skillWap.svg" alt="" loading="lazy" decoding="async" />
           </div>
           <div class="title">
             <svg
@@ -264,6 +266,9 @@
             <img
               src="https://ghchart.rshah.org/NixumbraSolivagant"
               alt="GitHub contribution heatmap"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
               style="width: 100%; max-width: 920px; border-radius: 12px;"
             />
           </div>
@@ -285,12 +290,13 @@
             </svg>
             {{ t('home.visitorMapTitle') }}
           </div>
-          <GlobeViewer :refresh-interval="60000" />
+          <div ref="globeHost" class="globe-lazy-host">
+            <GlobeViewer v-if="showGlobe" :refresh-interval="60000" />
+          </div>
         </div>
       </div>
     </div>
 
-    <footer></footer>
     <div class="tc">
       <div class="tc-main">
         <img class="tc-img" src="" alt="" />
@@ -318,6 +324,12 @@ const handlePop = imageUrl => {
 }
 
 let quoteTimer = null
+let quoteIdleHandle = null
+let threeBodyFrame = null
+let globeObserver = null
+let quoteVisibilityHandler = null
+const globeHost = ref(null)
+const showGlobe = ref(false)
 
 const fallbackQuotes = [
   { text: '天才是99%的努力加上1%的灵感。', author: '爱迪生' },
@@ -353,6 +365,19 @@ const fetchQuote = async () => {
 
 const { start: startThreeBody, stop: stopThreeBody } = useThreeBody()
 
+const stopQuoteUpdates = () => {
+  if (quoteTimer) {
+    clearInterval(quoteTimer)
+    quoteTimer = null
+  }
+}
+
+const startQuoteUpdates = () => {
+  if (quoteTimer || document.hidden) return
+  fetchQuote()
+  quoteTimer = window.setInterval(fetchQuote, 9000)
+}
+
 onMounted(() => {
   if (!document.querySelector('script[data-nix-script]')) {
     const script = document.createElement('script')
@@ -360,19 +385,47 @@ onMounted(() => {
     script.dataset.nixScript = 'true'
     document.body.appendChild(script)
   }
-  const canvas = document.getElementById('three-body-canvas')
-  if (canvas instanceof HTMLCanvasElement) {
-    startThreeBody(canvas)
+  threeBodyFrame = requestAnimationFrame(() => {
+    const canvas = document.getElementById('three-body-canvas')
+    if (canvas instanceof HTMLCanvasElement) startThreeBody(canvas)
+  })
+
+  if ('IntersectionObserver' in window && globeHost.value) {
+    globeObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      showGlobe.value = true
+      globeObserver?.disconnect()
+      globeObserver = null
+    }, { rootMargin: '500px 0px' })
+    globeObserver.observe(globeHost.value)
+  } else {
+    showGlobe.value = true
   }
-  fetchQuote()
-  quoteTimer = window.setInterval(() => {
-    fetchQuote()
-  }, 9000)
+
+  const scheduleQuoteUpdates = () => startQuoteUpdates()
+  if ('requestIdleCallback' in window) {
+    quoteIdleHandle = window.requestIdleCallback(scheduleQuoteUpdates, { timeout: 1500 })
+  } else {
+    quoteIdleHandle = window.setTimeout(scheduleQuoteUpdates, 300)
+  }
+
+  quoteVisibilityHandler = () => {
+    if (document.hidden) stopQuoteUpdates()
+    else startQuoteUpdates()
+  }
+  document.addEventListener('visibilitychange', quoteVisibilityHandler)
 })
 
 onBeforeUnmount(() => {
+  if (threeBodyFrame) cancelAnimationFrame(threeBodyFrame)
   stopThreeBody()
-  if (quoteTimer) clearInterval(quoteTimer)
+  stopQuoteUpdates()
+  globeObserver?.disconnect()
+  if (quoteVisibilityHandler) document.removeEventListener('visibilitychange', quoteVisibilityHandler)
+  if (quoteIdleHandle) {
+    if ('cancelIdleCallback' in window) window.cancelIdleCallback(quoteIdleHandle)
+    else clearTimeout(quoteIdleHandle)
+  }
 })
 </script>
 
@@ -399,5 +452,9 @@ onBeforeUnmount(() => {
   opacity: 1;
   background: var(--accent);
   border-color: transparent;
+}
+
+.globe-lazy-host {
+  min-height: min(560px, calc(100vw - 32px));
 }
 </style>

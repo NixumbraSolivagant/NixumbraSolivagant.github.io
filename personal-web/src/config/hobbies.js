@@ -28,7 +28,7 @@ export const hobbiesData = {
   },
   martial: {
     id: 'martial',
-    iconImg: '/static/img/hobbies/martial/martial-icon.png',
+    iconImg: '/static/img/hobbies/martial/martial-icon.webp',
     images: [
       '/static/img/hobbies/martial/martial-1.jpg',
       '/static/img/hobbies/martial/martial-2.png',
