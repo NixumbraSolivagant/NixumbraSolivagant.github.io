@@ -5,7 +5,7 @@ import Reveal from '@/components/ui/Reveal.vue'
 import PostCard from '@/components/blog/PostCard.vue'
 import { useLocale } from '@/composables/useLocale'
 import { useSeo } from '@/composables/useSeo'
-import { allTags, posts } from '@/lib/blog'
+import { popularTags, posts } from '@/lib/blog'
 
 const { t } = useLocale()
 useSeo(() => ({ title: t('meta.blogTitle'), description: t('meta.blogDesc') }))
@@ -38,7 +38,7 @@ const rest = computed(() => (featured.value ? filtered.value.slice(1) : filtered
               {{ t('blog.allTags') }}
             </span>
             <button
-              v-for="tag in ['all', ...allTags]"
+              v-for="tag in ['all', ...popularTags]"
               :key="tag"
               type="button"
               class="chip shrink-0 cursor-pointer transition-all duration-300"

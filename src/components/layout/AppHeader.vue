@@ -92,7 +92,7 @@ onBeforeUnmount(() => {
               {{ tr(profile.name) }}
             </span>
             <span class="font-mono text-[9px] tracking-[0.16em] text-mist-500 uppercase">
-              creative developer
+              {{ tr(profile.tagline) }}
             </span>
           </span>
         </RouterLink>

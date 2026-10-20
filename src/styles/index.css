@@ -773,6 +773,33 @@
   font-weight: 600;
   background: rgba(255, 255, 255, 0.03);
 }
+@media (max-width: 640px) {
+  .prose-custom table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* KaTeX 数学公式 */
+.prose-custom .katex {
+  color: rgba(236, 238, 245, 0.94);
+}
+.prose-custom .katex-display {
+  margin: 1.6rem 0;
+  padding: 0.85rem 0.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.prose-custom .katex-display > .katex {
+  white-space: normal;
+}
+.prose-custom .math-block {
+  overflow-x: auto;
+}
+.prose-custom .math-error {
+  color: #fca5a5;
+}
 
 /* highlight.js tokens (custom dark palette) */
 .hljs-comment,

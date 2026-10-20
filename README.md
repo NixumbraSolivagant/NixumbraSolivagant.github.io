@@ -2,7 +2,7 @@
 
 一个暗色渐变玻璃拟态风格的个人网站：主页 / 作品集 / 博客（Markdown）/ 关于，中英双语切换，带滚动入场、磁吸按钮、3D 倾斜卡片、光标光晕等动效。
 
-- **技术栈**：Vue 3 + TypeScript + Vite + Tailwind CSS v4 + Motion（原 Framer Motion 的 DOM 版）+ Lenis
+- **技术栈**：Vue 3 + TypeScript + Vite + Tailwind CSS v4 + Motion + Lenis + KaTeX（数学公式）
 - **内容**：博客是 `content/blog/*.md`，改文案只需要动 `src/data/site.ts` 和 `src/i18n/messages/*`
 - **部署**：纯静态产物（`dist/`），可放 GitHub Pages / Vercel / Netlify / 任意静态托管
 
@@ -48,6 +48,7 @@ src/
 | 想改什么 | 改哪里 |
 | --- | --- |
 | 名字、角色、邮箱、社交链接 | `src/data/site.ts` → `profile` / `socials` |
+| 头像 | `public/avatar.webp`（64px 方形，关于页使用） |
 | 首页标题、简介、按钮文案 | `src/i18n/messages/zh.ts`、`en.ts` → `home` |
 | 项目作品 | `src/data/site.ts` → `projects` |
 | 技能与经历 | `src/data/site.ts` → `skillGroups` / `experience` |
@@ -56,7 +57,7 @@ src/
 | 网站标题、SEO 描述、favicon | `index.html`、`public/favicon.svg` |
 | 邮箱等默认值 | `src/data/site.ts`（头像缩写是 `profile.initials`） |
 
-站点里的示例姓名「林知语 / Zhiyu Lin」、项目与文章都是占位内容，替换成你的即可。
+本站内容为胡明璋（NIX）的真实信息与文章；如果要改成你自己的，按上表替换即可。
 
 ### 博客文章格式
 
@@ -82,6 +83,7 @@ English body. 没有这段时，英文模式会回落到中文并显示提示。
 
 - 标题支持 `##` / `###`，会自动生成带锚点的目录（TOC）
 - 代码块使用 highlight.js 做语法高亮，支持 js/ts/css/html/json/bash/python/markdown
+- 数学公式用 KaTeX 渲染：行内 `$...$`，块级 `$$...$$`
 - 阅读时长按中英文字符数自动估算
 
 ## 动效设计
@@ -112,5 +114,5 @@ English body. 没有这段时，英文模式会回落到中文并显示提示。
 ## 说明
 
 - 没有引入任何外部字体或图片请求，离线也能完整显示（字体走系统栈）
-- 语言偏好存在 `localStorage` 的 `zhiyu.locale`，首次访问跟随浏览器语言
+- 语言偏好存在 `localStorage` 的 `nix.locale`，首次访问跟随浏览器语言
 - 博客内容在构建时通过 `import.meta.glob` 内联，新增文章后需要重新构建

@@ -101,7 +101,7 @@ const activeProject = ref<Project | null>(null)
                 <span class="h-2.5 w-2.5 rounded-full bg-white/15" />
                 <span class="h-2.5 w-2.5 rounded-full bg-white/10" />
                 <span class="h-2.5 w-2.5 rounded-full bg-white/[0.07]" />
-                <span class="ml-2 font-mono text-[10px] text-mist-500">~/studio/craft.ts</span>
+                <span class="ml-2 font-mono text-[10px] text-mist-500">~/nix/about.ts</span>
                 <span class="ml-auto inline-flex items-center gap-1.5 font-mono text-[9px] text-emerald-400/80">
                   <span class="h-1 w-1 rounded-full bg-emerald-400" />
                   live
@@ -110,16 +110,16 @@ const activeProject = ref<Project | null>(null)
 
               <pre
                 class="overflow-x-auto px-5 py-5 font-mono text-[11.5px] leading-[1.95] text-mist-300"
-              ><code><span class="text-violet-300">const</span> <span class="text-cyan-200">craft</span> = {
-  focus: <span class="text-emerald-300">'pixels &amp; motion'</span>,
-  stack: [<span class="text-emerald-300">'vue'</span>, <span class="text-emerald-300">'ts'</span>, <span class="text-emerald-300">'css'</span>],
-  shipping: <span class="text-amber-300">true</span>,
+              ><code><span class="text-violet-300">const</span> <span class="text-cyan-200">nix</span> = {
+  focus: <span class="text-emerald-300">'astronomy &amp; ML'</span>,
+  stack: [<span class="text-emerald-300">'vue'</span>, <span class="text-emerald-300">'python'</span>, <span class="text-emerald-300">'three'</span>],
+  learning: <span class="text-emerald-300">'MDP → GNN'</span>,
   curiosity: <span class="text-amber-300">Infinity</span>,
 }<span class="caret ml-0.5 inline-block h-3 w-[6px] translate-y-[1px] bg-violet-300/80" /></code></pre>
 
               <div class="flex items-center justify-between border-t border-white/[0.06] px-4 py-3">
                 <span class="font-mono text-[9px] tracking-wide text-mist-500">
-                  TypeScript · Vue 3 · Motion
+                  Vue 3 · Three.js · Python
                 </span>
                 <span class="flex items-center gap-1" aria-hidden="true">
                   <span class="h-1 w-6 rounded-full bg-gradient-to-r from-violet-400 to-cyan-300 opacity-80" />
@@ -134,7 +134,7 @@ const activeProject = ref<Project | null>(null)
                 <span class="grid h-6 w-6 place-items-center rounded-lg bg-violet-500/20 text-violet-300">
                   <Sparkles :size="13" />
                 </span>
-                <span class="font-mono text-[10px] text-mist-300">motion-first</span>
+                <span class="font-mono text-[10px] text-mist-300">canvas &amp; webgl</span>
               </div>
             </div>
 

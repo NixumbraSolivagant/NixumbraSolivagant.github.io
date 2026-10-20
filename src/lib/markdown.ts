@@ -10,6 +10,7 @@ import json from 'highlight.js/lib/languages/json'
 import bash from 'highlight.js/lib/languages/bash'
 import python from 'highlight.js/lib/languages/python'
 import markdown from 'highlight.js/lib/languages/markdown'
+import { mathPlugin } from './math'
 import type { TocItem } from './types'
 
 hljs.registerLanguage('javascript', javascript)
@@ -75,6 +76,8 @@ const md = new MarkdownIt({
   },
 })
 
+md.use(mathPlugin)
+
 md.use(anchor, {
   slugify,
   permalink: anchor.permalink.ariaHidden({ symbol: '#', placement: 'after' }),
@@ -109,14 +112,14 @@ export function renderMarkdown(source: string): RenderedMarkdown {
   for (let i = 0; i < tokens.length; i += 1) {
     const token = tokens[i]
     if (token.type !== 'heading_open') continue
-    if (token.tag !== 'h2' && token.tag !== 'h3') continue
+    if (token.tag !== 'h2') continue
     const id = token.attrGet('id')
     const inline = tokens[i + 1]
     if (id === null || !inline) continue
     toc.push({
       id: String(id),
       text: inline.content,
-      level: token.tag === 'h2' ? 2 : 3,
+      level: 2,
     })
   }
 

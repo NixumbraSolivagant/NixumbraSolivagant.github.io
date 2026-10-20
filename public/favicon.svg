@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ZL">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="N">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#a78bfa" />
@@ -10,7 +10,7 @@
   <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="url(#g)" opacity="0.92" />
   <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="none" stroke="#fff" stroke-opacity="0.25" />
   <path
-    d="M20 19h25L26 45h19"
+    d="M22 45V19l20 26V19"
     fill="none"
     stroke="#fff"
     stroke-width="4.5"

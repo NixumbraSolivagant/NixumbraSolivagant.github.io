@@ -1,6 +1,6 @@
 import type { Locale } from './types'
 
-export const LOCALE_STORAGE_KEY = 'zhiyu.locale'
+export const LOCALE_STORAGE_KEY = 'nix.locale'
 
 export function normalizeLocale(value: string | null | undefined): Locale | null {
   if (!value) return null

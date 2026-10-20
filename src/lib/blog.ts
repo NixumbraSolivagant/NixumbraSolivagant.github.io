@@ -130,4 +130,17 @@ export const allTags: string[] = Array.from(
   new Set(posts.flatMap((post) => post.tags)),
 ).sort()
 
+const tagCounts = new Map<string, number>()
+for (const post of posts) {
+  for (const tag of post.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)
+  }
+}
+
+/** 只把至少出现在两篇文章里的标签放进筛选栏，避免一排十几个标签 */
+export const popularTags: string[] = [...tagCounts.entries()]
+  .filter(([, count]) => count >= 2)
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  .map(([tag]) => tag)
+
 export const latestPosts = posts.slice(0, 3)

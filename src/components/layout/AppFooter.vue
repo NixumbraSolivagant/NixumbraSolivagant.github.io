@@ -140,7 +140,7 @@ const links = computed(() => [
       class="pointer-events-none relative -mb-4 select-none text-center font-display text-[clamp(4rem,17vw,15rem)] leading-[0.8] font-semibold tracking-[-0.05em] text-transparent"
       aria-hidden="true"
     >
-      <span class="bg-gradient-to-b from-white/[0.07] to-white/0 bg-clip-text">ZHIYU</span>
+      <span class="bg-gradient-to-b from-white/[0.07] to-white/0 bg-clip-text">NIX</span>
     </div>
   </footer>
 </template>

@@ -86,11 +86,14 @@ useSeo(() => ({ title: t('meta.aboutTitle'), description: t('meta.aboutDesc') })
           <Reveal :delay="0.08" :y="26">
             <GlassCard class="p-6">
               <div class="flex items-center gap-4">
-                <span
-                  class="grid h-16 w-16 place-items-center rounded-2xl border border-white/20 bg-gradient-to-br from-violet-500/90 via-indigo-500/60 to-cyan-400/70 text-xl font-semibold text-white shadow-lg shadow-violet-900/40"
-                >
-                  {{ profile.initials }}
-                </span>
+                <img
+                  :src="profile.avatar"
+                  :alt="tr(profile.name)"
+                  width="64"
+                  height="64"
+                  loading="lazy"
+                  class="h-16 w-16 rounded-2xl border border-white/15 object-cover shadow-lg shadow-violet-900/30"
+                />
                 <div>
                   <p class="text-lg font-semibold tracking-tight text-mist-50">
                     {{ tr(profile.name) }}
