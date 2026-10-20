@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#05060a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>林知语 · Creative Developer</title>
+    <meta
+      name="description"
+      content="林知语 — 前端工程师 / Creative Developer。做有质感的产品界面，也写关于网页、动效与工程的思考。"
+    />
+    <meta name="author" content="林知语" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="林知语 · Creative Developer" />
+    <meta
+      property="og:description"
+      content="前端工程师 / Creative Developer。做有质感的产品界面，也写关于网页、动效与工程的思考。"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script>
+      // 在首屏渲染前决定锚点滚动与主题，避免闪烁
+      document.documentElement.classList.add('js')
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <div style="padding: 48px; font-family: system-ui; color: #e5e7eb; background: #05060a">
+        本站需要启用 JavaScript 才能显示动画与内容。
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
